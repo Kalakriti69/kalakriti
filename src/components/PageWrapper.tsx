@@ -2,12 +2,14 @@
 
 import React, { useState } from "react";
 import Navbar from "./Navbar";
-import Hero from "./Hero";
-import ProblemsCarousel from "./ProblemsCarousel";
 import LoginPortal from "./LoginPortal";
 import LanguageSelector from "./LanguageSelector";
 
-export default function LandingPage() {
+interface PageWrapperProps {
+  children: React.ReactNode;
+}
+
+export default function PageWrapper({ children }: PageWrapperProps) {
   const [loginOpen, setLoginOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
@@ -26,11 +28,8 @@ export default function LandingPage() {
       {/* Header Navigation */}
       <Navbar onLoginClick={() => setLoginOpen(true)} />
 
-      {/* Main Hero Viewport */}
-      <main className="flex-1 w-full">
-        <Hero />
-        <ProblemsCarousel />
-      </main>
+      {/* Main Page Content */}
+      <main className="flex-1 w-full">{children}</main>
 
       {/* Premium Footer */}
       <footer className="bg-slate-900 text-white py-16 border-t border-slate-800 relative z-20">
@@ -84,7 +83,7 @@ export default function LandingPage() {
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-100 bg-slate-900 text-white border border-slate-800 px-5 py-3 rounded-full shadow-2xl text-xs font-bold flex items-center gap-2 animate-bounce">
           <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
-          {toastMessage}
+          🌐 Preferred Language Selected
         </div>
       )}
 

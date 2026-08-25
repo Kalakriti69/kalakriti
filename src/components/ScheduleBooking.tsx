@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 import { MOCK_CENTERS } from "./ProcurementCenters";
 
 interface ScheduleBookingProps {
@@ -30,6 +31,7 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
   const [weight, setWeight] = useState<number>(30); // in quintals
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState("");
+  const { t } = useTranslation();
   
   // Receipt details
   const [receipt, setReceipt] = useState<any>(null);
@@ -38,7 +40,6 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
   useEffect(() => {
     if (preselectedCenter) {
       setCenter(preselectedCenter);
-      // Automatically focus or scroll to scheduling section if preselected center changes
       setStep(1);
     }
   }, [preselectedCenter]);
@@ -81,7 +82,6 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // Finalize and generate receipt
       const randomToken = "KS-" + Math.floor(100000 + Math.random() * 900000);
       const bookingData = {
         center,
@@ -116,11 +116,11 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Book Schedule Slot
+            {t("sched_title")}
           </h2>
           <div className="h-1.5 w-24 bg-emerald-500 mx-auto my-4 rounded-full"></div>
           <p className="text-slate-600">
-            Secure your spot in line to deliver crops without long wait times. Generate your digit token in 3 easy steps.
+            {t("sched_desc")}
           </p>
         </div>
 
@@ -130,9 +130,9 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
           {step <= 3 && (
             <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
               {[
-                { s: 1, label: "Center" },
-                { s: 2, label: "Crop & Weight" },
-                { s: 3, label: "Date & Time" },
+                { s: 1, label: t("sched_step_center") },
+                { s: 2, label: t("sched_step_crop") },
+                { s: 3, label: t("sched_step_date") },
               ].map((item) => (
                 <div key={item.s} className="flex items-center space-x-2">
                   <div
@@ -160,40 +160,45 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
           <div className="min-h-[250px] mb-8">
             {step === 1 && (
               <div className="space-y-6 animate-fade-in-up">
-                <h3 className="text-lg font-bold text-slate-800">Step 1: Select your nearby Center</h3>
+                <h3 className="text-lg font-bold text-slate-800">{t("sched_step_1_title")}</h3>
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-slate-500 uppercase tracking-wide">
-                    Procurement Center
+                    {t("sched_step_center")}
                   </label>
                   <div className="grid grid-cols-1 gap-3">
-                    {MOCK_CENTERS.map((c) => (
-                      <div
-                        key={c.id}
-                        onClick={() => setCenter(c.name)}
-                        className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex justify-between items-center ${
-                          center === c.name
-                            ? "border-emerald-500 bg-emerald-50/50 shadow-sm"
-                            : "border-slate-100 hover:border-slate-200 hover:bg-slate-50"
-                        }`}
-                      >
-                        <div>
-                          <p className="font-bold text-slate-900">{c.name}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">{c.location}</p>
+                    {MOCK_CENTERS.map((c, idx) => {
+                      const localizedCenterName = t(`center_${idx + 1}_name`);
+                      const localizedLoc = t(`center_${idx + 1}_loc`);
+
+                      return (
+                        <div
+                          key={c.id}
+                          onClick={() => setCenter(c.name)}
+                          className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex justify-between items-center ${
+                            center === c.name
+                              ? "border-emerald-500 bg-emerald-50/50 shadow-sm"
+                              : "border-slate-100 hover:border-slate-200 hover:bg-slate-50"
+                          }`}
+                        >
+                          <div>
+                            <p className="font-bold text-slate-900">{localizedCenterName}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">{localizedLoc}</p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                              {c.distance}
+                            </span>
+                            <span
+                              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                                center === c.name ? "border-emerald-500 bg-emerald-500" : "border-slate-300"
+                              }`}
+                            >
+                              {center === c.name && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
-                            {c.distance}
-                          </span>
-                          <span
-                            className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                              center === c.name ? "border-emerald-500 bg-emerald-500" : "border-slate-300"
-                            }`}
-                          >
-                            {center === c.name && <span className="w-1.5 h-1.5 bg-white rounded-full"></span>}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -201,12 +206,12 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
 
             {step === 2 && (
               <div className="space-y-8 animate-fade-in-up">
-                <h3 className="text-lg font-bold text-slate-800">Step 2: Enter crop details</h3>
+                <h3 className="text-lg font-bold text-slate-800">{t("sched_step_2_title")}</h3>
                 
                 {/* Crop Type Select */}
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-slate-500 uppercase tracking-wide">
-                    Crop Variety
+                    {t("sched_step_2_crop")}
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {["Paddy", "Wheat", "Maize", "Mustard"].map((item) => (
@@ -220,7 +225,7 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                         }`}
                       >
                         <span className="block text-xl mb-1">🌾</span>
-                        <span className="text-sm">{item}</span>
+                        <span className="text-sm">{t("crop_" + item)}</span>
                       </div>
                     ))}
                   </div>
@@ -230,10 +235,10 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                 <div className="space-y-4 pt-2">
                   <div className="flex items-center justify-between">
                     <label className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-                      Estimated Weight (Quintals)
+                      {t("sched_step_2_weight")}
                     </label>
                     <span className="text-lg font-extrabold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100">
-                      {weight} Quintals <span className="text-xs font-normal text-slate-500">({weight * 100} kg)</span>
+                      {weight} Qtl <span className="text-xs font-normal text-slate-500">({weight * 100} kg)</span>
                     </span>
                   </div>
 
@@ -247,10 +252,10 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                     className="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none"
                   />
                   <div className="flex justify-between text-xs text-slate-400 font-semibold px-1">
-                    <span>5 Qtl (Min)</span>
+                    <span>5 Qtl {t("sched_step_2_min")}</span>
                     <span>50 Qtl</span>
                     <span>100 Qtl</span>
-                    <span>150 Qtl (Max)</span>
+                    <span>150 Qtl {t("sched_step_2_max")}</span>
                   </div>
                 </div>
               </div>
@@ -258,12 +263,12 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
 
             {step === 3 && (
               <div className="space-y-6 animate-fade-in-up">
-                <h3 className="text-lg font-bold text-slate-800">Step 3: Select Date & Time Slot</h3>
+                <h3 className="text-lg font-bold text-slate-800">{t("sched_step_3_title")}</h3>
 
                 {/* Date Slider */}
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-slate-500 uppercase tracking-wide">
-                    Delivery Date
+                    {t("sched_step_3_date")}
                   </label>
                   <div className="flex space-x-2 overflow-x-auto pb-2 scrollbar-thin">
                     {dateOptions.map((opt) => (
@@ -287,7 +292,7 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                 {/* Time Slots Grid */}
                 <div className="space-y-3">
                   <label className="block text-sm font-semibold text-slate-500 uppercase tracking-wide">
-                    Available Time Slots
+                    {t("sched_step_3_slots")}
                   </label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {TIME_SLOTS.map((slot) => {
@@ -349,42 +354,43 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                   </svg>
                 </div>
                 
-                <h3 className="text-2xl font-black text-slate-900">Schedule Booked Successfully!</h3>
+                <h3 className="text-2xl font-black text-slate-900">{t("sched_success")}</h3>
                 <p className="text-slate-500 max-w-md mx-auto text-sm">
-                  Your token has been generated. Please arrive at the center within your booked hours. A confirmation SMS has been sent to your phone.
+                  {t("sched_success_desc")}
                 </p>
 
                 {/* Digital Token Receipt Mockup */}
                 <div className="max-w-md mx-auto bg-slate-50 border border-slate-200/80 rounded-2xl p-6 text-left relative overflow-hidden shadow-inner">
-                  {/* Decorative corner indicators */}
                   <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-full flex items-center justify-center font-bold text-emerald-800 text-xs">
                     ACTIVE
                   </div>
 
                   <div className="border-b border-dashed border-slate-300 pb-4 mb-4">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Token ID</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t("sched_ticket_token")}</span>
                     <p className="text-2xl font-black text-emerald-600 tracking-wider mt-0.5">{receipt.tokenId}</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-xs font-semibold">
                     <div>
-                      <span className="text-slate-400 block mb-0.5">PROCUREMENT CENTER</span>
-                      <span className="text-slate-800 block text-sm font-bold leading-tight">{receipt.center}</span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block mb-0.5">CROP & WEIGHT</span>
-                      <span className="text-slate-800 block text-sm font-bold">
-                        🌾 {receipt.crop} ({receipt.weight} Qtl)
+                      <span className="text-slate-400 block mb-0.5">{t("sched_ticket_center")}</span>
+                      <span className="text-slate-800 block text-sm font-bold leading-tight">
+                        {t(`center_${MOCK_CENTERS.findIndex(c => c.name === receipt.center) + 1}_name`)}
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block mb-0.5">DATE OF DELIVERY</span>
+                      <span className="text-slate-400 block mb-0.5">{t("sched_ticket_crop")}</span>
+                      <span className="text-slate-800 block text-sm font-bold">
+                        🌾 {t("crop_" + receipt.crop)} ({receipt.weight} Qtl)
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block mb-0.5">{t("sched_ticket_date")}</span>
                       <span className="text-slate-800 block text-sm font-bold">
                         📅 {receipt.date}
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block mb-0.5">DELIVERY SLOT</span>
+                      <span className="text-slate-400 block mb-0.5">{t("sched_ticket_slot")}</span>
                       <span className="text-slate-800 block text-sm font-bold">
                         ⏰ {receipt.timeSlot}
                       </span>
@@ -396,10 +402,9 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                     <div>
                       <span className="text-[10px] text-slate-400 block font-bold uppercase">Status</span>
                       <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-0.5 font-bold text-[10px] mt-1 inline-block">
-                        Slot Verified
+                        {t("sched_ticket_status")}
                       </span>
                     </div>
-                    {/* Simulated barcode blocks */}
                     <div className="flex flex-col items-end">
                       <div className="w-24 h-6 bg-slate-900 relative flex items-center justify-between px-1.5 py-1 rounded">
                         <div className="h-full w-1 bg-white"></div>
@@ -410,7 +415,7 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                         <div className="h-full w-1.5 bg-white"></div>
                         <div className="h-full w-0.5 bg-white"></div>
                       </div>
-                      <span className="text-[9px] text-slate-400 font-mono mt-1">Scan at gate entry</span>
+                      <span className="text-[9px] text-slate-400 font-mono mt-1">{t("sched_ticket_scan")}</span>
                     </div>
                   </div>
                 </div>
@@ -421,13 +426,13 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                     onClick={() => window.print()}
                     className="flex-1 bg-slate-900 hover:bg-emerald-600 text-white font-bold text-sm px-6 py-3 rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
-                    🖨️ Print Ticket
+                    🖨️ {t("sched_btn_print")}
                   </button>
                   <button
                     onClick={resetForm}
                     className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm px-6 py-3 rounded-full shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
                   >
-                    🔄 Book Another
+                    🔄 {t("sched_btn_another")}
                   </button>
                 </div>
               </div>
@@ -446,14 +451,14 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                     : "text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 cursor-pointer"
                 }`}
               >
-                Previous Step
+                {t("sched_btn_prev")}
               </button>
 
               <button
                 onClick={handleNextStep}
                 className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm px-7 py-3 rounded-full shadow-md transition-all duration-300 cursor-pointer flex items-center gap-1"
               >
-                {step === 3 ? "Generate Ticket" : "Next Step"}
+                {step === 3 ? t("sched_btn_gen") : t("sched_btn_next")}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
