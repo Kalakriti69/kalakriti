@@ -17,20 +17,20 @@ export default function Hero() {
 
   return (
     <section className="relative w-full min-h-[90vh] pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden flex items-center bg-slate-950">
-      {/* Blurred Isolated Background Image - Light blur to keep the farmers visible */}
+      {/* Clean Crisp Background Image - No Blur */}
       <div 
-        className="absolute inset-0 bg-cover bg-center filter blur-[1.5px] scale-[1.02] z-0 transition-all duration-500"
+        className="absolute inset-0 bg-cover bg-center z-0 transition-all duration-500"
         style={{ backgroundImage: "url('/farmers_field.jpg')" }}
       ></div>
 
-      {/* Dark Vignette and Gradient Overlays for Peak Text Visibility and Image Contrast */}
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/30 to-slate-950/70 z-10"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_30%,_#020617_85%)] z-10 opacity-55"></div>
+      {/* Directional Gradient Overlay - Dark on the left for text contrast, fading to fully transparent on the right */}
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/45 to-transparent z-10"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Text Content Left - Wrapped in a Premium Fully Transparent Glass Container */}
-          <div className="lg:col-span-6 flex flex-col space-y-6 animate-fade-in-up bg-transparent backdrop-blur-md border border-white/15 p-6 sm:p-8 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.35)] shadow-blue-500/5">
+          
+          {/* Left Column: Modern Minimalist Typography (No Card Background) */}
+          <div className="lg:col-span-6 flex flex-col space-y-6 animate-fade-in-up">
             <div className="inline-flex items-center space-x-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full px-3 py-1.5 w-fit">
               <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
               <span className="text-emerald-300 font-semibold text-xs tracking-wide uppercase text-shadow-sm">
@@ -38,15 +38,15 @@ export default function Hero() {
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white leading-tight text-shadow-md">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight text-shadow-md">
               {t("hero_title")} <span className="text-emerald-400">KisanSetu</span>
             </h1>
 
-            <p className="text-base sm:text-lg text-slate-200 leading-relaxed text-shadow-sm">
+            <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-xl text-shadow-sm">
               {t("hero_desc")}
             </p>
 
-            {/* CTA Buttons */}
+            {/* Modern CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-2">
               <a
                 href="/scheduler"
@@ -77,7 +77,7 @@ export default function Hero() {
             </div>
 
             {/* Quick Metrics */}
-            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/10 text-shadow-sm">
+            <div className="grid grid-cols-3 gap-6 pt-6 border-t border-white/15 max-w-md text-shadow-sm">
               <div>
                 <span className="block text-2xl font-extrabold text-emerald-400">45+</span>
                 <span className="text-xs text-slate-300 font-bold">{t("hero_hubs")}</span>
@@ -93,73 +93,78 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Interactive Live Mandi & Weather Ticker Widget Right - Premium Fully Transparent Glass */}
-          <div className="lg:col-span-6 relative flex justify-center items-center">
-            <div className="w-full max-w-md bg-transparent backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-white/15 shadow-[0_8px_32px_0_rgba(0,0,0,0.35)] shadow-blue-500/5 space-y-6 text-white animate-float">
-              {/* Widget Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-white/10">
-                <h4 className="font-bold text-base text-white tracking-wide">🌾 {t("hero_mandi_rates")}</h4>
-                <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded flex items-center gap-1.5 animate-pulse">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+          {/* Right Column: Sleek Floating Mandi Ticker (No Card Background) */}
+          <div className="lg:col-span-6 relative flex justify-center lg:justify-end items-center">
+            <div className="w-full max-w-md space-y-6 text-white">
+              
+              {/* Header Info */}
+              <div className="flex items-center justify-between pb-3 border-b border-white/15">
+                <h4 className="font-bold text-sm text-slate-200 tracking-wider uppercase">🌾 {t("hero_mandi_rates")}</h4>
+                <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-400/10 border border-emerald-400/20 px-2 py-0.5 rounded flex items-center gap-1">
+                  <span className="h-1 w-1 rounded-full bg-emerald-400"></span>
                   {t("hero_msp")}
                 </span>
               </div>
 
-              {/* Ticker rates */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
+              {/* Ticker Rates: Borderless dividers */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center py-3 border-b border-white/5">
                   <div className="flex items-center space-x-3">
-                    <span className="text-xl">🌾</span>
+                    <span className="text-lg">🌾</span>
                     <div>
-                      <span className="block text-sm font-bold text-white">{labels.paddy}</span>
+                      <span className="block text-sm font-semibold text-white">{labels.paddy}</span>
                       <span className="block text-[10px] text-slate-400">{t("hero_mandi_price")}</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="block text-sm font-black text-white">₹2,300 / Qtl</span>
+                    <span className="block text-sm font-extrabold text-white">₹2,300 / Qtl</span>
                     <span className="block text-[10px] text-emerald-400 font-bold">▲ +₹50 {labels.today}</span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
+                <div className="flex justify-between items-center py-3 border-b border-white/5">
                   <div className="flex items-center space-x-3">
-                    <span className="text-xl">🌾</span>
+                    <span className="text-lg">🌾</span>
                     <div>
-                      <span className="block text-sm font-bold text-white">{labels.wheat}</span>
+                      <span className="block text-sm font-semibold text-white">{labels.wheat}</span>
                       <span className="block text-[10px] text-slate-400">{t("hero_mandi_price")}</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="block text-sm font-black text-white">₹2,275 / Qtl</span>
+                    <span className="block text-sm font-extrabold text-white">₹2,275 / Qtl</span>
                     <span className="block text-[10px] text-slate-300 font-bold">{labels.stable}</span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
+                <div className="flex justify-between items-center py-3 border-b border-white/5">
                   <div className="flex items-center space-x-3">
-                    <span className="text-xl">🌾</span>
+                    <span className="text-lg">🌾</span>
                     <div>
-                      <span className="block text-sm font-bold text-white">{labels.mustard}</span>
+                      <span className="block text-sm font-semibold text-white">{labels.mustard}</span>
                       <span className="block text-[10px] text-slate-400">{t("hero_mandi_price")}</span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="block text-sm font-black text-white">₹5,450 / Qtl</span>
+                    <span className="block text-sm font-extrabold text-white">₹5,450 / Qtl</span>
                     <span className="block text-[10px] text-emerald-400 font-bold">▲ +₹120 {labels.today}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Weather & Advisory */}
-              <div className="pt-4 border-t border-white/10 space-y-3">
-                <span className="text-[10px] text-slate-400 block font-semibold uppercase tracking-wider">{t("hero_weather_adv")}</span>
-                <div className="flex items-start space-x-3 text-xs bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl text-emerald-300 font-semibold leading-relaxed">
-                  <span className="text-lg shrink-0">☀️</span>
-                  <p>{t("hero_weather_desc")}</p>
+              {/* Weather & Advisory Banner */}
+              <div className="pt-2">
+                <div className="flex items-start space-x-3 text-xs bg-slate-900/40 border border-white/10 p-4 rounded-2xl text-slate-200 leading-relaxed backdrop-blur-sm">
+                  <span className="text-base shrink-0">☀️</span>
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-slate-400 block font-bold uppercase tracking-wider">{t("hero_weather_adv")}</span>
+                    <p className="font-medium">{t("hero_weather_desc")}</p>
+                  </div>
                 </div>
               </div>
+
             </div>
           </div>
+          
         </div>
       </div>
     </section>
