@@ -16,10 +16,10 @@ export default function Hero() {
   const labels = tickerCrops[lang] || tickerCrops["en"];
 
   return (
-    <section className="relative w-full min-h-[90vh] pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden flex items-center bg-slate-950">
-      {/* Clean Crisp Background Image - No Blur */}
+    <section className="relative w-full min-h-[90vh] pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden flex items-center bg-slate-950">
+      {/* Clean Crisp Background Image - Fixed Viewport Position for Parallax Effect */}
       <div 
-        className="absolute inset-0 bg-cover bg-center z-0 transition-all duration-500"
+        className="fixed inset-0 bg-cover bg-center z-0 transition-all duration-500"
         style={{ backgroundImage: "url('/farmers_field.jpg')" }}
       ></div>
 
@@ -31,12 +31,6 @@ export default function Hero() {
           
           {/* Left Column: Modern Minimalist Typography (No Card Background) */}
           <div className="lg:col-span-6 flex flex-col space-y-6 animate-fade-in-up">
-            <div className="inline-flex items-center space-x-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full px-3 py-1.5 w-fit">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
-              <span className="text-emerald-300 font-semibold text-xs tracking-wide uppercase text-shadow-sm">
-                {t("hero_badge")}
-              </span>
-            </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight text-shadow-md">
               {t("hero_title")} <span className="text-emerald-400">KisanSetu</span>

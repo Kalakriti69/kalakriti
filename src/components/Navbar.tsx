@@ -25,7 +25,7 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
     <>
       {/* Backdrop blur overlay for mobile menu */}
       {mobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-950/50 backdrop-blur-md z-40 md:hidden transition-all duration-300"
           onClick={() => setMobileMenuOpen(false)}
         ></div>
@@ -33,13 +33,12 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
 
       <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8 max-w-7xl mx-auto transition-all duration-300">
         <nav
-          className={`w-full transition-all duration-300 ${
-            mobileMenuOpen
-              ? "rounded-3xl bg-slate-950/90 backdrop-blur-xl border border-blue-500/30 shadow-[0_8px_32px_0_rgba(14,165,233,0.15)] py-4 px-6"
+          className={`w-full transition-all duration-300 ${mobileMenuOpen
+              ? "rounded-3xl bg-slate-950/90 backdrop-blur-xl border border-blue-500/30 shadow-[0_8px_32px_0_rgba(14,165,233,0.15)] py-3.5 px-5"
               : scrolled
-              ? "rounded-2xl md:rounded-full bg-slate-950/75 backdrop-blur-md border border-blue-500/20 shadow-[0_8px_32px_0_rgba(14,165,233,0.1)] py-3 px-6"
-              : "rounded-2xl md:rounded-full bg-slate-950/60 backdrop-blur-sm border border-blue-500/15 py-4 px-8"
-          }`}
+                ? "rounded-2xl md:rounded-full bg-slate-950/75 backdrop-blur-md border border-blue-500/20 shadow-[0_8px_32px_0_rgba(14,165,233,0.1)] py-2 md:py-2.5 px-4 md:px-6"
+                : "rounded-2xl md:rounded-full bg-slate-950/60 backdrop-blur-sm border border-blue-500/15 py-2.5 md:py-3.5 px-5 md:px-8"
+            }`}
         >
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -135,11 +134,10 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
           </div>
 
           {/* Mobile Dropdown Menu with Slide Down effect */}
-          <div className={`md:hidden flex flex-col space-y-4 px-2 overflow-hidden transition-all duration-500 ease-in-out ${
-            mobileMenuOpen
+          <div className={`md:hidden flex flex-col space-y-4 px-2 overflow-hidden transition-all duration-500 ease-in-out ${mobileMenuOpen
               ? "max-h-[500px] opacity-100 mt-4 pt-4 border-t border-slate-800/80 pb-2"
               : "max-h-0 opacity-0 pointer-events-none mt-0 pt-0 border-t-0 pb-0"
-          }`}>
+            }`}>
             <a
               href="/centers"
               onClick={() => setMobileMenuOpen(false)}
@@ -294,7 +292,7 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                   <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     🔐 Staff Access
                   </span>
-                  
+
                   <button
                     onClick={() => {
                       setSettingsOpen(false);
