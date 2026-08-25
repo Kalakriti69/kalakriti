@@ -1,0 +1,132 @@
+"use client";
+
+import React, { useState } from "react";
+import Navbar from "./Navbar";
+import Hero from "./Hero";
+import ProcurementCenters from "./ProcurementCenters";
+import ScheduleBooking from "./ScheduleBooking";
+import LiveQueue from "./LiveQueue";
+import LoginPortal from "./LoginPortal";
+import LanguageSelector from "./LanguageSelector";
+
+export default function LandingPage() {
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [preselectedCenter, setPreselectedCenter] = useState("");
+  const [activeBooking, setActiveBooking] = useState<any>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
+
+  const handleLanguageSelect = (lang: string) => {
+    setSelectedLanguage(lang);
+    setToastMessage(`🌐 Preferred Language: ${lang}`);
+    // Clear toast message after 4 seconds
+    setTimeout(() => {
+      setToastMessage("");
+    }, 4000);
+  };
+
+  const handleSelectCenter = (centerName: string) => {
+    setPreselectedCenter(centerName);
+    // Smooth scroll to scheduler section
+    const element = document.getElementById("scheduler");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleBookingSuccess = (bookingDetails: any) => {
+    setActiveBooking(bookingDetails);
+    // Smooth scroll to live queue monitor section
+    setTimeout(() => {
+      const element = document.getElementById("queue");
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 1500);
+  };
+
+  return (
+    <div className="flex-1 w-full min-h-screen bg-white">
+      {/* Navigation */}
+      <Navbar onLoginClick={() => setLoginOpen(true)} />
+
+      {/* Main Sections */}
+      <main className="w-full">
+        {/* Hero Landing */}
+        <Hero />
+
+        {/* Procurement Centers locator */}
+        <ProcurementCenters onSelectCenter={handleSelectCenter} />
+
+        {/* Multi-step scheduler booking */}
+        <ScheduleBooking
+          preselectedCenter={preselectedCenter}
+          onBookingSuccess={handleBookingSuccess}
+        />
+
+        {/* Real-time queue tracker */}
+        <LiveQueue activeBooking={activeBooking} />
+      </main>
+
+      {/* Premium Footer */}
+      <footer className="bg-slate-900 text-white py-16 border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <div className="space-y-4">
+              <span className="text-2xl font-black tracking-tight">
+                <span className="text-emerald-400">Kisan</span>Setu
+              </span>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Empowering farmers with digitised scheduling, queue tracking, and direct mandi linkage. Built for transparent Indian agriculture.
+              </p>
+            </div>
+            
+            <div>
+              <h5 className="text-sm font-bold uppercase tracking-wider text-emerald-400 mb-4">Farmer Resources</h5>
+              <ul className="space-y-2.5 text-sm text-slate-300 font-semibold">
+                <li><a href="#centers" className="hover:text-white transition-colors">Find Centers Near Me</a></li>
+                <li><a href="#scheduler" className="hover:text-white transition-colors">Book Delivery Token</a></li>
+                <li><a href="#queue" className="hover:text-white transition-colors">Live Queue Tracker</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 className="text-sm font-bold uppercase tracking-wider text-emerald-400 mb-4">Governing Support</h5>
+              <ul className="space-y-2.5 text-sm text-slate-300 font-semibold">
+                <li><a href="#" className="hover:text-white transition-colors">PM-Kisan Portal</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">MSP Crop Schemes</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">DBT Bank Registration</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h5 className="text-sm font-bold uppercase tracking-wider text-emerald-400 mb-4">Emergency Mandi Support</h5>
+              <p className="text-sm text-slate-300">
+                Facing issues with booking or slot delivery? Contact our 24/7 farmer support helpline.
+              </p>
+              <p className="text-emerald-400 font-bold text-lg mt-3">
+                📞 1800-420-1234 (Toll-Free)
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-slate-800 text-center text-xs text-slate-500 font-bold">
+            <p>© {new Date().getFullYear()} KisanSetu Portal. Designed in support of digital agriculture initiatives.</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-100 bg-slate-900 text-white border border-slate-800 px-5 py-3 rounded-full shadow-2xl text-xs font-bold flex items-center gap-2 animate-bounce">
+          <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+          {toastMessage}
+        </div>
+      )}
+
+      {/* Modals & Popups */}
+      <LoginPortal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+      <LanguageSelector onLanguageSelect={handleLanguageSelect} />
+    </div>
+  );
+}
