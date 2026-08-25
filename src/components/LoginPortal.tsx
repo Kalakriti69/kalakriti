@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface LoginPortalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   if (!isOpen) return null;
 
@@ -22,7 +24,6 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
       return;
     }
     setIsSubmitting(true);
-    // Simulate API delay
     setTimeout(() => {
       setIsSubmitting(false);
       setStep("otp");
@@ -36,7 +37,6 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
       return;
     }
     setIsSubmitting(true);
-    // Simulate API delay
     setTimeout(() => {
       setIsSubmitting(false);
       setStep("dashboard");
@@ -50,7 +50,6 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
     onClose();
   };
 
-  // Mock Dashboard Data for Farmers
   const MOCK_FARMER = {
     name: "Ramesh Kumar",
     state: "Uttar Pradesh",
@@ -76,7 +75,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
               <span className="text-emerald-400">Kisan</span>Setu
             </span>
             <span className="text-slate-400 text-xs px-2 py-0.5 rounded-full border border-slate-800 bg-slate-850">
-              {step === "dashboard" ? "Farmer Dashboard" : "Secure Login Portal"}
+              {step === "dashboard" ? "Farmer Dashboard" : t("nav_login_portal")}
             </span>
           </div>
 
@@ -103,16 +102,16 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
             <div className="max-w-md mx-auto py-8 space-y-6">
               <div className="text-center space-y-2">
                 <span className="text-4xl">🌾</span>
-                <h3 className="text-2xl font-black text-slate-900">Farmer's Portal Login</h3>
+                <h3 className="text-2xl font-black text-slate-900">{t("login_title")}</h3>
                 <p className="text-sm text-slate-500">
-                  Enter your mobile number registered with PM-Kisan or Mandi card. We will send a 4-digit OTP code to log in.
+                  {t("login_desc")}
                 </p>
               </div>
 
               <form onSubmit={handleSendOtp} className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
-                    Mobile Number
+                    {t("login_phone")}
                   </label>
                   <div className="relative">
                     <span className="absolute inset-y-0 left-0 pl-4 flex items-center font-bold text-slate-400 text-sm">
@@ -135,7 +134,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                   disabled={isSubmitting}
                   className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm py-4 rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center"
                 >
-                  {isSubmitting ? "Sending OTP..." : "Get OTP Verification Code"}
+                  {isSubmitting ? t("login_sending") : t("login_btn_otp")}
                 </button>
               </form>
             </div>
@@ -145,17 +144,16 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
             <div className="max-w-md mx-auto py-8 space-y-6">
               <div className="text-center space-y-2">
                 <span className="text-4xl">🔐</span>
-                <h3 className="text-2xl font-black text-slate-900">Enter OTP Verification</h3>
+                <h3 className="text-2xl font-black text-slate-900">{t("login_otp_title")}</h3>
                 <p className="text-sm text-slate-500">
-                  Verification OTP code sent to <span className="font-bold text-slate-800">+91 {phoneNumber}</span>. 
-                  (Use code <strong className="text-emerald-600 font-extrabold">1234</strong> for quick demo access).
+                  {t("login_otp_desc")}
                 </p>
               </div>
 
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
-                    4-Digit Verification Code
+                    {t("login_otp_label")}
                   </label>
                   <input
                     type="password"
@@ -173,7 +171,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                   disabled={isSubmitting}
                   className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm py-4 rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center"
                 >
-                  {isSubmitting ? "Verifying..." : "Verify & Access Account"}
+                  {isSubmitting ? t("login_otp_verifying") : t("login_otp_verify")}
                 </button>
               </form>
 
@@ -182,7 +180,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                   onClick={() => setStep("phone")}
                   className="text-xs font-bold text-slate-500 hover:text-emerald-600"
                 >
-                  ← Change Mobile Number
+                  ← {t("login_otp_change")}
                 </button>
               </div>
             </div>
@@ -208,7 +206,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
 
               {/* Active Bookings Section */}
               <div className="space-y-3">
-                <h4 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Active Token Delivery Booking</h4>
+                <h4 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">{t("dash_active")}</h4>
                 {MOCK_FARMER.activeBookings.map((b, idx) => (
                   <div key={idx} className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
                     <div className="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -245,7 +243,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
 
               {/* DBT Completed Payouts Transactions */}
               <div className="space-y-3">
-                <h4 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Mandi Sales & DBT Payout Invoices</h4>
+                <h4 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">{t("dash_mandi")}</h4>
                 <div className="space-y-3">
                   {MOCK_FARMER.salesHistory.map((s, idx) => (
                     <div
@@ -266,7 +264,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                         <span className="text-base font-black text-slate-800">{s.amount}</span>
                         <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded mt-1 flex items-center gap-1">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                          {s.payment} (Direct Benefit Transfer)
+                          {s.payment} ({t("dash_dbt")})
                         </span>
                       </div>
                     </div>

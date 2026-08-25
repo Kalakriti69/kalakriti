@@ -40,8 +40,12 @@ export default function LanguageSelector({ onLanguageSelect }: LanguageSelectorP
   const [isVisible, setIsVisible] = useState(false);
   const [activeTranslationIndex, setActiveTranslationIndex] = useState(0);
 
-  // Trigger pop-up after 2 seconds
+  // Trigger pop-up after 2 seconds only if no language is saved in localStorage
   useEffect(() => {
+    const saved = localStorage.getItem("kisanSetu_lang");
+    if (saved) {
+      return; // Do not show popup
+    }
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 2000);
@@ -60,8 +64,11 @@ export default function LanguageSelector({ onLanguageSelect }: LanguageSelectorP
   if (!isVisible) return null;
 
   const handleSelection = (langName: string) => {
+    localStorage.setItem("kisanSetu_lang", langName);
     setIsVisible(false);
     onLanguageSelect(langName);
+    // Notify other components of language change
+    window.dispatchEvent(new Event("kisanSetu_language_changed"));
   };
 
   return (

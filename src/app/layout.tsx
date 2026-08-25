@@ -11,6 +11,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className="h-full antialiased"
+      data-scroll-behavior="smooth"
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
