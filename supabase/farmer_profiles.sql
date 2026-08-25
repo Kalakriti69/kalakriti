@@ -1,5 +1,5 @@
 create table if not exists public.farmer_profiles (
-  phone text primary key check (phone ~ '^\\+91[6-9][0-9]{9}$'),
+  phone text primary key check (phone ~ '^\+91[6-9][0-9]{9}$'),
   name text not null check (char_length(name) between 2 and 100),
   location text not null check (char_length(location) between 2 and 200),
   area numeric(12, 2) not null check (area > 0 and area <= 100000),

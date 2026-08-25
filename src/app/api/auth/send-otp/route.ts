@@ -29,8 +29,14 @@ export async function POST(request: NextRequest) {
   });
 
   if (!response.ok) {
-    console.error("Twilio send OTP failed:", response.status);
-    return NextResponse.json({ success: false, error: "Could not send OTP. Please try again." }, { status: 502 });
+    const providerError = await response.json().catch(() => null) as { code?: number; message?: string } | null;
+    console.error("Twilio send OTP failed:", response.status, providerError?.code);
+    const error = providerError?.code === 20003
+      ? "Twilio is not allowing SMS on this Trial account. Upgrade the Twilio account, then try again."
+      : providerError?.code === 21608
+        ? "This phone number is not verified on the Twilio Trial account. Verify it in Twilio Console, then try again."
+        : "Could not send OTP. Please try again.";
+    return NextResponse.json({ success: false, error }, { status: 502 });
   }
 
   return NextResponse.json({ success: true });

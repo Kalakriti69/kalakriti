@@ -29,7 +29,10 @@ export async function GET(request: NextRequest) {
 
   if (error) {
     console.error("Farmer profile lookup failed:", error.message);
-    return NextResponse.json({ success: false, error: "Could not load farmer profile." }, { status: 500 });
+    const errorMessage = error.code === "PGRST205"
+      ? "Farmer profiles are not set up yet. Run supabase/farmer_profiles.sql in the Supabase SQL Editor."
+      : "Could not load farmer profile.";
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
   return NextResponse.json({ success: true, profile: data });
 }
@@ -51,7 +54,10 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     console.error("Farmer profile save failed:", error.message);
-    return NextResponse.json({ success: false, error: "Could not save farmer profile." }, { status: 500 });
+    const errorMessage = error.code === "PGRST205"
+      ? "Farmer profiles are not set up yet. Run supabase/farmer_profiles.sql in the Supabase SQL Editor."
+      : "Could not save farmer profile.";
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
   }
   return NextResponse.json({ success: true, profile: data });
 }
