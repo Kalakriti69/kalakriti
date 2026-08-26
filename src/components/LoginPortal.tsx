@@ -148,7 +148,12 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
       <div className="bg-white rounded-3xl w-full max-w-2xl border border-slate-100 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-fade-in-up">
         {/* Modal Header */}
         <div className="bg-slate-900 text-white px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2.5">
+            <img
+              src="/icon.svg"
+              alt="KisanSetu Logo"
+              className="w-7 h-7 rounded-lg shadow-sm"
+            />
             <span className="text-xl font-bold tracking-tight">
               <span className="text-emerald-400">Kisan</span>Setu
             </span>

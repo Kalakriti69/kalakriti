@@ -37,8 +37,15 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             <div className="space-y-4">
-              <a href="/" className="text-2xl font-black tracking-tight block">
-                <span className="text-emerald-400">Kisan</span>Setu
+              <a href="/" className="flex items-center space-x-2.5">
+                <img
+                  src="/icon.svg"
+                  alt="KisanSetu Logo"
+                  className="w-8 h-8 rounded-xl shadow-md shadow-emerald-500/20"
+                />
+                <span className="text-2xl font-black tracking-tight block">
+                  <span className="text-emerald-400">Kisan</span>Setu
+                </span>
               </a>
               <p className="text-sm text-slate-400 leading-relaxed">
                 Empowering farmers with digitised scheduling, queue tracking, and direct mandi linkage. Built for transparent Indian agriculture.
