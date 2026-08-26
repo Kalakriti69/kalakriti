@@ -212,24 +212,18 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
 
               {/* Mobile operator/admin */}
               <div className="grid grid-cols-2 gap-2 pt-1">
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    if (onOperatorClick) onOperatorClick();
-                  }}
-                  className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer"
+                <a
+                  href="/operator"
+                  className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer text-center flex items-center justify-center"
                 >
                   Operator
-                </button>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    if (onAdminClick) onAdminClick();
-                  }}
-                  className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer"
+                </a>
+                <a
+                  href="/admin"
+                  className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer text-center flex items-center justify-center"
                 >
                   Admin
-                </button>
+                </a>
               </div>
             </div>
           </div>
@@ -295,27 +289,23 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
                     Staff Access
                   </span>
 
-                  <button
-                    onClick={() => {
-                      setSettingsOpen(false);
-                      if (onOperatorClick) onOperatorClick();
-                    }}
+                  <a
+                    href="/operator"
+                    onClick={() => setSettingsOpen(false)}
                     className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
                   >
                     <span>Operator Login</span>
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-extrabold uppercase">Operator</span>
-                  </button>
+                  </a>
 
-                  <button
-                    onClick={() => {
-                      setSettingsOpen(false);
-                      if (onAdminClick) onAdminClick();
-                    }}
+                  <a
+                    href="/admin"
+                    onClick={() => setSettingsOpen(false)}
                     className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
                   >
                     <span>Admin Portal Login</span>
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-extrabold uppercase">Admin</span>
-                  </button>
+                  </a>
                 </div>
               </div>
             )}
