@@ -5,9 +5,11 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 interface NavbarProps {
   onLoginClick: () => void;
+  onOperatorClick?: () => void;
+  onAdminClick?: () => void;
 }
 
-export default function Navbar({ onLoginClick }: NavbarProps) {
+export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -186,7 +188,7 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
             {/* Mobile Settings Block with Blue Glass theme */}
             <div className="pt-4 mt-2 border-t border-slate-800/80 space-y-3">
               <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">
-                ⚙️ Quick Options
+                Quick Options
               </span>
 
               {/* Mobile Language */}
@@ -213,20 +215,20 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    alert("Operator login page is under maintenance.");
+                    if (onOperatorClick) onOperatorClick();
                   }}
                   className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer"
                 >
-                  🛠️ Operator
+                  Operator
                 </button>
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    alert("Admin login portal is restricted.");
+                    if (onAdminClick) onAdminClick();
                   }}
                   className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer"
                 >
-                  👮 Admin
+                  Admin
                 </button>
               </div>
             </div>
@@ -269,7 +271,7 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                 {/* Language Selection */}
                 <div className="space-y-1.5">
                   <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    🌐 Quick Language
+                    Quick Language
                   </span>
                   <select
                     value={lang}
@@ -290,28 +292,28 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                 {/* Administrative Login Portals */}
                 <div className="space-y-2 pt-2 border-t border-slate-800">
                   <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    🔐 Staff Access
+                    Staff Access
                   </span>
 
                   <button
                     onClick={() => {
                       setSettingsOpen(false);
-                      alert("Operator login page is under maintenance. Please contact IT center.");
+                      if (onOperatorClick) onOperatorClick();
                     }}
                     className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
                   >
-                    <span>🛠️ Operator Login</span>
+                    <span>Operator Login</span>
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-extrabold uppercase">Operator</span>
                   </button>
 
                   <button
                     onClick={() => {
                       setSettingsOpen(false);
-                      alert("Administrative login portal requires secondary hardware security key.");
+                      if (onAdminClick) onAdminClick();
                     }}
                     className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
                   >
-                    <span>👮 Admin Portal Login</span>
+                    <span>Admin Portal Login</span>
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-extrabold uppercase">Admin</span>
                   </button>
                 </div>
