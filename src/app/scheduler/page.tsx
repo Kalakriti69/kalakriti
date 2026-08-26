@@ -13,11 +13,10 @@ function SchedulerContent() {
   const handleBookingSuccess = (bookingDetails: any) => {
     // Extract short token from full tokenId
     const numericToken = bookingDetails.tokenId.replace(/\D/g, "");
-    const shortToken = Number(numericToken) % 100 + 110;
     
     // Redirect to queue page with token and center details
     router.push(
-      `/queue?token=${shortToken}&center=${encodeURIComponent(bookingDetails.center)}`
+      `/queue?token=${numericToken}&center=${encodeURIComponent(bookingDetails.center)}`
     );
   };
 
