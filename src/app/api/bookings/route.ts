@@ -3,9 +3,9 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const bookingSchema = z.object({
-  farmerId: z.string().uuid(),
-  centreId: z.string().uuid(),
-  slotId: z.string().uuid(),
+  farmerId: z.string().min(1),
+  centreId: z.string().min(1),
+  slotId: z.string().min(1),
 });
 
 export async function POST(request: NextRequest) {
