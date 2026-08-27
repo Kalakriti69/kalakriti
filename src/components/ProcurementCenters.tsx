@@ -17,7 +17,7 @@ export interface Center {
 
 export const MOCK_CENTERS: Center[] = [
   {
-    id: "center-1",
+    id: "11111111-1111-1111-1111-111111111111",
     name: "GreenValley Agriculture Hub",
     location: "Kalyanpur Market Link Rd, Block A",
     distance: "1.2 km",
@@ -28,7 +28,7 @@ export const MOCK_CENTERS: Center[] = [
     phone: "+91 98765 43210",
   },
   {
-    id: "center-2",
+    id: "22222222-2222-2222-2222-222222222222",
     name: "Kalyanpur Krishi Mandi",
     location: "Mandi Bypass Chowk, Sector 4",
     distance: "3.8 km",
@@ -39,7 +39,7 @@ export const MOCK_CENTERS: Center[] = [
     phone: "+91 98765 43211",
   },
   {
-    id: "center-3",
+    id: "33333333-3333-3333-3333-333333333333",
     name: "Jai Kisan Sangrah Kendra",
     location: "National Highway 2, Near Toll Plaza",
     distance: "5.5 km",
@@ -50,7 +50,7 @@ export const MOCK_CENTERS: Center[] = [
     phone: "+91 98765 43212",
   },
   {
-    id: "center-4",
+    id: "44444444-4444-4444-4444-444444444444",
     name: "Setu Sahakari Samiti Kendra",
     location: "Rampur Village Panchayat Office",
     distance: "7.1 km",
@@ -137,11 +137,10 @@ export default function ProcurementCenters({ onSelectCenter }: ProcurementCenter
                 <button
                   key={crop}
                   onClick={() => setSelectedCrop(crop)}
-                  className={`px-4 py-2 rounded-full font-bold text-xs transition-all cursor-pointer whitespace-nowrap ${
-                    selectedCrop === crop
+                  className={`px-4 py-2 rounded-full font-bold text-xs transition-all cursor-pointer whitespace-nowrap ${selectedCrop === crop
                       ? "bg-slate-900 text-white shadow-md"
                       : "bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
-                  }`}
+                    }`}
                 >
                   {label}
                 </button>
@@ -158,7 +157,7 @@ export default function ProcurementCenters({ onSelectCenter }: ProcurementCenter
               const centerIdx = MOCK_CENTERS.findIndex((c) => c.id === center.id) + 1;
               const localizedName = t(`center_${centerIdx}_name`);
               const localizedLoc = t(`center_${centerIdx}_loc`);
-              
+
               // Helper to parse wait time minutes and append localized string
               const formatWaitTime = (rawWait: string) => {
                 const minutes = rawWait.replace(/\D/g, "");
@@ -223,13 +222,12 @@ export default function ProcurementCenters({ onSelectCenter }: ProcurementCenter
                       <div className="flex items-center justify-between text-xs font-semibold">
                         <span className="text-slate-500">{t("centers_space")}</span>
                         <span
-                          className={`font-bold ${
-                            center.status === "available"
+                          className={`font-bold ${center.status === "available"
                               ? "text-emerald-600"
                               : center.status === "busy"
-                              ? "text-amber-500"
-                              : "text-red-500"
-                          }`}
+                                ? "text-amber-500"
+                                : "text-red-500"
+                            }`}
                         >
                           {center.capacity}% {center.status === "available" ? t("centers_available") : center.status === "busy" ? t("centers_busy") : t("centers_full")}
                         </span>
@@ -237,13 +235,12 @@ export default function ProcurementCenters({ onSelectCenter }: ProcurementCenter
 
                       <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all duration-1000 ${
-                            center.status === "available"
+                          className={`h-full rounded-full transition-all duration-1000 ${center.status === "available"
                               ? "bg-emerald-500"
                               : center.status === "busy"
-                              ? "bg-amber-50"
-                              : "bg-red-500"
-                          }`}
+                                ? "bg-amber-50"
+                                : "bg-red-500"
+                            }`}
                           style={{ width: `${center.capacity}%` }}
                         ></div>
                       </div>
