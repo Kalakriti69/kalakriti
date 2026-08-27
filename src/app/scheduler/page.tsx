@@ -9,21 +9,27 @@ function SchedulerContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedCenter = searchParams.get("center") || "";
+  const preselectedCrop = searchParams.get("crop") || "";
+  const preselectedWeight = searchParams.get("weight") ? Number(searchParams.get("weight")) : undefined;
+  const preselectedDate = searchParams.get("date") || "";
+  const preselectedSlot = searchParams.get("slot") || "";
+  const preselectedStep = searchParams.get("step") ? Number(searchParams.get("step")) : undefined;
 
   const handleBookingSuccess = (bookingDetails: any) => {
-    // Extract short token from full tokenId
     const numericToken = bookingDetails.tokenId.replace(/\D/g, "");
-    const shortToken = Number(numericToken) % 100 + 110;
-    
-    // Redirect to queue page with token and center details
     router.push(
-      `/queue?token=${shortToken}&center=${encodeURIComponent(bookingDetails.center)}`
+      `/queue?token=${numericToken}&center=${encodeURIComponent(bookingDetails.center)}`
     );
   };
 
   return (
     <ScheduleBooking
       preselectedCenter={preselectedCenter}
+      preselectedCrop={preselectedCrop}
+      preselectedWeight={preselectedWeight}
+      preselectedDate={preselectedDate}
+      preselectedSlot={preselectedSlot}
+      preselectedStep={preselectedStep}
       onBookingSuccess={handleBookingSuccess}
     />
   );

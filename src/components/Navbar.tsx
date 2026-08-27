@@ -34,19 +34,31 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
       <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8 max-w-7xl mx-auto transition-all duration-300">
         <nav
           className={`w-full transition-all duration-300 ${mobileMenuOpen
-              ? "rounded-3xl bg-slate-950/90 backdrop-blur-xl border border-blue-500/30 shadow-[0_8px_32px_0_rgba(14,165,233,0.15)] py-3.5 px-5"
-              : scrolled
-                ? "rounded-2xl md:rounded-full bg-slate-950/75 backdrop-blur-md border border-blue-500/20 shadow-[0_8px_32px_0_rgba(14,165,233,0.1)] py-2 md:py-2.5 px-4 md:px-6"
-                : "rounded-2xl md:rounded-full bg-slate-950/60 backdrop-blur-sm border border-blue-500/15 py-2.5 md:py-3.5 px-5 md:px-8"
+            ? "rounded-3xl bg-slate-950/90 backdrop-blur-xl border border-blue-500/30 shadow-[0_8px_32px_0_rgba(14,165,233,0.15)] py-3.5 px-5"
+            : scrolled
+              ? "rounded-2xl md:rounded-full bg-slate-950/75 backdrop-blur-md border border-blue-500/20 shadow-[0_8px_32px_0_rgba(14,165,233,0.1)] py-2 md:py-2.5 px-4 md:px-6"
+              : "rounded-2xl md:rounded-full bg-slate-950/60 backdrop-blur-sm border border-blue-500/15 py-2.5 md:py-3.5 px-5 md:px-8"
             }`}
         >
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <a href="/" className="flex items-center space-x-2">
-              <span className="text-xl sm:text-2xl font-black tracking-tight select-none">
-                <span className="text-emerald-400">Kisan</span>
-                <span className="text-white">Setu</span>
-              </span>
+            <a href="/" className="flex items-center space-x-2.5 group">
+              <div className="relative flex items-center justify-center">
+                <img
+                  src="/icon.svg"
+                  alt="KisanSetu Logo"
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shadow-md shadow-emerald-500/20 transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl sm:text-2xl font-black tracking-tight select-none leading-none">
+                  <span className="text-emerald-400">Kisan</span>
+                  <span className="text-white">Setu</span>
+                </span>
+                <span className="text-[9px] font-bold tracking-wider text-emerald-400/80 uppercase mt-0.5 hidden sm:block">
+                  Farmer's Portal
+                </span>
+              </div>
             </a>
 
             {/* Navigation Options - Middle */}
@@ -135,8 +147,8 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
 
           {/* Mobile Dropdown Menu with Slide Down effect */}
           <div className={`md:hidden flex flex-col space-y-4 px-2 overflow-hidden transition-all duration-500 ease-in-out ${mobileMenuOpen
-              ? "max-h-[500px] opacity-100 mt-4 pt-4 border-t border-slate-800/80 pb-2"
-              : "max-h-0 opacity-0 pointer-events-none mt-0 pt-0 border-t-0 pb-0"
+            ? "max-h-[500px] opacity-100 mt-4 pt-4 border-t border-slate-800/80 pb-2"
+            : "max-h-0 opacity-0 pointer-events-none mt-0 pt-0 border-t-0 pb-0"
             }`}>
             <a
               href="/centers"

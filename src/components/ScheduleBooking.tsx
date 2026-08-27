@@ -5,7 +5,12 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { MOCK_CENTERS } from "./ProcurementCenters";
 
 interface ScheduleBookingProps {
-  preselectedCenter: string;
+  preselectedCenter?: string;
+  preselectedCrop?: string;
+  preselectedWeight?: number;
+  preselectedDate?: string;
+  preselectedSlot?: string;
+  preselectedStep?: number;
   onBookingSuccess: (bookingDetails: {
     center: string;
     crop: string;
@@ -24,7 +29,15 @@ const TIME_SLOTS = [
   { time: "04:00 PM - 06:00 PM", status: "Available", color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
 ];
 
-export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }: ScheduleBookingProps) {
+export default function ScheduleBooking({
+  preselectedCenter,
+  preselectedCrop,
+  preselectedWeight,
+  preselectedDate,
+  preselectedSlot,
+  preselectedStep,
+  onBookingSuccess,
+}: ScheduleBookingProps) {
   const [step, setStep] = useState(1);
   const [center, setCenter] = useState("");
   const [crop, setCrop] = useState("Paddy");
@@ -35,14 +48,21 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
   
   // Receipt details
   const [receipt, setReceipt] = useState<any>(null);
+  const [isBooking, setIsBooking] = useState(false);
 
-  // Sync preselected center from ProcurementCenters component selection
+  // Sync preselected parameters from URL/Chatbot
   useEffect(() => {
-    if (preselectedCenter) {
-      setCenter(preselectedCenter);
+    if (preselectedCenter) setCenter(preselectedCenter);
+    if (preselectedCrop) setCrop(preselectedCrop);
+    if (preselectedWeight && !isNaN(preselectedWeight)) setWeight(preselectedWeight);
+    if (preselectedDate) setSelectedDate(preselectedDate);
+    if (preselectedSlot) setSelectedSlot(preselectedSlot);
+    if (preselectedStep && preselectedStep >= 1 && preselectedStep <= 4) {
+      setStep(preselectedStep);
+    } else if (preselectedCenter) {
       setStep(1);
     }
-  }, [preselectedCenter]);
+  }, [preselectedCenter, preselectedCrop, preselectedWeight, preselectedDate, preselectedSlot, preselectedStep]);
 
   // Generate date options (Next 6 days starting today)
   const [dateOptions, setDateOptions] = useState<any[]>([]);
@@ -65,7 +85,7 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
     setSelectedDate(days[0].id); // default to today
   }, []);
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (step === 1 && !center) {
       alert("Please select a procurement center first.");
       return;
@@ -82,18 +102,65 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
     if (step < 3) {
       setStep(step + 1);
     } else {
-      const randomToken = "KS-" + Math.floor(100000 + Math.random() * 900000);
-      const bookingData = {
-        center,
-        crop,
-        weight,
-        date: selectedDate,
-        timeSlot: selectedSlot,
-        tokenId: randomToken,
-      };
-      setReceipt(bookingData);
-      setStep(4);
-      onBookingSuccess(bookingData);
+      if (isBooking) return;
+      setIsBooking(true);
+      try {
+        const matchCenter = MOCK_CENTERS.find(c => c.name === center);
+        const centreId = matchCenter ? matchCenter.id : MOCK_CENTERS[0].id;
+
+        // Map selectedSlot string to UUID format matching database.types.ts schemas
+        const slotMap: Record<string, string> = {
+          "08:00 AM - 10:00 AM": "11111111-aaa1-1111-1111-111111111111",
+          "10:00 AM - 12:00 PM": "11111111-aaa2-1111-1111-111111111111",
+          "12:00 PM - 02:00 PM": "11111111-aaa3-1111-1111-111111111111",
+          "02:00 PM - 04:00 PM": "11111111-aaa4-1111-1111-111111111111",
+          "04:00 PM - 06:00 PM": "11111111-aaa5-1111-1111-111111111111",
+        };
+        const slotId = slotMap[selectedSlot] || "11111111-aaa1-1111-1111-111111111111";
+        const farmerId = "99999999-9999-9999-9999-999999999999";
+
+        const res = await fetch("/api/bookings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ farmerId, centreId, slotId }),
+        });
+        const data = await res.json();
+        
+        if (data.success && data.booking) {
+          const bookingData = {
+            center,
+            crop,
+            weight,
+            date: selectedDate,
+            timeSlot: selectedSlot,
+            tokenId: `KS-${data.booking.token_number}`,
+          };
+          setReceipt(bookingData);
+          setStep(4);
+          onBookingSuccess(bookingData);
+        } else {
+          alert("Booking failed: " + (data.error || "Please try again."));
+        }
+      } catch (err) {
+        console.error("Booking error:", err);
+        alert("An error occurred during booking. Generating offline receipt...");
+        
+        // Fallback to random offline token if API is down
+        const randomToken = "KS-" + Math.floor(100000 + Math.random() * 900000);
+        const bookingData = {
+          center,
+          crop,
+          weight,
+          date: selectedDate,
+          timeSlot: selectedSlot,
+          tokenId: randomToken,
+        };
+        setReceipt(bookingData);
+        setStep(4);
+        onBookingSuccess(bookingData);
+      } finally {
+        setIsBooking(false);
+      }
     }
   };
 
@@ -456,19 +523,22 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
 
               <button
                 onClick={handleNextStep}
-                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm px-7 py-3 rounded-full shadow-md transition-all duration-300 cursor-pointer flex items-center gap-1"
+                disabled={isBooking}
+                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm px-7 py-3 rounded-full shadow-md transition-all duration-300 cursor-pointer flex items-center gap-1 disabled:opacity-50"
               >
-                {step === 3 ? t("sched_btn_gen") : t("sched_btn_next")}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                </svg>
+                {isBooking ? "Booking..." : (step === 3 ? t("sched_btn_gen") : t("sched_btn_next"))}
+                {!isBooking && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                )}
               </button>
             </div>
           )}
