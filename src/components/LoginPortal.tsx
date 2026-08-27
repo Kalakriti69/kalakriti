@@ -30,21 +30,15 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
     }
   }, []);
 
-  if (!isOpen) return null;
-
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (phoneNumber.length !== 10) {
-      setErrorMessage("Please enter a valid 10-digit mobile number.");
-      return;
-    }
+  const sendOtpForPhone = async (num: string) => {
+    if (num.length !== 10) return;
     setIsSubmitting(true);
     setErrorMessage("");
     try {
       const response = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: `+91${phoneNumber}` }),
+        body: JSON.stringify({ phone: `+91${num}` }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Could not send OTP.");
@@ -54,6 +48,30 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
       setIsSubmitting(false);
       setErrorMessage(error instanceof Error ? error.message : "Could not send OTP.");
     }
+  };
+
+  useEffect(() => {
+    const handleLoginEvent = (e: any) => {
+      const { phone, autoSendOtp } = e.detail || {};
+      if (phone) {
+        const clean = phone.replace(/\D/g, "").slice(-10);
+        setPhoneNumber(clean);
+        if (autoSendOtp && clean.length === 10) {
+          sendOtpForPhone(clean);
+        }
+      }
+    };
+    window.addEventListener("kisansetu_open_login", handleLoginEvent);
+    return () => window.removeEventListener("kisansetu_open_login", handleLoginEvent);
+  }, []);
+
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (phoneNumber.length !== 10) {
+      setErrorMessage("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+    await sendOtpForPhone(phoneNumber);
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -141,6 +159,8 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
       { id: "INV-8912", crop: "Mustard", weight: 15, rate: "₹5,450/Qtl", amount: "₹81,750", date: "2026-04-18", payment: "DBT Transferred" }
     ]
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/60 backdrop-blur-md px-4 py-8">

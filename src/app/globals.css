@@ -16,6 +16,55 @@
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-slow: pulse-slow 3s ease-in-out infinite;
   --animate-fade-in-up: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-bounce-gentle: bounce-gentle 2.2s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
+  --animate-macos-open: macos-open 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-macos-close: macos-close 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+
+  @keyframes bounce-gentle {
+    0%, 100% {
+      transform: translateY(0) scale(1);
+    }
+    30% {
+      transform: translateY(-8px) scale(1.04);
+    }
+    50% {
+      transform: translateY(0) scale(0.98);
+    }
+    70% {
+      transform: translateY(-3px) scale(1.01);
+    }
+  }
+
+  @keyframes macos-open {
+    0% {
+      opacity: 0;
+      transform: scale(0.82) translateY(24px);
+      transform-origin: bottom right;
+    }
+    70% {
+      opacity: 1;
+      transform: scale(1.02) translateY(-2px);
+      transform-origin: bottom right;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      transform-origin: bottom right;
+    }
+  }
+
+  @keyframes macos-close {
+    0% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      transform-origin: bottom right;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.82) translateY(20px);
+      transform-origin: bottom right;
+    }
+  }
 
   @keyframes float {
     0%, 100% {
