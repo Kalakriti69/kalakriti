@@ -18,7 +18,7 @@ export default function Hero() {
   return (
     <section className="relative w-full min-h-[90vh] pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden flex items-center bg-slate-950">
       {/* Clean Crisp Background Image - Fixed Viewport Position for Parallax Effect */}
-      <div 
+      <div
         className="fixed inset-0 bg-cover bg-center z-0 transition-all duration-500"
         style={{ backgroundImage: "url('/farmers_field.jpg')" }}
       ></div>
@@ -28,7 +28,7 @@ export default function Hero() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+
           {/* Left Column: Modern Minimalist Typography (No Card Background) */}
           <div className="lg:col-span-6 flex flex-col space-y-6 animate-fade-in-up">
 
@@ -90,7 +90,7 @@ export default function Hero() {
           {/* Right Column: Sleek Floating Mandi Ticker (No Card Background) */}
           <div className="lg:col-span-6 relative flex justify-center lg:justify-end items-center">
             <div className="w-full max-w-md space-y-6 text-white">
-              
+
               {/* Header Info */}
               <div className="flex items-center justify-between pb-3 border-b border-white/15">
                 <h4 className="font-bold text-sm text-slate-200 tracking-wider uppercase">🌾 {t("hero_mandi_rates")}</h4>
@@ -158,7 +158,7 @@ export default function Hero() {
 
             </div>
           </div>
-          
+
         </div>
       </div>
     </section>

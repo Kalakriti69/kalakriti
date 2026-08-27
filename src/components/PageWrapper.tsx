@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import LoginPortal from "./LoginPortal";
 import LanguageSelector from "./LanguageSelector";
@@ -22,6 +22,14 @@ export default function PageWrapper({ children }: PageWrapperProps) {
       setToastMessage("");
     }, 4000);
   };
+
+  useEffect(() => {
+    const handleOpenLogin = () => {
+      setLoginOpen(true);
+    };
+    window.addEventListener("kisansetu_open_login", handleOpenLogin);
+    return () => window.removeEventListener("kisansetu_open_login", handleOpenLogin);
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-white w-full">
