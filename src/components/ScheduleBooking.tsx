@@ -5,7 +5,12 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { MOCK_CENTERS } from "./ProcurementCenters";
 
 interface ScheduleBookingProps {
-  preselectedCenter: string;
+  preselectedCenter?: string;
+  preselectedCrop?: string;
+  preselectedWeight?: number;
+  preselectedDate?: string;
+  preselectedSlot?: string;
+  preselectedStep?: number;
   onBookingSuccess: (bookingDetails: {
     center: string;
     crop: string;
@@ -24,7 +29,15 @@ const TIME_SLOTS = [
   { time: "04:00 PM - 06:00 PM", status: "Available", color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
 ];
 
-export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }: ScheduleBookingProps) {
+export default function ScheduleBooking({
+  preselectedCenter,
+  preselectedCrop,
+  preselectedWeight,
+  preselectedDate,
+  preselectedSlot,
+  preselectedStep,
+  onBookingSuccess,
+}: ScheduleBookingProps) {
   const [step, setStep] = useState(1);
   const [center, setCenter] = useState("");
   const [crop, setCrop] = useState("Paddy");
@@ -37,13 +50,19 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
   const [receipt, setReceipt] = useState<any>(null);
   const [isBooking, setIsBooking] = useState(false);
 
-  // Sync preselected center from ProcurementCenters component selection
+  // Sync preselected parameters from URL/Chatbot
   useEffect(() => {
-    if (preselectedCenter) {
-      setCenter(preselectedCenter);
+    if (preselectedCenter) setCenter(preselectedCenter);
+    if (preselectedCrop) setCrop(preselectedCrop);
+    if (preselectedWeight && !isNaN(preselectedWeight)) setWeight(preselectedWeight);
+    if (preselectedDate) setSelectedDate(preselectedDate);
+    if (preselectedSlot) setSelectedSlot(preselectedSlot);
+    if (preselectedStep && preselectedStep >= 1 && preselectedStep <= 4) {
+      setStep(preselectedStep);
+    } else if (preselectedCenter) {
       setStep(1);
     }
-  }, [preselectedCenter]);
+  }, [preselectedCenter, preselectedCrop, preselectedWeight, preselectedDate, preselectedSlot, preselectedStep]);
 
   // Generate date options (Next 6 days starting today)
   const [dateOptions, setDateOptions] = useState<any[]>([]);

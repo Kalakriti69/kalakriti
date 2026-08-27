@@ -56,7 +56,7 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                   <span className="text-white">Setu</span>
                 </span>
                 <span className="text-[9px] font-bold tracking-wider text-emerald-400/80 uppercase mt-0.5 hidden sm:block">
-
+                  Farmer's Portal
                 </span>
               </div>
             </a>
