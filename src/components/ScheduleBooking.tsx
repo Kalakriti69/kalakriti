@@ -35,6 +35,7 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
   
   // Receipt details
   const [receipt, setReceipt] = useState<any>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sync preselected center from ProcurementCenters component selection
   useEffect(() => {
@@ -65,7 +66,7 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
     setSelectedDate(days[0].id); // default to today
   }, []);
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (step === 1 && !center) {
       alert("Please select a procurement center first.");
       return;
@@ -78,22 +79,56 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
       alert("Please choose an available time slot.");
       return;
     }
-    
+
     if (step < 3) {
       setStep(step + 1);
-    } else {
-      const randomToken = "KS-" + Math.floor(100000 + Math.random() * 900000);
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          farmerName: "Ramesh Kumar",
+          centreName: center,
+          crop,
+          weight,
+          appointmentDate: selectedDate,
+          appointmentTime: selectedSlot,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Unable to save booking.");
+      }
+
       const bookingData = {
-        center,
-        crop,
-        weight,
-        date: selectedDate,
-        timeSlot: selectedSlot,
-        tokenId: randomToken,
+        center: result.booking.centreName || center,
+        crop: result.booking.crop || crop,
+        weight: result.booking.weight || weight,
+        date: result.booking.appointmentDate || selectedDate,
+        timeSlot: result.booking.appointmentTime || selectedSlot,
+        tokenId: result.booking.tokenId,
+        qrCode: result.booking.qrCode,
+        confirmationStatus: result.booking.confirmationStatus || "Confirmed",
+        farmerName: result.booking.farmerName || "Ramesh Kumar",
+        qrToken: result.booking.qrToken,
       };
+
       setReceipt(bookingData);
       setStep(4);
       onBookingSuccess(bookingData);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Unable to process booking.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -108,6 +143,7 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
     setWeight(30);
     setSelectedSlot("");
     setReceipt(null);
+    setIsSubmitting(false);
   };
 
   return (
@@ -359,65 +395,77 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
                   {t("sched_success_desc")}
                 </p>
 
-                {/* Digital Token Receipt Mockup */}
-                <div className="max-w-md mx-auto bg-slate-50 border border-slate-200/80 rounded-2xl p-6 text-left relative overflow-hidden shadow-inner">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-full flex items-center justify-center font-bold text-emerald-800 text-xs">
-                    ACTIVE
-                  </div>
+                {/* Confirmation slip */}
+                <div className="max-w-2xl mx-auto bg-slate-50 border border-slate-200/80 rounded-2xl p-6 text-left relative overflow-hidden shadow-inner">
+                 <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-bl-full flex items-center justify-center font-bold text-emerald-800 text-[10px] uppercase">
+                   Active
+                 </div>
 
-                  <div className="border-b border-dashed border-slate-300 pb-4 mb-4">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t("sched_ticket_token")}</span>
-                    <p className="text-2xl font-black text-emerald-600 tracking-wider mt-0.5">{receipt.tokenId}</p>
-                  </div>
+                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between pb-4 border-b border-dashed border-slate-300 mb-4">
+                   <div>
+                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t("sched_ticket_token")}</span>
+                     <p className="text-2xl font-black text-emerald-600 tracking-wider mt-0.5">{receipt.tokenId}</p>
+                   </div>
+                   <div className="text-left md:text-right">
+                     <span className="text-[10px] text-slate-400 block font-bold uppercase">Confirmation status</span>
+                     <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-bold text-[10px] mt-1 inline-block">
+                       {receipt.confirmationStatus || "Confirmed"}
+                     </span>
+                   </div>
+                 </div>
 
-                  <div className="grid grid-cols-2 gap-4 text-xs font-semibold">
-                    <div>
-                      <span className="text-slate-400 block mb-0.5">{t("sched_ticket_center")}</span>
-                      <span className="text-slate-800 block text-sm font-bold leading-tight">
-                        {t(`center_${MOCK_CENTERS.findIndex(c => c.name === receipt.center) + 1}_name`)}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block mb-0.5">{t("sched_ticket_crop")}</span>
-                      <span className="text-slate-800 block text-sm font-bold">
-                        🌾 {t("crop_" + receipt.crop)} ({receipt.weight} Qtl)
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block mb-0.5">{t("sched_ticket_date")}</span>
-                      <span className="text-slate-800 block text-sm font-bold">
-                        📅 {receipt.date}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 block mb-0.5">{t("sched_ticket_slot")}</span>
-                      <span className="text-slate-800 block text-sm font-bold">
-                        ⏰ {receipt.timeSlot}
-                      </span>
-                    </div>
-                  </div>
+                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 text-xs font-semibold">
+                   <div>
+                     <span className="text-slate-400 block mb-0.5">Farmer</span>
+                     <span className="text-slate-800 block text-sm font-bold leading-tight">{receipt.farmerName}</span>
+                   </div>
+                   <div>
+                     <span className="text-slate-400 block mb-0.5">{t("sched_ticket_center")}</span>
+                     <span className="text-slate-800 block text-sm font-bold leading-tight">
+                       {t(`center_${MOCK_CENTERS.findIndex(c => c.name === receipt.center) + 1}_name`)}
+                     </span>
+                   </div>
+                   <div>
+                     <span className="text-slate-400 block mb-0.5">{t("sched_ticket_crop")}</span>
+                     <span className="text-slate-800 block text-sm font-bold">
+                       🌾 {t("crop_" + receipt.crop)} ({receipt.weight} Qtl)
+                     </span>
+                   </div>
+                   <div>
+                     <span className="text-slate-400 block mb-0.5">Weight</span>
+                     <span className="text-slate-800 block text-sm font-bold">{receipt.weight} quintals</span>
+                   </div>
+                   <div>
+                     <span className="text-slate-400 block mb-0.5">{t("sched_ticket_date")}</span>
+                     <span className="text-slate-800 block text-sm font-bold">📅 {receipt.date}</span>
+                   </div>
+                   <div>
+                     <span className="text-slate-400 block mb-0.5">{t("sched_ticket_slot")}</span>
+                     <span className="text-slate-800 block text-sm font-bold">⏰ {receipt.timeSlot}</span>
+                   </div>
+                 </div>
 
-                  {/* Mock QR Code Visual */}
-                  <div className="mt-6 pt-5 border-t border-slate-200/60 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block font-bold uppercase">Status</span>
-                      <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-0.5 font-bold text-[10px] mt-1 inline-block">
-                        {t("sched_ticket_status")}
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <div className="w-24 h-6 bg-slate-900 relative flex items-center justify-between px-1.5 py-1 rounded">
-                        <div className="h-full w-1 bg-white"></div>
-                        <div className="h-full w-0.5 bg-white"></div>
-                        <div className="h-full w-2 bg-white"></div>
-                        <div className="h-full w-0.5 bg-white"></div>
-                        <div className="h-full w-1 bg-white"></div>
-                        <div className="h-full w-1.5 bg-white"></div>
-                        <div className="h-full w-0.5 bg-white"></div>
-                      </div>
-                      <span className="text-[9px] text-slate-400 font-mono mt-1">{t("sched_ticket_scan")}</span>
-                    </div>
-                  </div>
+                 <div className="mt-6 pt-5 border-t border-slate-200/60 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                   <div className="flex-1">
+                     <span className="text-[10px] text-slate-400 block font-bold uppercase">One-time pass</span>
+                     <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-0.5 font-bold text-[10px] mt-1 inline-block">
+                       {t("sched_ticket_status")}
+                     </span>
+                   </div>
+                   <div className="flex justify-center md:justify-end">
+                     {receipt.qrCode ? (
+                       <img
+                         src={receipt.qrCode}
+                         alt="Booking QR code"
+                         className="w-32 h-32 rounded-xl border border-slate-200 bg-white p-2 shadow-sm"
+                       />
+                     ) : (
+                       <div className="w-32 h-32 border border-slate-200 bg-slate-100 rounded-xl flex items-center justify-center text-[10px] font-bold uppercase text-slate-500">
+                         QR
+                       </div>
+                     )}
+                   </div>
+                 </div>
                 </div>
 
                 {/* Receipt Actions */}
@@ -456,19 +504,22 @@ export default function ScheduleBooking({ preselectedCenter, onBookingSuccess }:
 
               <button
                 onClick={handleNextStep}
-                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm px-7 py-3 rounded-full shadow-md transition-all duration-300 cursor-pointer flex items-center gap-1"
+                disabled={isSubmitting}
+                className={`bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm px-7 py-3 rounded-full shadow-md transition-all duration-300 flex items-center gap-1 ${isSubmitting ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
               >
-                {step === 3 ? t("sched_btn_gen") : t("sched_btn_next")}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  stroke="currentColor"
-                  className="w-4 h-4"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                </svg>
+                {isSubmitting ? "Saving..." : step === 3 ? t("sched_btn_gen") : t("sched_btn_next")}
+                {!isSubmitting && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                  </svg>
+                )}
               </button>
             </div>
           )}
