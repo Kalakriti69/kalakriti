@@ -1,24 +1,18 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import PageWrapper from "@/components/PageWrapper";
 import ScheduleBooking from "@/components/ScheduleBooking";
 
 function SchedulerContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedCenter = searchParams.get("center") || "";
 
   const handleBookingSuccess = (bookingDetails: any) => {
-    // Extract short token from full tokenId
-    const numericToken = bookingDetails.tokenId.replace(/\D/g, "");
-    const shortToken = Number(numericToken) % 100 + 110;
-    
-    // Redirect to queue page with token and center details
-    router.push(
-      `/queue?token=${shortToken}&center=${encodeURIComponent(bookingDetails.center)}`
-    );
+    if (bookingDetails?.tokenId) {
+      console.info("Booking confirmed", bookingDetails);
+    }
   };
 
   return (
