@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import LoginPortal from "./LoginPortal";
 import LanguageSelector from "./LanguageSelector";
+import StaffPortal from "./StaffPortal";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -11,6 +12,8 @@ interface PageWrapperProps {
 
 export default function PageWrapper({ children }: PageWrapperProps) {
   const [loginOpen, setLoginOpen] = useState(false);
+  const [staffOpen, setStaffOpen] = useState(false);
+  const [staffRole, setStaffRole] = useState<"operator" | "admin">("operator");
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
 
@@ -34,7 +37,17 @@ export default function PageWrapper({ children }: PageWrapperProps) {
   return (
     <div className="flex flex-col min-h-screen bg-white w-full">
       {/* Header Navigation */}
-      <Navbar onLoginClick={() => setLoginOpen(true)} />
+      <Navbar 
+        onLoginClick={() => setLoginOpen(true)} 
+        onOperatorClick={() => {
+          setStaffRole("operator");
+          setStaffOpen(true);
+        }}
+        onAdminClick={() => {
+          setStaffRole("admin");
+          setStaffOpen(true);
+        }}
+      />
 
       {/* Main Page Content */}
       <main className="flex-1 w-full">{children}</main>
@@ -104,6 +117,7 @@ export default function PageWrapper({ children }: PageWrapperProps) {
 
       {/* Global Modals */}
       <LoginPortal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+      <StaffPortal isOpen={staffOpen} onClose={() => setStaffOpen(false)} role={staffRole} />
       <LanguageSelector onLanguageSelect={handleLanguageSelect} />
     </div>
   );
