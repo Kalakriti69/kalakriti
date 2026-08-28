@@ -290,8 +290,24 @@ export default function KisanChatbot() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceReply, setVoiceReply] = useState(true);
+  const voiceReplyRef = useRef<boolean>(true);
   const [isProcessingBooking, setIsProcessingBooking] = useState(false);
   const [isAwaitingLoginPhone, setIsAwaitingLoginPhone] = useState(false);
+
+  useEffect(() => {
+    try {
+      const storedVoice = localStorage.getItem("kisansetu_voice_reply");
+      if (storedVoice !== null) {
+        const val = storedVoice === "true";
+        setVoiceReply(val);
+        voiceReplyRef.current = val;
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    voiceReplyRef.current = voiceReply;
+  }, [voiceReply]);
 
   const loc = CHAT_I18N[lang] || CHAT_I18N.en;
 
@@ -317,6 +333,10 @@ export default function KisanChatbot() {
 
   const toggleOpenState = (open: boolean) => {
     if (!open) {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+      }
       setIsClosing(true);
       try {
         sessionStorage.setItem("kisansetu_chat_open", "false");
@@ -366,7 +386,7 @@ export default function KisanChatbot() {
 
   // Web Speech Synthesis (Text to Speech)
   const speakText = (text: string) => {
-    if (!voiceReply || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (!voiceReplyRef.current || typeof window === "undefined" || !("speechSynthesis" in window)) return;
     try {
       window.speechSynthesis.cancel();
       const cleanText = text
@@ -471,6 +491,7 @@ export default function KisanChatbot() {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       options: [
         { label: l.btn_book_slot, action: () => startBookingFlow({}) },
+        { label: "🌤️ Live Weather", action: () => showLiveWeather() },
         { label: l.btn_my_profile || "👨‍🌾 Farmer Profile", action: () => handleNavigate("/profile", "Opening Farmer Profile Dashboard...") },
         { label: l.btn_login_otp, action: () => promptLogin() },
         { label: l.btn_centers, action: () => handleNavigate("/centers", "Navigating to Procurement Centers...") },
@@ -536,6 +557,145 @@ export default function KisanChatbot() {
     };
     setMessages((prev) => [...prev, botMsg]);
     speakText(text.replace(/[*_#•]/g, ""));
+  };
+
+  const showLiveWeather = async () => {
+    const l = CHAT_I18N[lang] || CHAT_I18N.en;
+
+    const loadId = "weather-load-" + Date.now();
+    const loadingMsg: Message = {
+      id: loadId,
+      sender: "bot",
+      text:
+        lang === "hi"
+          ? "🌤️ आपके लाइव स्थान का मौसम और कृषि सलाह खोजी जा रही है..."
+          : lang === "bn"
+          ? "🌤️ আপনার লাইভ অবস্থানের আবহাওয়া দেখা হচ্ছে..."
+          : lang === "pa"
+          ? "🌤️ ਤੁਹਾਡੇ ਲਾਈਵ ਸਥਾਨ ਦਾ ਮੌਸਮ ਵੇਖਿਆ ਜਾ ਰਿਹਾ ਹੈ..."
+          : lang === "or"
+          ? "🌤️ ପାଣିପାଗ ସୂଚନା ଯାଞ୍ଚ ହେଉଛି..."
+          : "🌤️ Fetching live weather report for your current location...",
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+    setMessages((prev) => [...prev, loadingMsg]);
+
+    const fetchWeather = async (lat: number, lon: number) => {
+      try {
+        const weatherRes = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+        );
+        const weatherJson = await weatherRes.json();
+
+        let resolvedArea = "Chandaka";
+        let resolvedCity = "Bhubaneswar";
+        let resolvedState = "Odisha";
+
+        try {
+          const geoRes = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+          );
+          const geoJson = await geoRes.json();
+          if (geoJson) {
+            const adminList = geoJson.localityInfo?.administrative || [];
+            resolvedState = geoJson.principalSubdivision || "Odisha";
+
+            const subdistrict =
+              adminList.find((a: any) => a.order >= 4 || a.adminLevel >= 6)?.name ||
+              geoJson.localityInfo?.informative?.[0]?.name;
+            const mainCity = geoJson.city || geoJson.locality || "Bhubaneswar";
+            const district = geoJson.principalSubdivisionDistrict || adminList.find((a: any) => a.order === 3)?.name || mainCity;
+
+            if (subdistrict && subdistrict.toLowerCase() !== mainCity.toLowerCase()) {
+              resolvedArea = subdistrict;
+              resolvedCity = mainCity;
+            } else if (district && district.toLowerCase() !== mainCity.toLowerCase()) {
+              resolvedArea = district;
+              resolvedCity = mainCity;
+            } else {
+              resolvedArea = geoJson.localityInfo?.informative?.[0]?.name || geoJson.locality || "Local Area";
+              resolvedCity = mainCity;
+            }
+
+            const POPULAR_METROS = ["Bhubaneswar", "Cuttack", "Kolkata", "Delhi", "New Delhi", "Mumbai", "Pune", "Lucknow", "Kanpur", "Patna", "Ludhiana", "Amritsar", "Jaipur", "Ahmedabad", "Chandigarh", "Bengaluru", "Hyderabad", "Chennai"];
+            if (POPULAR_METROS.includes(resolvedArea) && !POPULAR_METROS.includes(resolvedCity)) {
+              const temp = resolvedArea;
+              resolvedArea = resolvedCity;
+              resolvedCity = temp;
+            }
+          }
+        } catch {}
+
+        const current = weatherJson?.current_weather || { temperature: 28, windspeed: 11, weathercode: 0 };
+        const temp = Math.round(current.temperature);
+        const wind = Math.round(current.windspeed);
+
+        let icon = "☀️";
+        let conditionText = "Clear Sky";
+        let advisory = "Optimal conditions for crop harvesting, transit, and mandi delivery.";
+
+        if (current.weathercode >= 51 && current.weathercode <= 99) {
+          icon = "🌧️";
+          conditionText = lang === "hi" ? "बारिश / बूंदाबांदी" : lang === "bn" ? "বৃষ্টিপাত" : lang === "pa" ? "ਮੀਂਹ" : lang === "or" ? "ବର୍ଷା" : "Rain / Drizzle";
+          advisory =
+            lang === "hi"
+              ? `${resolvedCity} मंडी में फसल ले जाते समय तिरपाल से ढकें और कतार टोकन पहले से बुक करें।`
+              : lang === "bn"
+              ? `${resolvedCity} মান্ডিতে শস্য পরিবহনে ত্রিপল ব্যবহার করুন।`
+              : lang === "pa"
+              ? `${resolvedCity} ਮੰਡੀ ਜਾਣ ਸਮੇਂ ਫ਼ਸਲ ਨੂੰ ਤਰਪਾਲ ਨਾਲ ਢੱਕੋ।`
+              : `Keep tarpaulins ready during ${resolvedCity} mandi transit and pre-book token.`;
+        } else if (current.weathercode >= 1 && current.weathercode <= 3) {
+          icon = "⛅";
+          conditionText = lang === "hi" ? "आंशिक रूप से बादल" : lang === "bn" ? "আংশিক মেঘলা" : lang === "pa" ? "ਬੱਦਲਵਾਈ" : lang === "or" ? "ମେଘୁଆ" : "Partly Cloudy";
+        }
+
+        const weatherCardText =
+          `🌤️ **Live Weather & Mandi Advisory**\n\n` +
+          `• **Location**: 📍 ${resolvedArea}, ${resolvedCity}, ${resolvedState}\n` +
+          `• **Temperature**: ${temp}°C ${icon} (${conditionText})\n` +
+          `• **Wind Speed**: ${wind} km/h 💨\n\n` +
+          `🌾 **Agro Advisory**: ${advisory}`;
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === loadId
+              ? {
+                  ...m,
+                  text: weatherCardText,
+                  options: [
+                    { label: l.btn_book_slot, primary: true, action: () => startBookingFlow({}) },
+                    { label: l.btn_msp, action: () => showMspRates() },
+                    { label: l.btn_queue, action: () => handleNavigate("/queue", "Opening Live Queue tracker...") },
+                  ],
+                }
+              : m
+          )
+        );
+
+        speakText(
+          lang === "hi"
+            ? `${resolvedArea}, ${resolvedCity} में तापमान ${temp} डिग्री है। ${advisory}`
+            : lang === "bn"
+            ? `${resolvedArea}, ${resolvedCity} এলাকায় তাপমাত্রা ${temp} ডিগ্রি সেলসিয়াস।`
+            : lang === "pa"
+            ? `${resolvedArea}, ${resolvedCity} ਵਿੱਚ ਤਾਪਮਾਨ ${temp} ਡਿਗਰੀ ਹੈ।`
+            : `Live weather in ${resolvedArea}, ${resolvedCity} is ${temp} degrees Celsius with ${conditionText}. ${advisory}`
+        );
+      } catch (err) {
+        console.error("Chatbot weather error:", err);
+      }
+    };
+
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+        () => fetchWeather(20.2961, 85.8245),
+        { timeout: 8000 }
+      );
+    } else {
+      fetchWeather(20.2961, 85.8245);
+    }
   };
 
   // Sync scheduler URL with currently selected parameters
@@ -885,6 +1045,26 @@ export default function KisanChatbot() {
     }
 
     if (
+      text.includes("weather") ||
+      text.includes("मौसम") ||
+      text.includes("आबोहवा") ||
+      text.includes("আবহাওয়া") ||
+      text.includes("ਮੌਸਮ") ||
+      text.includes("ਪਾଣିਪାਗ") ||
+      text.includes("temperature") ||
+      text.includes("तापमान") ||
+      text.includes("बारिश") ||
+      text.includes("rain") ||
+      text.includes("বৃষ্টি") ||
+      text.includes("ਮੀਂਹ") ||
+      text.includes("ବର୍ଷା") ||
+      text.includes("climate")
+    ) {
+      showLiveWeather();
+      return;
+    }
+
+    if (
       text.includes("msp") ||
       text.includes("rate") ||
       text.includes("price") ||
@@ -1220,29 +1400,56 @@ export default function KisanChatbot() {
               </div>
             </div>
 
-            <div className="flex items-center space-x-1.5">
+            <div className="flex items-center space-x-1">
               {/* Reset / New Chat */}
               <button
                 onClick={() => {
                   bookingDraftRef.current = { center: "", centreId: "", crop: "", weight: 0, date: "", timeSlot: "", slotId: "" };
                   setBookingDraft(bookingDraftRef.current);
                   setMessages([getWelcomeMessage(lang)]);
+                  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+                    window.speechSynthesis.cancel();
+                    setIsSpeaking(false);
+                  }
                 }}
-                className="p-1.5 sm:p-2 rounded-xl text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+                className="p-2 rounded-full bg-transparent hover:bg-white/10 text-slate-400 hover:text-white transition-all cursor-pointer active:scale-90"
                 title="Restart / Clear Chat"
+                aria-label="Restart chat"
               >
-                🔄
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
               </button>
 
               {/* Voice Readout Toggle */}
               <button
-                onClick={() => setVoiceReply(!voiceReply)}
-                className={`p-1.5 sm:p-2 rounded-xl text-xs transition-colors cursor-pointer ${
-                  voiceReply ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-slate-800 text-slate-400"
+                onClick={() => {
+                  const next = !voiceReply;
+                  setVoiceReply(next);
+                  voiceReplyRef.current = next;
+                  try {
+                    localStorage.setItem("kisansetu_voice_reply", String(next));
+                  } catch {}
+                  if (!next && typeof window !== "undefined" && "speechSynthesis" in window) {
+                    window.speechSynthesis.cancel();
+                    setIsSpeaking(false);
+                  }
+                }}
+                className={`p-2 rounded-full bg-transparent hover:bg-white/10 transition-all cursor-pointer active:scale-90 ${
+                  voiceReply ? "text-emerald-400 hover:text-emerald-300" : "text-slate-500 hover:text-slate-300"
                 }`}
-                title={voiceReply ? "Voice Speech Enabled" : "Voice Speech Muted"}
+                title={voiceReply ? "Voice Speech Enabled (Click to Mute)" : "Voice Speech Muted (Click to Unmute)"}
+                aria-label="Toggle voice speech"
               >
-                {voiceReply ? "🔊" : "🔇"}
+                {voiceReply ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.757 3.63 8.25 4.51 8.25H6.75Z" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.757 3.63 8.25 4.51 8.25H6.75Z" />
+                  </svg>
+                )}
               </button>
             </div>
           </div>
