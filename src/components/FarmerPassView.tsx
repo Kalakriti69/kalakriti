@@ -40,9 +40,40 @@ export default function FarmerPassView() {
 
   const [pass, setPass] = useState<FarmerBookingPass>(DEFAULT_DEMO_PASS);
   const [generatedQr, setGeneratedQr] = useState<string>("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchTokenInput, setSearchTokenInput] = useState("");
   const [copiedNotification, setCopiedNotification] = useState(false);
+  const [isPassUsed, setIsPassUsed] = useState(false);
+  const [usedTimestamp, setUsedTimestamp] = useState<string>("");
+
+  // Function to verify if token has been scanned by operator
+  const checkTokenConsumption = (targetTokenId: string, targetTokenNum?: number) => {
+    if (typeof window === "undefined") return false;
+    try {
+      const usedTokens = JSON.parse(localStorage.getItem("kisanSetu_used_tokens") || "[]");
+      const numStr = String(targetTokenNum || targetTokenId.replace(/\D/g, ""));
+      const isUsed = usedTokens.includes(targetTokenId) || (numStr && usedTokens.includes(numStr));
+
+      if (isUsed) {
+        setIsPassUsed(true);
+        setUsedTimestamp(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+        return true;
+      }
+
+      // Also check checked-in registry
+      const registry = JSON.parse(localStorage.getItem("kisanSetu_checked_in_registry") || "[]");
+      if (Array.isArray(registry)) {
+        const found = registry.find(
+          (f) => String(f.tokenNumber) === numStr || f.farmerName?.toLowerCase() === pass.farmerName?.toLowerCase()
+        );
+        if (found) {
+          setIsPassUsed(true);
+          setUsedTimestamp(found.checkInTime || "Today");
+          return true;
+        }
+      }
+    } catch {}
+    setIsPassUsed(false);
+    return false;
+  };
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -62,7 +93,6 @@ export default function FarmerPassView() {
           } catch {}
         }
 
-        // Check if user has registered a profile
         const farmerProfile = localStorage.getItem("farmer_profile") || localStorage.getItem("kisanSetu_farmer_profile");
         if (farmerProfile) {
           try {
@@ -83,8 +113,8 @@ export default function FarmerPassView() {
       }
 
       setPass(activePass);
+      checkTokenConsumption(activePass.tokenId, activePass.tokenNumber);
 
-      // Generate Working Scannable QR Payload with complete farmer data
       const qrPayload = JSON.stringify({
         tokenId: activePass.tokenId,
         tokenNumber: activePass.tokenNumber || Number(activePass.tokenId.replace(/\D/g, "")) || 112,
@@ -96,14 +126,14 @@ export default function FarmerPassView() {
         date: activePass.date,
         timeSlot: activePass.timeSlot,
         oneTimePass: true,
-        valid: true,
+        valid: !isPassUsed,
         issuedAt: new Date().toISOString(),
       });
 
       try {
         const dataUrl = await QRCode.toDataURL(qrPayload, {
           margin: 1,
-          width: 320,
+          width: 420,
           errorCorrectionLevel: "H",
           color: {
             dark: "#022c22",
@@ -117,48 +147,36 @@ export default function FarmerPassView() {
     };
 
     loadBooking();
-  }, [urlToken]);
 
-  const handleSearchLookup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchTokenInput.trim()) return;
-
-    const formattedToken = searchTokenInput.trim().toUpperCase().startsWith("KS-")
-      ? searchTokenInput.trim().toUpperCase()
-      : `KS-${searchTokenInput.trim().replace(/\D/g, "") || searchTokenInput.trim()}`;
-
-    const updatedPass: FarmerBookingPass = {
-      ...pass,
-      tokenId: formattedToken,
-      tokenNumber: Number(formattedToken.replace(/\D/g, "")) || 112,
+    // Listen for storage events (e.g. when operator scans in another tab)
+    const handleStorageChange = () => {
+      checkTokenConsumption(pass.tokenId, pass.tokenNumber);
     };
 
-    setPass(updatedPass);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [urlToken]);
 
-    const qrPayload = JSON.stringify({
-      tokenId: updatedPass.tokenId,
-      tokenNumber: updatedPass.tokenNumber,
-      farmerName: updatedPass.farmerName,
-      phone: updatedPass.farmerPhone || "+91 98765 43210",
-      center: updatedPass.center,
-      crop: updatedPass.crop,
-      weight: updatedPass.weight,
-      date: updatedPass.date,
-      timeSlot: updatedPass.timeSlot,
-      oneTimePass: true,
-    });
-
+  // Test scan simulation toggle
+  const togglePassScanSimulation = () => {
+    if (typeof window === "undefined") return;
     try {
-      const dataUrl = await QRCode.toDataURL(qrPayload, {
-        margin: 1,
-        width: 320,
-        errorCorrectionLevel: "H",
-        color: { dark: "#022c22", light: "#ffffff" },
-      });
-      setGeneratedQr(dataUrl);
+      const used = JSON.parse(localStorage.getItem("kisanSetu_used_tokens") || "[]");
+      if (isPassUsed) {
+        // Reset
+        const filtered = used.filter((t: string) => t !== pass.tokenId && t !== String(pass.tokenNumber));
+        localStorage.setItem("kisanSetu_used_tokens", JSON.stringify(filtered));
+        setIsPassUsed(false);
+      } else {
+        // Mark as scanned
+        if (!used.includes(pass.tokenId)) used.push(pass.tokenId);
+        if (pass.tokenNumber && !used.includes(String(pass.tokenNumber))) used.push(String(pass.tokenNumber));
+        localStorage.setItem("kisanSetu_used_tokens", JSON.stringify(used));
+        setIsPassUsed(true);
+        setUsedTimestamp(new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+      }
+      window.dispatchEvent(new Event("storage"));
     } catch {}
-
-    setIsSearching(false);
   };
 
   const copyTokenNumber = () => {
@@ -168,209 +186,210 @@ export default function FarmerPassView() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 sm:px-6 lg:px-8 font-sans print:min-h-0 print:bg-white print:text-black print:p-0 print:m-0">
+    <div className="min-h-screen bg-white text-slate-900 py-8 px-4 sm:px-6 lg:px-8 font-sans print:min-h-0 print:bg-white print:p-0 print:m-0">
       <div className="max-w-3xl mx-auto print:max-w-none print:w-full">
-        {/* Top Header */}
-        <div className="text-center mb-8 print:hidden">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider mb-3">
-            <span>🎫</span>
-            <span>Digital APMC Yard Entry Gate Pass</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-            Farmer's Official Gate Pass & QR Code
+        {/* Page Top Header */}
+        <div className="text-center mb-6 print:hidden">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            Official Gate Pass & Scannable QR Code
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-lg mx-auto mt-2">
-            Show this scannable dynamic QR code at the procurement center entry gate for instant contactless check-in.
+          <p className="text-xs text-slate-500 max-w-lg mx-auto mt-1">
+            Show this scannable QR code at the APMC gate for instant contactless check-in.
           </p>
         </div>
 
-        {/* Quick Search / Token Switcher */}
-        <div className="flex justify-center mb-6 print:hidden">
-          {!isSearching ? (
-            <button
-              onClick={() => setIsSearching(true)}
-              className="text-xs font-bold text-slate-400 hover:text-emerald-400 bg-slate-900 border border-slate-800 hover:border-emerald-500/40 px-4 py-2 rounded-full transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <span>🔍</span>
-              <span>Look Up Different Token / Phone</span>
-            </button>
-          ) : (
-            <form onSubmit={handleSearchLookup} className="flex items-center gap-2 max-w-md w-full animate-fadeIn">
-              <input
-                type="text"
-                placeholder="Enter Token ID (e.g. KS-781920 or 112)"
-                value={searchTokenInput}
-                onChange={(e) => setSearchTokenInput(e.target.value)}
-                className="flex-1 bg-slate-900 border border-slate-700 text-white font-mono font-bold text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500"
-              />
-              <button
-                type="submit"
-                className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs px-4 py-2 rounded-xl cursor-pointer"
-              >
-                Load
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsSearching(false)}
-                className="text-slate-400 hover:text-white text-xs px-2 cursor-pointer"
-              >
-                ✕
-              </button>
-            </form>
-          )}
-        </div>
-
-        {/* OFFICIAL PRINTABLE GATE PASS SLIP */}
+        {/* OFFICIAL GATE PASS SLIP */}
         <div
           id="printable-gate-pass"
-          className="bg-white text-slate-900 rounded-3xl p-6 sm:p-10 shadow-2xl border-4 border-emerald-600/30 relative overflow-hidden printable-slip-area print:border-2 print:border-black print:shadow-none print:p-6 print:text-black print:bg-white print:rounded-2xl"
+          className={`rounded-3xl p-5 sm:p-7 shadow-2xl border-2 relative overflow-hidden printable-slip-area print:border-2 print:border-black print:shadow-none print:p-4 print:text-black print:bg-white print:rounded-none ${
+            isPassUsed
+              ? "bg-slate-950 text-white border-rose-500/50"
+              : "bg-slate-950 text-white border-emerald-500/40"
+          }`}
         >
           {/* Watermark badge */}
-          <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 rounded-bl-full flex items-start justify-end p-4 font-black text-emerald-800 text-[11px] uppercase tracking-widest pointer-events-none">
-            VALID PASS
+          <div
+            className={`absolute top-0 right-0 w-32 h-32 rounded-bl-full flex items-start justify-end p-2.5 font-black text-[9px] uppercase tracking-widest pointer-events-none print:hidden ${
+              isPassUsed ? "bg-rose-500/15 text-rose-400" : "bg-emerald-500/10 text-emerald-400"
+            }`}
+          >
+            {isPassUsed ? "PASS USED" : "VALID PASS"}
           </div>
 
           {/* Slip Header */}
-          <div className="flex items-center gap-3 pb-5 border-b-2 border-dashed border-slate-300">
-            <img src="/icon.svg" alt="Logo" className="w-12 h-12 rounded-2xl shadow-md" />
+          <div className="flex items-center gap-3 pb-3 border-b border-slate-800 print:border-b-2 print:border-dashed print:border-slate-300 print:pb-2">
+            <img src="/icon.svg" alt="Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-md border border-slate-700 print:border-none" />
             <div>
-              <span className="text-[10px] font-extrabold text-emerald-700 uppercase tracking-widest block">
+              <span className="text-[8.5px] sm:text-[9.5px] font-extrabold text-emerald-400 print:text-emerald-800 uppercase tracking-widest block">
                 Government of India • Ministry of Agriculture & Farmers Welfare
               </span>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-none mt-0.5">
+              <h2 className="text-base sm:text-lg font-black text-white print:text-slate-900 tracking-tight leading-none mt-0.5">
                 APMC YARD ENTRY GATE PASS
               </h2>
-              <p className="text-xs text-slate-600 font-semibold mt-1">
+              <p className="text-[10px] text-slate-400 print:text-slate-600 font-semibold mt-0.5">
                 Direct Benefit Transfer (DBT) Crop Procurement Hub
               </p>
             </div>
           </div>
 
-          {/* Big Token Number & Pass Validity */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-6 border-b border-slate-200 gap-4">
-            <div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                ASSIGNED TOKEN NUMBER
-              </span>
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-3xl sm:text-4xl font-black text-emerald-600 font-mono tracking-tight">
-                  {pass.tokenId}
-                </span>
-                <button
-                  onClick={copyTokenNumber}
-                  className="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1 print:hidden"
-                  title="Copy Token ID"
-                >
-                  <span>📋</span>
-                  <span>{copiedNotification ? "Copied!" : "Copy"}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="sm:text-right">
-              <span className="text-[11px] text-slate-400 block font-bold uppercase">Pass Status</span>
-              <span className="text-emerald-900 bg-emerald-100 border border-emerald-300 rounded-full px-3.5 py-1 font-black text-xs inline-flex items-center gap-2 mt-1 shadow-sm">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>ONE-TIME PASS • VALID</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Appointment Time Window Banner (Prominently Displayed) */}
-          <div className="bg-emerald-950/5 border-2 border-emerald-500/20 rounded-2xl p-4 my-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-xl shadow-md">
-                ⏰
-              </div>
-              <div>
-                <span className="text-[10px] font-black text-emerald-800 uppercase tracking-wider block">
-                  SCHEDULED ARRIVAL TIME WINDOW
-                </span>
-                <span className="text-lg sm:text-xl font-black text-slate-900 font-mono">
-                  {pass.timeSlot}
-                </span>
-              </div>
-            </div>
-
-            <div className="sm:text-right font-semibold text-xs text-slate-600">
-              <span>Delivery Date: </span>
-              <span className="font-bold text-slate-900 font-mono">{pass.date}</span>
-            </div>
-          </div>
-
-          {/* Beneficiary Details Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2 text-xs">
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-              <span className="text-slate-400 block font-bold text-[10px] uppercase">Farmer Beneficiary</span>
-              <span className="text-slate-900 font-black text-base block mt-0.5">{pass.farmerName}</span>
-              <span className="text-slate-500 font-mono text-xs block mt-0.5">{pass.farmerPhone || "+91 98765 43210"}</span>
-            </div>
-
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-              <span className="text-slate-400 block font-bold text-[10px] uppercase">Designated Procurement Center</span>
-              <span className="text-slate-900 font-bold text-sm block mt-0.5 leading-snug">{pass.center}</span>
-            </div>
-
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-              <span className="text-slate-400 block font-bold text-[10px] uppercase">Commodity Crop Variety</span>
-              <span className="text-emerald-800 font-black text-sm block mt-0.5">🌾 {pass.crop}</span>
-            </div>
-
-            <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-              <span className="text-slate-400 block font-bold text-[10px] uppercase">Declared Intake Weight</span>
-              <span className="text-slate-900 font-mono font-black text-base block mt-0.5">
-                {pass.weight} Quintals <span className="text-xs font-normal text-slate-500">({pass.weight * 100} kg)</span>
-              </span>
-            </div>
-          </div>
-
-          {/* DYNAMIC SCANNABLE QR CODE SECTION */}
-          <div className="mt-6 pt-6 border-t-2 border-dashed border-slate-300 flex flex-col sm:flex-row items-center justify-between gap-6 bg-gradient-to-r from-emerald-50/80 to-slate-50 p-5 rounded-3xl border border-emerald-500/20">
-            <div className="space-y-1.5 text-center sm:text-left">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <span className="text-lg">📷</span>
-                <span className="text-sm font-black text-emerald-950">Operator Verification QR Code</span>
-              </div>
-              <p className="text-xs text-slate-600 max-w-sm leading-relaxed">
-                Scan with the APMC Operator Camera at the yard gate. All farmer details, token ID, weight, and appointment time will be parsed automatically.
-              </p>
-              <div className="pt-1">
-                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 border border-emerald-200 px-2.5 py-1 rounded-lg inline-block">
-                  ✓ High-Resolution Dynamic 2D Data Matrix
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col items-center shrink-0">
-              {generatedQr ? (
-                <img
-                  src={generatedQr}
-                  alt="Farmer Gate Pass QR Code"
-                  className="w-40 h-40 rounded-2xl border-2 border-emerald-600/40 bg-white p-2 shadow-lg"
-                />
-              ) : (
-                <div className="w-40 h-40 border-2 border-dashed border-emerald-400 bg-white rounded-2xl flex items-center justify-center font-bold text-emerald-800 text-xs">
-                  Generating QR...
+          {/* INVALID PASS ALERT BANNER (IF SCANNED) */}
+          {isPassUsed && (
+            <div className="bg-rose-500/20 border border-rose-500/40 text-rose-300 rounded-2xl p-3 my-3 text-xs flex items-center justify-between gap-2 animate-fadeIn">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🚫</span>
+                <div>
+                  <strong className="block font-black text-white">ONE-TIME PASS USED & EXPIRED</strong>
+                  <p className="text-[11px] text-rose-200">
+                    This pass was verified and checked in at the APMC yard gate ({usedTimestamp || "Today"}).
+                  </p>
                 </div>
-              )}
-              <span className="text-[10px] font-mono text-slate-500 font-bold mt-1.5 tracking-wider uppercase">
-                SCANNABLE BY OPERATOR
+              </div>
+              <span className="text-[9px] font-mono bg-rose-950/80 border border-rose-500/40 text-rose-200 px-2 py-0.5 rounded font-bold uppercase shrink-0">
+                VOID
+              </span>
+            </div>
+          )}
+
+          {/* TOP SECTION: TOKEN ID + TIME WINDOW + SCANNABLE QR CODE (BIGGER & RESPONSIVE) */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-3.5 border-b border-slate-800 print:border-slate-200">
+            {/* Left: Token ID & Arrival Window */}
+            <div className="flex-1 space-y-2.5 w-full">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[9px] font-bold text-slate-400 print:text-slate-500 uppercase tracking-wider block">
+                    ASSIGNED TOKEN NUMBER
+                  </span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span
+                      className={`text-3xl sm:text-4xl font-black font-mono tracking-tight ${
+                        isPassUsed ? "text-slate-400 line-through" : "text-emerald-400 print:text-emerald-700"
+                      }`}
+                    >
+                      {pass.tokenId}
+                    </span>
+                    <button
+                      onClick={copyTokenNumber}
+                      className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-bold px-2 py-0.5 rounded-md transition-all cursor-pointer flex items-center gap-1 print:hidden"
+                      title="Copy Token ID"
+                    >
+                      <span>📋</span>
+                      <span>{copiedNotification ? "Copied!" : "Copy"}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  {isPassUsed ? (
+                    <span className="text-rose-300 bg-rose-500/20 border border-rose-500/40 rounded-full px-2.5 py-0.5 font-black text-[10px] inline-flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                      <span>PASS USED (VOID)</span>
+                    </span>
+                  ) : (
+                    <span className="text-emerald-300 bg-emerald-500/20 border border-emerald-500/40 print:text-emerald-900 print:bg-emerald-100 print:border-emerald-300 rounded-full px-2.5 py-0.5 font-black text-[10px] inline-flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 print:bg-emerald-600 animate-pulse"></span>
+                      <span>VALID ONE-TIME PASS</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Scheduled Arrival Time Window */}
+              <div className="bg-slate-900/90 border border-slate-800 print:bg-emerald-50 print:border-emerald-200 rounded-xl p-2.5 flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500 text-slate-950 font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                  ⏰
+                </div>
+                <div>
+                  <span className="text-[8.5px] font-black text-emerald-400 print:text-emerald-900 uppercase tracking-wider block">
+                    SCHEDULED ARRIVAL TIME WINDOW
+                  </span>
+                  <span className="text-xs sm:text-sm font-black text-white print:text-slate-900 font-mono">
+                    {pass.timeSlot} • <span className="font-bold text-slate-300 print:text-slate-700">{pass.date}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: TOP POSITIONED SCANNABLE QR CODE (BIGGER ON MOBILE & LAPTOP) */}
+            <div className="flex flex-col items-center shrink-0 bg-slate-900/90 print:bg-white p-2 sm:p-2.5 rounded-2xl border border-slate-800 print:border-none shadow-md relative group">
+              <div className="relative">
+                {generatedQr ? (
+                  <img
+                    src={generatedQr}
+                    alt="Farmer Gate Pass QR Code"
+                    className={`w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 print:w-28 print:h-28 rounded-2xl border-2 bg-white p-1.5 shadow-md transition-all ${
+                      isPassUsed
+                        ? "opacity-30 grayscale border-rose-500"
+                        : "border-slate-700 print:border-slate-300"
+                    }`}
+                  />
+                ) : (
+                  <div className="w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 border-2 border-dashed border-emerald-400 bg-white rounded-2xl flex items-center justify-center font-bold text-emerald-800 text-xs">
+                    Generating QR...
+                  </div>
+                )}
+
+                {/* Overlaid Invalid / Scanned Watermark if pass is consumed */}
+                {isPassUsed && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/80 rounded-2xl border-2 border-rose-500 p-2 text-center">
+                    <span className="text-2xl sm:text-3xl mb-1">❌</span>
+                    <span className="text-xs sm:text-sm font-black text-rose-400 uppercase tracking-tight">
+                      PASS SCANNED
+                    </span>
+                    <span className="text-[9px] font-mono text-slate-300 font-bold mt-0.5">
+                      Already Verified
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <span
+                className={`text-[9px] sm:text-[10px] font-mono font-bold mt-1.5 tracking-wider uppercase ${
+                  isPassUsed ? "text-rose-400" : "text-emerald-400 print:text-slate-600"
+                }`}
+              >
+                {isPassUsed ? "🚫 EXPIRED ONE-TIME PASS" : "📷 SCAN AT APMC GATE"}
+              </span>
+            </div>
+          </div>
+
+          {/* LOWER SECTION: BENEFICIARY DETAILS GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 py-3 text-xs print:gap-2">
+            <div className="bg-slate-900/90 print:bg-slate-50 p-2.5 rounded-xl border border-slate-800 print:border-slate-200">
+              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">Farmer Beneficiary</span>
+              <span className="text-white print:text-slate-900 font-black text-xs sm:text-sm block mt-0.5">{pass.farmerName}</span>
+              <span className="text-slate-400 print:text-slate-500 font-mono text-[10px] block mt-0.5">{pass.farmerPhone || "+91 98765 43210"}</span>
+            </div>
+
+            <div className="bg-slate-900/90 print:bg-slate-50 p-2.5 rounded-xl border border-slate-800 print:border-slate-200">
+              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">Designated Procurement Center</span>
+              <span className="text-white print:text-slate-900 font-bold text-[11px] block mt-0.5 leading-snug">{pass.center}</span>
+            </div>
+
+            <div className="bg-slate-900/90 print:bg-slate-50 p-2.5 rounded-xl border border-slate-800 print:border-slate-200">
+              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">Commodity Crop Variety</span>
+              <span className="text-emerald-400 print:text-emerald-800 font-black text-xs block mt-0.5">🌾 {pass.crop}</span>
+            </div>
+
+            <div className="bg-slate-900/90 print:bg-slate-50 p-2.5 rounded-xl border border-slate-800 print:border-slate-200">
+              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">Declared Intake Weight</span>
+              <span className="text-white print:text-slate-900 font-mono font-black text-xs sm:text-sm block mt-0.5">
+                {pass.weight} Quintals <span className="text-[10px] font-normal text-slate-400 print:text-slate-500">({pass.weight * 100} kg)</span>
               </span>
             </div>
           </div>
 
           {/* Slip Footer Security Stamp */}
-          <div className="mt-6 pt-4 border-t border-slate-200 text-center text-[10px] text-slate-500 flex items-center justify-between">
+          <div className="mt-2 pt-2 border-t border-slate-800 print:border-slate-200 text-center text-[8.5px] text-slate-400 print:text-slate-500 flex items-center justify-between">
             <span>🔒 Verified Digitally via KisanSetu National Mandi Portal</span>
             <span>Gate Entry Token: {pass.tokenId}</span>
           </div>
         </div>
 
         {/* USER ACTION BUTTONS */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-8 print:hidden">
+        <div className="flex flex-wrap items-center justify-center gap-2.5 pt-5 print:hidden">
           <button
             onClick={() => window.print()}
-            className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm px-6 py-3.5 rounded-full shadow-lg transition-all cursor-pointer flex items-center gap-2 hover:scale-105 active:scale-95"
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-md transition-all cursor-pointer flex items-center gap-2 hover:scale-105 active:scale-95"
           >
             <span>🖨️</span>
             <span>Print Official Gate Pass</span>
@@ -380,16 +399,16 @@ export default function FarmerPassView() {
             <a
               href={generatedQr}
               download={`KisanSetu_Pass_${pass.tokenId}.png`}
-              className="bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-xs sm:text-sm px-6 py-3.5 rounded-full shadow-md border border-slate-700 transition-all cursor-pointer flex items-center gap-2 hover:scale-105"
+              className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-md border border-slate-700 transition-all cursor-pointer flex items-center gap-2 hover:scale-105"
             >
               <span>📥</span>
-              <span>Download QR Code Image</span>
+              <span>Download QR Code</span>
             </a>
           )}
 
           <a
             href={`/queue?token=${pass.tokenId.replace(/\D/g, "")}&center=${encodeURIComponent(pass.center)}`}
-            className="bg-slate-900 hover:bg-emerald-900/60 text-emerald-300 font-bold text-xs sm:text-sm px-6 py-3.5 rounded-full border border-emerald-500/30 transition-all cursor-pointer flex items-center gap-2"
+            className="bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-800 font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full border border-slate-300 shadow-sm transition-all cursor-pointer flex items-center gap-2"
           >
             <span>📍</span>
             <span>Track Live Yard Queue</span>
@@ -397,7 +416,7 @@ export default function FarmerPassView() {
 
           <a
             href="/scheduler"
-            className="text-slate-400 hover:text-white font-bold text-xs px-4 py-2 cursor-pointer"
+            className="text-slate-500 hover:text-slate-900 font-bold text-xs px-3 py-1.5 cursor-pointer"
           >
             🔄 Book New Appointment
           </a>

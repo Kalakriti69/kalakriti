@@ -488,76 +488,81 @@ export default function ScheduleBooking({
                     </div>
                   </div>
 
-                  {/* Token & Confirmation Status */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 border-b border-slate-100 gap-2">
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">ASSIGNED TOKEN ID</span>
-                      <p className="text-3xl font-black text-emerald-600 font-mono tracking-tight mt-0.5">{receipt.tokenId}</p>
+                  {/* Top Section: Token ID, Time Window & Scannable QR Code */}
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-3.5 border-b border-slate-100 print:border-slate-200">
+                    <div className="flex-1 space-y-2.5 w-full">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">ASSIGNED TOKEN ID</span>
+                          <p className="text-3xl sm:text-4xl font-black text-emerald-600 font-mono tracking-tight mt-0.5">{receipt.tokenId}</p>
+                        </div>
+                        <div>
+                          <span className="text-emerald-800 bg-emerald-100 border border-emerald-300 rounded-full px-3 py-1 font-extrabold text-xs inline-flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span>ACTIVE PASS</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-2.5 flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
+                          ⏰
+                        </div>
+                        <div>
+                          <span className="text-[9px] font-black text-emerald-900 uppercase tracking-wider block">
+                            SCHEDULED ARRIVAL
+                          </span>
+                          <span className="text-xs sm:text-sm font-black text-slate-900 font-mono">
+                            {receipt.timeSlot} • <span className="font-bold text-slate-600">{receipt.date}</span>
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="sm:text-right">
-                      <span className="text-[10px] text-slate-400 block font-bold uppercase">Pass Status</span>
-                      <span className="text-emerald-800 bg-emerald-100 border border-emerald-300 rounded-full px-3 py-1 font-extrabold text-xs inline-flex items-center gap-1.5 mt-0.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span>ONE-TIME PASS • ACTIVE</span>
+
+                    {/* Top Scannable QR Code */}
+                    <div className="flex flex-col items-center shrink-0 bg-white p-2 sm:p-2.5 rounded-2xl border border-emerald-200 shadow-md">
+                      {receipt.qrCode ? (
+                        <img
+                          src={receipt.qrCode}
+                          alt="One-Time Pass QR Code"
+                          className="w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-2xl border-2 border-emerald-300 p-1.5 shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 border-2 border-dashed border-emerald-400 bg-white rounded-2xl flex items-center justify-center font-bold text-emerald-800 text-xs">
+                          QR Pass
+                        </div>
+                      )}
+                      <span className="text-[9px] sm:text-[10px] font-mono text-emerald-800 font-bold mt-1.5 tracking-wider uppercase">
+                        📷 SCAN AT APMC GATE
                       </span>
                     </div>
                   </div>
 
                   {/* Details Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 text-xs">
-                    <div className="bg-slate-100/60 p-3 rounded-2xl">
-                      <span className="text-slate-400 block font-semibold text-[10px] uppercase">Farmer Beneficiary</span>
-                      <span className="text-slate-900 font-black text-sm block mt-0.5">{receipt.farmerName}</span>
-                      <span className="text-slate-500 font-mono text-xs">{receipt.farmerPhone || "+91 98765 43210"}</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-3 text-xs">
+                    <div className="bg-slate-100/60 p-2.5 rounded-xl">
+                      <span className="text-slate-400 block font-semibold text-[9px] uppercase">Farmer Beneficiary</span>
+                      <span className="text-slate-900 font-black text-xs sm:text-sm block mt-0.5">{receipt.farmerName}</span>
+                      <span className="text-slate-500 font-mono text-[10px]">{receipt.farmerPhone || "+91 98765 43210"}</span>
                     </div>
 
-                    <div className="bg-slate-100/60 p-3 rounded-2xl">
-                      <span className="text-slate-400 block font-semibold text-[10px] uppercase">Procurement Hub</span>
-                      <span className="text-slate-900 font-bold text-xs block mt-0.5 leading-snug">{receipt.center}</span>
+                    <div className="bg-slate-100/60 p-2.5 rounded-xl">
+                      <span className="text-slate-400 block font-semibold text-[9px] uppercase">Procurement Hub</span>
+                      <span className="text-slate-900 font-bold text-[11px] block mt-0.5 leading-snug">{receipt.center}</span>
                     </div>
 
-                    <div className="bg-slate-100/60 p-3 rounded-2xl">
-                      <span className="text-slate-400 block font-semibold text-[10px] uppercase">Commodity & Quantity</span>
-                      <span className="text-emerald-800 font-black text-sm block mt-0.5">
+                    <div className="bg-slate-100/60 p-2.5 rounded-xl">
+                      <span className="text-slate-400 block font-semibold text-[9px] uppercase">Commodity & Quantity</span>
+                      <span className="text-emerald-800 font-black text-xs block mt-0.5">
                         🌾 {receipt.crop} — {receipt.weight} Quintals
                       </span>
                     </div>
 
-                    <div className="bg-slate-100/60 p-3 rounded-2xl">
-                      <span className="text-slate-400 block font-semibold text-[10px] uppercase">Scheduled Appointment</span>
-                      <span className="text-slate-900 font-bold text-xs block mt-0.5">
-                        📅 {receipt.date} • ⏰ {receipt.timeSlot}
+                    <div className="bg-slate-100/60 p-2.5 rounded-xl">
+                      <span className="text-slate-400 block font-semibold text-[9px] uppercase">Official Status</span>
+                      <span className="text-slate-900 font-bold text-[11px] block mt-0.5">
+                        ✓ Verified Gate Entry Pass
                       </span>
-                    </div>
-                  </div>
-
-                  {/* Dynamic One-Time Pass QR Code Container */}
-                  <div className="mt-4 pt-5 border-t-2 border-dashed border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6 bg-emerald-950/5 p-4 rounded-3xl">
-                    <div className="space-y-1 text-center sm:text-left">
-                      <span className="text-xs font-black text-emerald-900 block flex items-center gap-1.5 justify-center sm:justify-start">
-                        <span>📲 Dynamic One-Time Scannable Pass</span>
-                      </span>
-                      <p className="text-[11px] text-slate-600 max-w-xs leading-relaxed">
-                        Present this QR code to the APMC Yard Operator camera at the weighbridge gate for instant contactless check-in.
-                      </p>
-                      <span className="text-[10px] text-amber-700 font-bold bg-amber-100/80 px-2 py-0.5 rounded-md inline-block mt-1 print:hidden">
-                        ⚠️ Pass will automatically expire once scanned at the yard.
-                      </span>
-                    </div>
-
-                    <div className="flex flex-col items-center">
-                      {receipt.qrCode ? (
-                        <img
-                          src={receipt.qrCode}
-                          alt="One-Time Pass QR Code"
-                          className="w-36 h-36 rounded-2xl border-2 border-emerald-500/40 bg-white p-2 shadow-md"
-                        />
-                      ) : (
-                        <div className="w-36 h-36 border-2 border-dashed border-emerald-400 bg-white rounded-2xl flex items-center justify-center font-bold text-emerald-800 text-xs">
-                          QR Pass
-                        </div>
-                      )}
-                      <span className="text-[10px] font-mono text-slate-400 mt-1 font-bold">SCAN WITH OPERATOR DESK</span>
                     </div>
                   </div>
                 </div>

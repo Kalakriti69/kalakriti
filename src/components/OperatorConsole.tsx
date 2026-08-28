@@ -91,6 +91,7 @@ export default function OperatorConsole() {
   // Camera Scanner State
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<"environment" | "user">("environment");
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
 
   // Manual Form State
@@ -152,18 +153,22 @@ export default function OperatorConsole() {
   };
 
   // Start HTML5 Camera QR Scanner
-  const startCameraScanner = async () => {
+  const startCameraScanner = async (targetFacing: "environment" | "user" = facingMode) => {
     setCameraError(null);
     setIsCameraActive(true);
 
     try {
       if (!html5QrCodeRef.current) {
         html5QrCodeRef.current = new Html5Qrcode("reader");
+      } else if (html5QrCodeRef.current.isScanning) {
+        try {
+          await html5QrCodeRef.current.stop();
+        } catch {}
       }
 
-      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+      const config = { fps: 15, qrbox: { width: 250, height: 250 } };
       await html5QrCodeRef.current.start(
-        { facingMode: "environment" },
+        { facingMode: targetFacing },
         config,
         (decodedText) => {
           handleQrCodeScanned(decodedText);
@@ -176,6 +181,14 @@ export default function OperatorConsole() {
       console.warn("Camera init error:", err);
       setCameraError("Camera access denied or device has no camera. You can also use Manual Entry.");
       setIsCameraActive(false);
+    }
+  };
+
+  const switchCameraFacingMode = async () => {
+    const nextMode = facingMode === "environment" ? "user" : "environment";
+    setFacingMode(nextMode);
+    if (isCameraActive) {
+      await startCameraScanner(nextMode);
     }
   };
 
@@ -238,6 +251,17 @@ export default function OperatorConsole() {
 
     // Mark Token as Consumed
     setConsumedQrTokens((prev) => new Set([...prev, tokenId]));
+
+    if (typeof window !== "undefined") {
+      try {
+        const used = JSON.parse(localStorage.getItem("kisanSetu_used_tokens") || "[]");
+        if (!used.includes(tokenId)) used.push(tokenId);
+        const numStr = String(tokenId).replace(/\D/g, "");
+        if (numStr && !used.includes(numStr)) used.push(numStr);
+        localStorage.setItem("kisanSetu_used_tokens", JSON.stringify(used));
+        window.dispatchEvent(new Event("storage"));
+      } catch {}
+    }
 
     const numericToken = Number(String(tokenId).replace(/\D/g, "")) || Math.floor(100 + Math.random() * 900);
     const newCheckIn: CheckedInFarmer = {
@@ -458,19 +482,19 @@ export default function OperatorConsole() {
       </header>
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        {/* Yard Banner & Stats Bar */}
-        <div className="bg-slate-900 border border-slate-800 p-5 rounded-3xl shadow-lg mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl border border-emerald-500/30">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+        {/* Compact Yard Banner & Quick Stats (Mobile Friendly) */}
+        <div className="bg-slate-900/90 border border-slate-800 p-3.5 sm:p-4 rounded-2xl shadow-lg mb-4 sm:mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/30 shrink-0">
               🏬
             </div>
-            <div>
-              <span className="text-xs text-slate-400 font-bold uppercase tracking-wider block">Active Procurement Yard</span>
+            <div className="flex-1 min-w-0">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Active Procurement Yard</span>
               <select
                 value={selectedYard}
                 onChange={(e) => setSelectedYard(e.target.value)}
-                className="bg-slate-950 border border-slate-700 text-white font-extrabold text-sm sm:text-base rounded-xl px-3 py-1.5 mt-1 focus:outline-none focus:border-emerald-500"
+                className="w-full bg-slate-950 border border-slate-700 text-white font-extrabold text-xs sm:text-sm rounded-xl px-2.5 py-1 focus:outline-none focus:border-emerald-500 cursor-pointer truncate"
               >
                 <option value="Chandaka RMC Procurement Yard, Odisha">Chandaka RMC Procurement Yard, Odisha</option>
                 <option value="Kalyanpur Krishi Mandi, Uttar Pradesh">Kalyanpur Krishi Mandi, Uttar Pradesh</option>
@@ -480,32 +504,32 @@ export default function OperatorConsole() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="bg-slate-950 border border-slate-800 px-4 py-2 rounded-2xl">
-              <span className="text-[10px] text-slate-400 block font-bold uppercase">Today's Check-Ins</span>
-              <span className="text-lg font-black text-emerald-400">{totalCheckedInCount} Farmers</span>
+          <div className="flex items-center justify-between sm:justify-end gap-2 text-xs">
+            <div className="bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl flex-1 sm:flex-initial text-center sm:text-left">
+              <span className="text-[9px] text-slate-400 block font-bold uppercase">Check-Ins</span>
+              <span className="text-sm sm:text-base font-black text-emerald-400 font-mono">{totalCheckedInCount} Farmers</span>
             </div>
-            <div className="bg-slate-950 border border-slate-800 px-4 py-2 rounded-2xl">
-              <span className="text-[10px] text-slate-400 block font-bold uppercase">Estimated Intake</span>
-              <span className="text-lg font-black text-white">{totalIntakeQtl} Qtl</span>
+            <div className="bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl flex-1 sm:flex-initial text-center sm:text-left">
+              <span className="text-[9px] text-slate-400 block font-bold uppercase">Intake</span>
+              <span className="text-sm sm:text-base font-black text-white font-mono">{totalIntakeQtl} Qtl</span>
             </div>
             <button
               onClick={handleDownloadExcel}
-              className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-xs sm:text-sm px-4 py-3 rounded-2xl shadow-lg transition-all cursor-pointer flex items-center gap-2 hover:scale-105 active:scale-95"
+              className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 hover:scale-105 active:scale-95 shrink-0"
               title="Download Excel Spreadsheet of all checked-in farmers"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
               </svg>
-              <span>Download Excel (.xlsx)</span>
+              <span>Excel (.xlsx)</span>
             </button>
           </div>
         </div>
 
-        {/* Live Notification Bar */}
+        {/* Live Notification Alert Bar */}
         {notification && (
           <div
-            className={`mb-6 p-4 rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-between animate-fadeIn border ${
+            className={`mb-4 p-3.5 rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-between animate-fadeIn border ${
               notification.type === "error"
                 ? "bg-rose-500/20 border-rose-500/40 text-rose-200"
                 : "bg-emerald-500/20 border-emerald-500/40 text-emerald-200"
@@ -515,22 +539,22 @@ export default function OperatorConsole() {
               <span>{notification.type === "error" ? "⚠️" : "✅"}</span>
               <span>{notification.message}</span>
             </div>
-            <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-white">✕</button>
+            <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-white px-2">✕</button>
           </div>
         )}
 
-        {/* Navigation Tabs */}
-        <div className="flex flex-wrap bg-slate-900 p-1.5 rounded-3xl border border-slate-800 mb-8 max-w-2xl">
+        {/* TOP OF ALL: PRIMARY TAB NAVIGATION SELECTOR (MOBILE RESPONSIVE GRID) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 mb-4 sm:mb-6">
           <button
             onClick={() => setActiveTab("camera")}
-            className={`flex-1 py-3 px-4 rounded-2xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+            className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               activeTab === "camera"
                 ? "bg-emerald-500 text-slate-950 shadow-md font-black"
-                : "text-slate-400 hover:text-slate-200"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
             <span>📷</span>
-            <span>Camera QR Scanner</span>
+            <span>Camera Scanner</span>
           </button>
 
           <button
@@ -538,10 +562,10 @@ export default function OperatorConsole() {
               stopCameraScanner();
               setActiveTab("manual");
             }}
-            className={`flex-1 py-3 px-4 rounded-2xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+            className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               activeTab === "manual"
                 ? "bg-emerald-500 text-slate-950 shadow-md font-black"
-                : "text-slate-400 hover:text-slate-200"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
             <span>✍️</span>
@@ -553,14 +577,14 @@ export default function OperatorConsole() {
               stopCameraScanner();
               setActiveTab("weighbridge");
             }}
-            className={`flex-1 py-3 px-4 rounded-2xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+            className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               activeTab === "weighbridge"
                 ? "bg-emerald-500 text-slate-950 shadow-md font-black"
-                : "text-slate-400 hover:text-slate-200"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
             <span>⚖️</span>
-            <span>Weighbridge Terminal</span>
+            <span>Weighbridge</span>
           </button>
 
           <button
@@ -568,102 +592,126 @@ export default function OperatorConsole() {
               stopCameraScanner();
               setActiveTab("registry");
             }}
-            className={`flex-1 py-3 px-4 rounded-2xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+            className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               activeTab === "registry"
                 ? "bg-emerald-500 text-slate-950 shadow-md font-black"
-                : "text-slate-400 hover:text-slate-200"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
             }`}
           >
             <span>📋</span>
-            <span>Checked-In Registry</span>
+            <span>Registry ({totalCheckedInCount})</span>
           </button>
         </div>
 
-        {/* TAB 1: Camera QR Scanner */}
+        {/* TOP POSITIONED: TAB 1 Camera QR Scanner */}
         {activeTab === "camera" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xl">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
                 <div>
-                  <h3 className="text-xl font-black text-white flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
                     <span>📷 Live Gate Camera QR Scanner</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Scan farmer's One-Time QR Pass at the yard entry gate. The pass will be consumed and validated instantly.
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Scan farmer's One-Time QR Pass at the yard entry gate for instant check-in.
                   </p>
                 </div>
               </div>
 
               {/* Camera Scanner Viewport */}
-              <div className="relative bg-slate-950 border-2 border-dashed border-emerald-500/40 rounded-3xl overflow-hidden min-h-[300px] flex flex-col items-center justify-center p-4">
-                <div id="reader" className="w-full max-w-sm rounded-2xl overflow-hidden"></div>
+              <div className="relative bg-slate-950 border-2 border-dashed border-emerald-500/40 rounded-2xl overflow-hidden min-h-[260px] sm:min-h-[300px] flex flex-col items-center justify-center p-3">
+                <div id="reader" className="w-full max-w-sm rounded-xl overflow-hidden"></div>
 
                 {!isCameraActive && (
-                  <div className="text-center space-y-4 py-8">
-                    <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-3xl">
+                  <div className="text-center space-y-3 py-6 px-2">
+                    <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto text-2xl animate-pulse">
                       📸
                     </div>
                     <div>
-                      <h4 className="font-black text-white text-base">Camera is currently standby</h4>
-                      <p className="text-xs text-slate-400 max-w-xs mx-auto mt-1">
-                        Click below to open device camera and scan the farmer's dynamic pass.
+                      <h4 className="font-black text-white text-sm sm:text-base">Camera Scanner Ready</h4>
+                      <p className="text-xs text-slate-400 max-w-xs mx-auto mt-0.5">
+                        Tap button below to launch phone/webcam camera scanner.
                       </p>
                     </div>
-                    <button
-                      onClick={startCameraScanner}
-                      className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm px-6 py-3 rounded-2xl shadow-lg transition-all cursor-pointer hover:scale-105"
-                    >
-                      Start Camera Scanner
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
+                      <button
+                        onClick={() => startCameraScanner()}
+                        className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm px-6 py-3 rounded-full shadow-lg transition-all cursor-pointer hover:scale-105 active:scale-95"
+                      >
+                        📸 Start Camera Scanner
+                      </button>
+
+                      {/* Mobile-Only Reverse / Flip Camera Selector */}
+                      <button
+                        onClick={switchCameraFacingMode}
+                        className="sm:hidden w-full bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-4 py-2.5 rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
+                        title="Toggle Front/Rear Camera"
+                      >
+                        <span>🔄</span>
+                        <span>Mode: {facingMode === "environment" ? "Rear (Back) Camera" : "Front (Selfie) Camera"}</span>
+                      </button>
+                    </div>
                   </div>
                 )}
 
                 {isCameraActive && (
-                  <div className="mt-4 flex gap-3">
+                  <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                    {/* Mobile-Only Live Flip / Reverse Camera Button */}
+                    <button
+                      onClick={switchCameraFacingMode}
+                      className="sm:hidden bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 font-bold text-xs px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
+                      title="Switch between front and back cameras on phone"
+                    >
+                      <span>🔄</span>
+                      <span>Flip Cam ({facingMode === "environment" ? "Rear" : "Front"})</span>
+                    </button>
+
                     <button
                       onClick={stopCameraScanner}
-                      className="bg-slate-800 hover:bg-rose-900/60 text-slate-300 hover:text-rose-200 font-bold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
+                      className="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 font-bold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
                     >
-                      Stop Camera
+                      ⏹ Stop Scanner
                     </button>
                   </div>
                 )}
 
                 {cameraError && (
-                  <div className="mt-4 p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-200 text-xs text-center max-w-sm">
+                  <div className="mt-3 p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-200 text-xs text-center max-w-sm">
                     {cameraError}
                   </div>
                 )}
               </div>
 
               {/* Quick Simulated Test Scanner */}
-              <div className="mt-6 p-4 bg-slate-950 border border-slate-800 rounded-2xl">
-                <span className="block text-xs font-bold text-slate-400 mb-2">Simulate Quick QR Scanner for Testing:</span>
-                <div className="flex flex-wrap gap-2">
+              <div className="mt-4 p-3 bg-slate-950 border border-slate-800 rounded-2xl">
+                <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  ⚡ 1-Tap QR Scan Simulator (For Testing Pass Invalidation):
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    onClick={() => handleQrCodeScanned(JSON.stringify({ tokenId: "KS-781920", farmerName: "Ramesh Kumar", crop: "Paddy (Common)", weight: 35.0, phone: "+91 98765 43210" }))}
+                    className="bg-slate-900 hover:bg-emerald-900/40 hover:text-emerald-300 text-slate-200 font-mono text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer"
+                  >
+                    Scan Pass KS-781920 (Ramesh)
+                  </button>
                   <button
                     onClick={() => handleQrCodeScanned(JSON.stringify({ tokenId: "KS-112", farmerName: "Bikash Mohanty", crop: "Paddy (Common)", weight: 35.0, phone: "+91 97782 10934" }))}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs px-3 py-1.5 rounded-xl border border-slate-700 cursor-pointer"
+                    className="bg-slate-900 hover:bg-emerald-900/40 hover:text-emerald-300 text-slate-200 font-mono text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer"
                   >
                     Scan Token #112 (Bikash)
                   </button>
                   <button
                     onClick={() => handleQrCodeScanned(JSON.stringify({ tokenId: "KS-113", farmerName: "Gurpreet Gill", crop: "Paddy (Grade A)", weight: 60.0, phone: "+91 98140 33412" }))}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs px-3 py-1.5 rounded-xl border border-slate-700 cursor-pointer"
+                    className="bg-slate-900 hover:bg-emerald-900/40 hover:text-emerald-300 text-slate-200 font-mono text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 cursor-pointer"
                   >
                     Scan Token #113 (Gurpreet)
-                  </button>
-                  <button
-                    onClick={() => handleQrCodeScanned(JSON.stringify({ tokenId: "KS-114", farmerName: "Rameshwar Patil", crop: "Soybean", weight: 22.0, phone: "+91 98220 91823" }))}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs px-3 py-1.5 rounded-xl border border-slate-700 cursor-pointer"
-                  >
-                    Scan Token #114 (Rameshwar)
                   </button>
                 </div>
               </div>
             </div>
 
             {/* Right: Quick Recent Check-Ins Sidebar */}
-            <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+            <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xl space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <h4 className="font-black text-white text-base">Recent Check-Ins</h4>
                 <span className="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-2.5 py-0.5 rounded-full">

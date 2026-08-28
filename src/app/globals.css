@@ -40,21 +40,12 @@ html {
     }
   }
 
-  @keyframes macos-open {
+  @keyframes shimmer {
     0% {
-      opacity: 0;
-      transform: scale(0.82) translateY(24px);
-      transform-origin: bottom right;
-    }
-    70% {
-      opacity: 1;
-      transform: scale(1.02) translateY(-2px);
-      transform-origin: bottom right;
+      background-position: 200% 0;
     }
     100% {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-      transform-origin: bottom right;
+      background-position: -200% 0;
     }
   }
 
@@ -156,8 +147,23 @@ html {
   text-shadow: 0 4px 16px rgba(0, 0, 0, 0.9);
 }
 
-/* Print optimization - hide navbar, chatbot, footer and show only official slip & QR */
+/* Print optimization - hide navbar, chatbot, footer and ensure strict 1-page fit */
+@page {
+  size: portrait;
+  margin: 6mm;
+}
+
 @media print {
+  html, body {
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   header,
   nav,
   footer,
@@ -170,24 +176,20 @@ html {
     display: none !important;
   }
 
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
   #printable-gate-pass,
   .printable-slip-area {
     margin: 0 auto !important;
-    padding: 1.5rem !important;
+    padding: 1rem !important;
     border: 2px solid #059669 !important;
     box-shadow: none !important;
     background: #ffffff !important;
     color: #000000 !important;
     page-break-inside: avoid !important;
+    page-break-after: avoid !important;
+    page-break-before: avoid !important;
     width: 100% !important;
     max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 }
 
