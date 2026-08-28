@@ -6,10 +6,11 @@ import { useTranslation } from "@/hooks/useTranslation";
 
 interface NavbarProps {
   onLoginClick: () => void;
+  onOperatorClick?: () => void;
+  onAdminClick?: () => void;
 }
 
-export default function Navbar({ onLoginClick }: NavbarProps) {
-  const pathname = usePathname();
+export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -279,7 +280,7 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
             {/* Mobile Settings Block with Blue Glass theme */}
             <div className="pt-4 mt-2 border-t border-slate-800/80 space-y-3">
               <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider px-1">
-                ⚙️ Quick Options
+                Quick Options
               </span>
 
               {/* Mobile Language */}
@@ -303,24 +304,18 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
 
               {/* Mobile operator/admin */}
               <div className="grid grid-cols-2 gap-2 pt-1">
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    alert("Operator login page is under maintenance.");
-                  }}
-                  className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer"
+                <a
+                  href="/operator"
+                  className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer text-center flex items-center justify-center"
                 >
-                  🛠️ Operator
-                </button>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    alert("Admin login portal is restricted.");
-                  }}
-                  className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer"
+                  Operator
+                </a>
+                <a
+                  href="/admin"
+                  className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer text-center flex items-center justify-center"
                 >
-                  👮 Admin
-                </button>
+                  Admin
+                </a>
               </div>
             </div>
           </div>
@@ -362,7 +357,7 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                 {/* Language Selection */}
                 <div className="space-y-1.5">
                   <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    🌐 Quick Language
+                    Quick Language
                   </span>
                   <select
                     value={lang}
@@ -383,30 +378,26 @@ export default function Navbar({ onLoginClick }: NavbarProps) {
                 {/* Administrative Login Portals */}
                 <div className="space-y-2 pt-2 border-t border-slate-800">
                   <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    🔐 Staff Access
+                    Staff Access
                   </span>
 
-                  <button
-                    onClick={() => {
-                      setSettingsOpen(false);
-                      alert("Operator login page is under maintenance. Please contact IT center.");
-                    }}
+                  <a
+                    href="/operator"
+                    onClick={() => setSettingsOpen(false)}
                     className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
                   >
-                    <span>🛠️ Operator Login</span>
+                    <span>Operator Login</span>
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-extrabold uppercase">Operator</span>
-                  </button>
+                  </a>
 
-                  <button
-                    onClick={() => {
-                      setSettingsOpen(false);
-                      alert("Administrative login portal requires secondary hardware security key.");
-                    }}
+                  <a
+                    href="/admin"
+                    onClick={() => setSettingsOpen(false)}
                     className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
                   >
-                    <span>👮 Admin Portal Login</span>
+                    <span>Admin Portal Login</span>
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-extrabold uppercase">Admin</span>
-                  </button>
+                  </a>
                 </div>
               </div>
             )}
