@@ -60,9 +60,12 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     welcome: "Namaste! 🙏 I am **KisanMitra**, your AI Assistant. I can help you **book delivery slots**, check **live queues**, or navigate anywhere on KisanSetu. Speak or type below!",
     btn_book_slot: "🌾 Book a Delivery Slot",
     btn_login_otp: "🔐 Farmer's Login & OTP",
+    btn_my_profile: "👨‍🌾 Farmer Profile",
     btn_centers: "📍 View Nearby Centers",
     btn_queue: "⚡ Check Live Queue",
     btn_msp: "💰 Mandi MSP Rates",
+    profile_summary: "👨‍🌾 **Farmer Profile Details Found!**\n\n• **Name**: {name}\n• **Farmer ID**: {id}\n• **Location**: {location}, {district}\n• **Land Area**: {area} Acres\n• **Primary Crop**: {crop}\n• **DBT Account**: {bank}\n\nYou can update details, view active tokens, or check DBT sales ledger on your profile page!",
+    btn_open_profile: "🚀 Open Full Profile Dashboard",
     step_1_center: "Step 1 of 4: Please choose your nearest **Procurement Center** for crop delivery:",
     step_2_crop: "📍 Center: **{center}** ✅\n\nStep 2 of 4: Which **crop variety** are you delivering?",
     step_3_weight: "🌾 Crop: **{crop}** ✅\n\nStep 3 of 4: What is your estimated **weight in Quintals**? (1 Qtl = 100 kg):",
@@ -74,8 +77,8 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     booking_success: "🎉 **Booking Confirmed! Token #{token} Generated!**\n\nYour digital token has been registered. Opening Live Queue tracker...",
     btn_track_queue: "⚡ View in Live Queue Tracker",
     btn_book_another: "🔄 Book Another Slot",
-    login_ask_phone: "📲 **Farmer Login Portal**\n\nPlease speak or type your **10-digit mobile number** (e.g. 9876543210). I will open the portal, auto-fill your number, and click **Get OTP** for you! ⚡",
-    login_otp_sent: "📱 **Farmer Portal Opened!**\n\nAuto-filled mobile number **+91 {mobile}** and clicked **Get OTP**.\n\nPlease check your SMS and enter the 6-digit verification code in the login portal! 🔐",
+    login_ask_phone: "📲 **Farmer Login Portal**\n\nPlease speak or type your **10-digit mobile number** (e.g. 9876543210). I will open the portal with Demo OTP (**4241**) and take you to your Profile! ⚡",
+    login_otp_sent: "📱 **Farmer Portal Opened!**\n\nAuto-filled mobile number **+91 {mobile}** and generated Demo OTP **4241**.\n\nPlease enter code **4241** in the popup to open your full profile! 🔐",
     btn_view_login: "🔑 View Login Window",
     fallback_out_of_scope: "I am **KisanMitra**, the digital assistant for **KisanSetu Farmer's Portal** 🌾.\n\nI can only assist with **KisanSetu platform services**, such as:\n• **Booking Delivery Slots & Generating Tokens**\n• **Finding Nearby Procurement Centers & Mandis**\n• **Live Queue Position & Wait Times**\n• **Today's Mandi MSP Crop Rates**\n• **Farmer Login & Profile Access**\n\nPlease select one of the platform options below or ask me about any of these services!",
     input_placeholder: "Type or speak: 'Book Paddy slot', 'Login'...",
@@ -96,9 +99,12 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     welcome: "नमस्ते किसान भाई! 🙏 मैं **किसान मित्र** हूँ, किसानसेतु का एआई सहायक। मैं फसल डिलीवरी स्लॉट बुक करने, लाइव कतार देखने, केंद्र ढूंढने या लॉगिन करने में आपकी पूरी मदद करूँगा। बोलकर या लिखकर बताएं!",
     btn_book_slot: "🌾 फसल स्लॉट बुक करें",
     btn_login_otp: "🔐 किसान लॉगिन व OTP",
+    btn_my_profile: "👨‍🌾 मेरी किसान प्रोफाइल",
     btn_centers: "📍 नजदीकी खरीद केंद्र",
     btn_queue: "⚡ लाइव कतार स्थिति",
     btn_msp: "💰 मंडी MSP रेट्स",
+    profile_summary: "👨‍🌾 **किसान प्रोफाइल विवरण!**\n\n• **नाम**: {name}\n• **किसान ID**: {id}\n• **स्थान**: {location}, {district}\n• **जमीन**: {area} एकड़\n• **मुख्य फसल**: {crop}\n• **DBT बैंक**: {bank}\n\nआप प्रोफाइल पेज पर सभी विवरण अपडेट कर सकते हैं व टोकन व DBT लेजर देख सकते हैं!",
+    btn_open_profile: "🚀 पूरा प्रोफाइल पेज खोलें",
     step_1_center: "चरण 1: कृपया फसल डिलीवरी के लिए अपना नजदीकी **खरीद केंद्र** चुनें:",
     step_2_crop: "📍 केंद्र: **{center}** ✅\n\nचरण 2: आप कौन सी **फसल** ला रहे हैं?",
     step_3_weight: "🌾 फसल: **{crop}** ✅\n\nचरण 3: आपका अनुमानित **वजन (क्विंटल में)** कितना है? (1 क्विंटल = 100 किग्रा):",
@@ -110,8 +116,8 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     booking_success: "🎉 **बुकिंग सफल! टोकन #{token} जनरेट हो गया!**\n\nआपका डिजिटल टोकन दर्ज हो चुका है। लाइव कतार ट्रैकर खोला जा रहा है...",
     btn_track_queue: "⚡ लाइव कतार ट्रैकर देखें",
     btn_book_another: "🔄 दूसरा स्लॉट बुक करें",
-    login_ask_phone: "📲 **किसान लॉगिन पोर्टल**\n\nकृपया अपना **10 अंकों का मोबाइल नंबर** (उदा. 9876543210) बोलें या लिखें। मैं पोर्टल खोलकर नंबर भर दूंगा और **Get OTP** पर क्लिक कर दूंगा! ⚡",
-    login_otp_sent: "📱 **किसान पोर्टल खुल गया!**\n\nमोबाइल नंबर **+91 {mobile}** भरकर **Get OTP** पर क्लिक किया गया।\n\nकृपया अपना SMS देखें और 6 अंकों का OTP कोड दर्ज करें! 🔐",
+    login_ask_phone: "📲 **किसान लॉगिन पोर्टल**\n\nकृपया अपना **10 अंकों का मोबाइल नंबर** (उदा. 9876543210) बोलें या लिखें। मैं डेमो OTP (**4241**) के साथ पोर्टल खोल दूंगा! ⚡",
+    login_otp_sent: "📱 **किसान पोर्टल खुल गया!**\n\nमोबाइल नंबर **+91 {mobile}** भरकर डेमो OTP **4241** तैयार है।\n\nकृपया पॉपअप में **4241** दर्ज करके अपनी प्रोफाइल खोलें! 🔐",
     btn_view_login: "🔑 लॉगिन विंडो देखें",
     fallback_out_of_scope: "मैं **किसान मित्र** हूँ, किसानसेतु पोर्टल का डिजिटल सहायक 🌾।\n\nमैं केवल **किसानसेतु पोर्टल सेवाओं** में आपकी सहायता कर सकता हूँ:\n• **फसल टोकन व स्लॉट बुकिंग**\n• **नजदीकी खरीद केंद्र व मंडियां**\n• **लाइव कतार स्थिति व वाहन ट्रैकिंग**\n• **आज के मंडी MSP रेट्स**\n• **किसान लॉगिन व प्रोफाइल एक्सेस**\n\nकृपया नीचे दिए गए विकल्पों में से चुनें या किसानसेतु से संबंधित सवाल पूछें!",
     input_placeholder: "बोलें या लिखें: 'धान का स्लॉट बुक करें', 'लॉगिन'...",
@@ -132,9 +138,12 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     welcome: "নমস্কার কৃষক ভাই! 🙏 আমি **কিষাণমিত্র**, কিষাণসেতু পোর্টালের এআই সহকারী। আমি শস্য ডেলিভারি স্লট বুক করতে, লাইভ কাতার দেখতে, কেন্দ্র খুঁজতে বা লগইন করতে সাহায্য করব। কথা বলুন বা টাইপ করুন!",
     btn_book_slot: "🌾 ডেলিভারি স্লট বুক করুন",
     btn_login_otp: "🔐 কৃষক লগইন ও OTP",
+    btn_my_profile: "👨‍🌾 আমার কৃষক প্রোফাইল",
     btn_centers: "📍 নিকটবর্তী ক্রয় কেন্দ্র",
     btn_queue: "⚡ লাইভ কাতার স্ট্যাটাস",
     btn_msp: "💰 আজকের মান্ডি MSP দর",
+    profile_summary: "👨‍🌾 **কৃষক প্রোফাইল বিবরণ!**\n\n• **নাম**: {name}\n• **কৃষক আইডি**: {id}\n• **অবস্থান**: {location}, {district}\n• **জমি**: {area} একর\n• **প্রধান শস্য**: {crop}\n• **ডিবিটি ব্যাংক**: {bank}\n\nআপনি আপনার ফুল-স্ক্রিন প্রোফাইল পেজে সমস্ত বিবরণ দেখতে ও আপডেট করতে পারেন!",
+    btn_open_profile: "🚀 সম্পূর্ণ প্রোফাইল পেজ খুলুন",
     step_1_center: "ধাপ ১: অনুগ্রহ করে শস্য ডেলিভারির জন্য আপনার নিকটবর্তী **ক্রয় কেন্দ্র** নির্বাচন করুন:",
     step_2_crop: "📍 কেন্দ্র: **{center}** ✅\n\nধাপ ২: আপনি কোন **শস্য** ডেলিভারি করছেন?",
     step_3_weight: "🌾 শস্য: **{crop}** ✅\n\nধাপ ৩: আপনার আনুমানিক **ওজন (কুইন্টালে)** কত? (১ কুইন্টাল = ১০০ কেজি):",
@@ -146,8 +155,8 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     booking_success: "🎉 **বুকিং নিশ্চিত! টোকেন #{token} তৈরি হয়েছে!**\n\nআপনার ডিজিটাল টোকেন নিবন্ধিত হয়েছে। লাইভ কাতার ট্র্যাকার খোলা হচ্ছে...",
     btn_track_queue: "⚡ লাইভ কাতার ট্র্যাকার দেখুন",
     btn_book_another: "🔄 অন্য স্লট বুক করুন",
-    login_ask_phone: "📲 **কৃষক লগইন পোর্টাল**\n\nঅনুগ্রহ করে আপনার **১০-সংখ্যার মোবাইল নম্বর** বলুন বা লিখুন (যেমন ৯৮৭৬৫৪৩২১০)। আমি পোর্টাল খুলে নম্বর লিখে **Get OTP** ক্লিক করে দেব! ⚡",
-    login_otp_sent: "📱 **কৃষক পোর্টাল খোলা হয়েছে!**\n\nমোবাইল নম্বর **+91 {mobile}** লিখে **Get OTP** ক্লিক করা হয়েছে।\n\nঅনুগ্রহ করে এসএমএস দেখে ৬-সংখ্যার কোডটি প্রবেশ করান! 🔐",
+    login_ask_phone: "📲 **কৃষক লগইন পোর্টাল**\n\nঅনুগ্রহ করে আপনার **১০-সংখ্যার মোবাইল নম্বর** বলুন বা লিখুন। ডেমো OTP (**4241**) দিয়ে পোর্টাল খুলে দেওয়া হবে! ⚡",
+    login_otp_sent: "📱 **কৃষক পোর্টাল খোলা হয়েছে!**\n\nমোবাইল নম্বর **+91 {mobile}** তৈরি এবং ডেমো OTP **4241**। পপআপে **4241** লিখুন! 🔐",
     btn_view_login: "🔑 লগইন উইন্ডো দেখুন",
     fallback_out_of_scope: "আমি **কিষাণমিত্র**, কিষাণসেতু পোর্টালের ডিজিটাল সহকারী 🌾।\n\nআমি কেবল **কিষাণসেতু প্ল্যাটফর্মের পরিষেবাগুলিতে** সাহায্য করতে পারি:\n• **শস্য টোকেন ও স্লট বুকিং**\n• **নিকটবর্তী ক্রয় কেন্দ্র ও মান্ডি**\n• **লাইভ কাতার অবস্থান ও সময়**\n• **আজকের মান্ডি এমএসপি দর**\n• **কৃষক লগইন ও প্রোফাইল**\n\nঅনুগ্রহ করে নিচের বিকল্পগুলি থেকে নির্বাচন করুন!",
     input_placeholder: "বলুন বা লিখুন: 'ধানের স্লট বুক করুন', 'লগইন'...",
@@ -168,9 +177,12 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     welcome: "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੋ! 🙏 ਮੈਂ **ਕਿਸਾਨ ਮਿੱਤਰ** ਹਾਂ, ਕਿਸਾਨਸੇਤੂ ਦਾ ਏਆਈ ਸਹਾਇਕ। ਮੈਂ ਫ਼ਸਲ ਡਿਲਿਵਰੀ ਸਲਾਟ ਬੁੱਕ ਕਰਨ, ਲਾਈਵ ਲਾਈਨ ਵੇਖਣ, ਮੰਡੀ ਕੇਂਦਰ ਲੱਭਣ ਜਾਂ ਲੌਗਇਨ ਕਰਨ ਵਿੱਚ ਤੁਹਾਡੀ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ। ਬੋਲੋ ਜਾਂ ਲਿਖੋ!",
     btn_book_slot: "🌾 ਫ਼ਸਲ ਸਲਾਟ ਬੁੱਕ ਕਰੋ",
     btn_login_otp: "🔐 ਕਿਸਾਨ ਲੌਗਇਨ ਤੇ OTP",
+    btn_my_profile: "👨‍🌾 ਮੇਰੀ ਕਿਸਾਨ ਪ੍ਰੋਫਾਈਲ",
     btn_centers: "📍 ਨੇੜਲੇ ਖਰੀਦ ਕੇਂਦਰ",
     btn_queue: "⚡ ਲਾਈਵ ਲਾਈਨ ਸਥਿਤੀ",
     btn_msp: "💰 ਮੰਡੀ MSP ਰੇਟ",
+    profile_summary: "👨‍🌾 **ਕਿਸਾਨ ਪ੍ਰੋਫਾਈਲ ਵੇਰਵੇ!**\n\n• **ਨਾਮ**: {name}\n• **ਕਿਸਾਨ ID**: {id}\n• **ਸਥਾਨ**: {location}, {district}\n• **ਜ਼ਮੀਨ**: {area} ਏਕੜ\n• **ਮੁੱਖ ਫ਼ਸਲ**: {crop}\n• **DBT ਬੈਂਕ**: {bank}\n\nਤੁਸੀਂ ਆਪਣੇ ਪੂਰੇ ਪ੍ਰੋਫਾਈਲ ਪੇਜ 'ਤੇ ਸਾਰੇ ਵੇਰਵੇ ਵੇਖ ਤੇ ਅੱਪਡੇਟ ਕਰ ਸਕਦੇ ਹੋ!",
+    btn_open_profile: "🚀 ਪੂਰਾ ਪ੍ਰੋਫਾਈਲ ਪੇਜ ਖੋਲ੍ਹੋ",
     step_1_center: "ਪੜਾਅ 1: ਕਿਰਪਾ ਕਰਕੇ ਫ਼ਸਲ ਡਿਲਿਵਰੀ ਲਈ ਆਪਣਾ ਨੇੜਲਾ **ਖਰੀਦ ਕੇਂਦਰ** ਚੁਣੋ:",
     step_2_crop: "📍 ਕੇਂਦਰ: **{center}** ✅\n\nਪੜਾਅ 2: ਤੁਸੀਂ ਕਿਹੜੀ **ਫ਼ਸਲ** ਲਿਆ ਰਹੇ ਹੋ?",
     step_3_weight: "🌾 ਫ਼ਸਲ: **{crop}** ✅\n\nਪੜਾਅ 3: ਤੁਹਾਡਾ ਅਨੁਮਾਨਿਤ **ਭਾਰ (ਕੁਇੰਟਲ ਵਿੱਚ)** ਕਿੰਨਾ ਹੈ? (1 ਕੁਇੰਟਲ = 100 ਕਿੱਲੋ):",
@@ -182,8 +194,8 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     booking_success: "🎉 **ਬੁਕਿੰਗ ਪੱਕੀ! ਟੋਕਨ #{token} ਬਣ ਗਿਆ!**\n\nਤੁਹਾਡਾ ਡਿਜੀਟਲ ਟੋਕਨ ਦਰਜ ਹੋ ਚੁੱਕਾ ਹੈ। ਲਾਈਵ ਲਾਈਨ ਟਰੈਕਰ ਖੋਲ੍ਹਿਆ ਜਾ ਰਿਹਾ ਹੈ...",
     btn_track_queue: "⚡ ਲਾਈਵ ਲਾਈਨ ਵੇਖੋ",
     btn_book_another: "🔄 ਹੋਰ ਸਲਾਟ ਬੁੱਕ ਕਰੋ",
-    login_ask_phone: "📲 **ਕਿਸਾਨ ਲੌਗਇਨ ਪੋਰਟਲ**\n\nਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ **10-ਅੰਕਾਂ ਵਾਲਾ ਮੋਬਾਈਲ ਨੰਬਰ** (ਜਿਵੇਂ 9876543210) ਬੋਲੋ ਜਾਂ ਲਿਖੋ। ਮੈਂ ਪੋਰਟਲ ਖੋਲ੍ਹਾਂਗਾ, ਨੰਬਰ ਭਰਾਂਗਾ ਅਤੇ **Get OTP** 'ਤੇ ਕਲਿੱਕ ਕਰਾਂਗਾ! ⚡",
-    login_otp_sent: "📱 **ਕਿਸਾਨ ਪੋਰਟਲ ਖੁੱਲ੍ਹ ਗਿਆ!**\n\nਮੋਬਾਈਲ ਨੰਬਰ **+91 {mobile}** ਭਰ ਕੇ **Get OTP** 'ਤੇ ਕਲਿੱਕ ਕੀਤਾ ਗਿਆ।\n\nਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ SMS ਵੇਖੋ ਅਤੇ 6-ਅੰਕਾਂ ਦਾ ਕੋਡ ਦਰਜ ਕਰੋ! 🔐",
+    login_ask_phone: "📲 **ਕਿਸਾਨ ਲੌਗਇਨ ਪੋਰਟਲ**\n\nਕਿਰਪਾ ਕਰਕੇ ਆਪਣਾ **10-ਅੰਕਾਂ ਵਾਲਾ ਮੋਬਾਈਲ ਨੰਬਰ** (ਜਿਵੇਂ 9876543210) ਬੋਲੋ ਜਾਂ ਲਿਖੋ। ਡੈਮੋ OTP (**4241**) ਨਾਲ ਪੋਰਟਲ ਖੋਲ੍ਹਿਆ ਜਾਵੇਗਾ! ⚡",
+    login_otp_sent: "📱 **ਕਿਸਾਨ ਪੋਰਟਲ ਖੁੱਲ੍ਹ ਗਿਆ!**\n\nਮੋਬਾਈਲ ਨੰਬਰ **+91 {mobile}** ਅਤੇ ਡੈਮੋ OTP **4241**। ਪੌਪਅੱਪ ਵਿੱਚ **4241** ਭਰੋ! 🔐",
     btn_view_login: "🔑 ਲੌਗਇਨ ਵਿੰਡੋ ਵੇਖੋ",
     fallback_out_of_scope: "ਮੈਂ **ਕਿਸਾਨ ਮਿੱਤਰ** ਹਾਂ, ਕਿਸਾਨਸੇਤੂ ਪੋਰਟਲ ਦਾ ਡਿਜੀਟਲ ਸਹਾਇਕ 🌾।\n\nਮੈਂ ਕੇਵਲ **ਕਿਸਾਨਸੇਤੂ ਪੋਰਟਲ ਸੇਵਾਵਾਂ** ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ:\n• **ਫ਼ਸਲ ਟੋਕਨ ਤੇ ਸਲਾਟ ਬੁਕਿੰਗ**\n• **ਨੇੜਲੇ ਖਰੀਦ ਕੇਂਦਰ ਤੇ ਮੰਡੀਆਂ**\n• **ਲਾਈਵ ਲਾਈਨ ਸਥਿਤੀ**\n• **ਅੱਜ ਦੇ ਮੰਡੀ MSP ਰੇਟ**\n• **ਕਿਸਾਨ ਲੌਗਇਨ ਤੇ ਪ੍ਰੋਫਾਈਲ**\n\nਕਿਰਪਾ ਕਰਕੇ ਹੇਠਾਂ ਦਿੱਤੇ ਵਿਕਲਪਾਂ ਵਿੱਚੋਂ ਚੁਣੋ!",
     input_placeholder: "ਬੋਲੋ ਜਾਂ ਲਿਖੋ: 'ਝੋਨੇ ਦਾ ਸਲਾਟ ਬੁੱਕ ਕਰੋ', 'ਲੌਗਇਨ'...",
@@ -204,9 +216,12 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     welcome: "ନମସ୍କାର କୃଷକ ଭାଇ! 🙏 ମୁଁ **କିଷାନ ମିତ୍ର**, କିଷାନସେତୁର ଏଆଇ ସହାୟକ। ଫସଲ ଡେଲିଭରୀ ସ୍ଲଟ୍ ବୁକିଂ, ଲାଇଭ୍ ଧାଡ଼ି ସ୍ଥିତି ଏବଂ ମଣ୍ଡି କେନ୍ଦ୍ର ଖୋଜିବାରେ ମୁଁ ସାହାଯ୍ୟ କରିବି। କୁହନ୍ତୁ କିମ୍ବା ଲେଖନ୍ତୁ!",
     btn_book_slot: "🌾 ଫସଲ ସ୍ଲଟ୍ ବୁକ୍ କରନ୍ତୁ",
     btn_login_otp: "🔐 କୃଷକ ଲଗଇନ୍ ଓ OTP",
+    btn_my_profile: "👨‍🌾 ମୋର କୃଷକ ପ୍ରୋଫାଇଲ୍",
     btn_centers: "📍 ନିକଟସ୍ଥ କ୍ରୟ କେନ୍ଦ୍ର",
     btn_queue: "⚡ ଲାଇଭ୍ ଧାଡ଼ି ସ୍ଥିତି",
     btn_msp: "💰 ଆଜିର ମଣ୍ଡି MSP ଦର",
+    profile_summary: "👨‍🌾 **କୃଷକ ପ୍ରୋଫାଇଲ୍ ବିବରଣୀ!**\n\n• **ନାମ**: {name}\n• **କୃଷକ ID**: {id}\n• **ସ୍ଥାନ**: {location}, {district}\n• **ଜମି**: {area} ଏକର\n• **ମୁଖ୍ୟ ଫସଲ**: {crop}\n• **DBT ବ୍ୟାଙ୍କ**: {bank}\n\nଆପଣ ପ୍ରୋଫାଇଲ୍ ପେଜ୍ ଖୋଲି ବିବରଣୀ ଅଦ୍ୟତନ କରିପାରିବେ!",
+    btn_open_profile: "🚀 ପ୍ରୋଫାଇଲ୍ ପେଜ୍ ଖୋଲନ୍ତୁ",
     step_1_center: "ପର୍ଯ୍ୟାୟ ୧: ଦୟାକରି ଫସଲ ଡେଲିଭରୀ ପାଇଁ ଆପଣଙ୍କ ନିକଟସ୍ଥ **କ୍ରୟ କେନ୍ଦ୍ର** ବାଛନ୍ତୁ:",
     step_2_crop: "📍 କେନ୍ଦ୍ର: **{center}** ✅\n\nପର୍ଯ୍ୟାୟ ୨: ଆପଣ କେଉଁ **ଫସଲ** ଆଣୁଛନ୍ତି?",
     step_3_weight: "🌾 ଫସଲ: **{crop}** ✅\n\nପର୍ଯ୍ୟାୟ ୩: ଆପଣଙ୍କର ଆନୁମାନିକ **ଓଜନ (କ୍ୱିଣ୍ଟାଲରେ)** କେତେ? (୧ କ୍ୱିଣ୍ଟାଲ = ୧୦୦ କିଗ୍ରା):",
@@ -215,11 +230,11 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     confirm_title: "📋 **ବୁକିଂ ବିବରଣୀ ପ୍ରସ୍ତୁତ!**\n\n• **କେନ୍ଦ୍ର**: {center}\n• **ଫସଲ**: {crop}\n• **ଓଜନ**: {weight} କ୍ୱିଣ୍ଟାଲ ({kg} କିଗ୍ରା)\n• **ତାରିଖ**: {date}\n• **ସମୟ ସ୍ଲଟ୍**: {slot}\n\nଆପଣ କଣ ଡିଜିଟାଲ୍ ଟୋକନ ସୃଷ୍ଟି କରିବାକୁ ପ୍ରସ୍ତୁତ?",
     btn_confirm_token: "⚡ ହଁ, ଡିଜିଟାଲ୍ ଟୋକନ ସୃଷ୍ଟି କରନ୍ତୁ",
     btn_modify: "🔄 ବିବରଣୀ ବଦଳାନ୍ତୁ",
-    booking_success: "🎉 **ବୁକିଂ ନିଶ୍ଚିତ! ଟୋକନ #{token} ସୃଷ୍ଟି ହୋଇଛି!**\n\nଲାଇଭ୍ ଧାଡ଼ି ଟ୍ରାକର୍ ଖୋଲାଯାଉଛି...",
-    btn_track_queue: "⚡ ଲାଇଭ୍ ଧାଡ଼ି ଦେଖନ୍ତୁ",
+    booking_success: "🎉 **ବੁକିଂ ନିଶ୍ଚିତ! ଟୋକନ #{token} ସୃଷ୍ଟି ହୋଇଛି!**\n\nଲାଇଭ୍ ଧାଡ଼ି ଟ୍ରାକର୍ ଖୋଲାଯାଉଛି...",
+    btn_track_queue: "⚡ ଲାଇଭ୍ ଧାଡ଼ି ଦେਖନ୍ତୁ",
     btn_book_another: "🔄 ଅନ୍ୟ ସ୍ଲଟ୍ ବୁକ୍ କରନ୍ତୁ",
-    login_ask_phone: "📲 **କୃଷକ ଲଗଇନ୍ ପୋର୍ଟାଲ୍**\n\nଦୟାକରି ଆପଣଙ୍କର **୧୦-ଅଙ୍କ ବିଶିଷ୍ଟ ମୋବାଇଲ୍ ନମ୍ବର** କୁହନ୍ତୁ କିମ୍ବା ଲେଖନ୍ତୁ। ମୁଁ ପୋର୍ଟାଲ୍ ଖୋଲି **Get OTP** କ୍ଲିକ୍ କରିଦେବି! ⚡",
-    login_otp_sent: "📱 **କୃଷକ ପୋର୍ଟାଲ୍ ଖୋଲିଗଲା!**\n\nମୋବାଇଲ୍ ନମ୍ବର **+91 {mobile}** ଭରି **Get OTP** କ୍ଲିକ୍ କରାଗଲା। ଦୟାକରି SMS ଦେଖି ୬-ଅଙ୍କ ବିଶିଷ୍ଟ କୋଡ୍ ଦିଅନ୍ତୁ! 🔐",
+    login_ask_phone: "📲 **କୃଷକ ଲଗଇନ୍ ପୋର୍ଟାଲ୍**\n\nଦୟାକରି ଆପଣଙ୍କର **୧୦-ଅଙ୍କ ବିଶିଷ୍ଟ ମୋବାଇଲ୍ ନମ୍ବର** କୁହନ୍ତୁ କିମ୍ବା ଲେଖନ୍ତୁ। ଡେମୋ OTP (**4241**) ବ୍ୟବହାର ହେବ! ⚡",
+    login_otp_sent: "📱 **କୃଷକ ପୋର୍ଟାଲ୍ ଖୋଲିଗଲା!**\n\nମୋବାଇଲ୍ ନମ୍ବର **+91 {mobile}** ଓ ଡେମୋ OTP **4241**। ପପ୍-ଅପ୍ ରେ **4241** ଦିଅନ୍ତୁ! 🔐",
     btn_view_login: "🔑 ଲଗଇନ୍ ୱିଣ୍ଡୋ ଦେଖନ୍ତୁ",
     fallback_out_of_scope: "ମୁଁ **କିଷାନ ମିତ୍ର**, କିଷାନସେତୁ ପୋର୍ଟାଲର ଡିଜିଟାଲ୍ ସହାୟକ 🌾।\n\nମୁଁ କେବଳ **କିଷାନସେତୁ ସେବା**ରେ ସାହାଯ୍ୟ କରିପାରିବି:\n• **ଫସଲ ଟୋକନ ଓ ସ୍ଲଟ୍ ବୁକିଂ**\n• **ନିକଟସ୍ଥ କ୍ରୟ କେନ୍ଦ୍ର ଓ ମଣ୍ଡି**\n• **ଲାଇଭ୍ ଧାଡ଼ି ସ୍ଥିତି**\n• **ଆଜିର ମଣ୍ଡି MSP ଦର**\n• **କୃଷକ ଲଗଇନ୍**",
     input_placeholder: "କୁହନ୍ତୁ କିମ୍ବା ଲେଖନ୍ତୁ: 'ଧାନ ସ୍ଲଟ୍ ବୁକ୍ କରନ୍ତୁ'...",
@@ -275,8 +290,24 @@ export default function KisanChatbot() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceReply, setVoiceReply] = useState(true);
+  const voiceReplyRef = useRef<boolean>(true);
   const [isProcessingBooking, setIsProcessingBooking] = useState(false);
   const [isAwaitingLoginPhone, setIsAwaitingLoginPhone] = useState(false);
+
+  useEffect(() => {
+    try {
+      const storedVoice = localStorage.getItem("kisansetu_voice_reply");
+      if (storedVoice !== null) {
+        const val = storedVoice === "true";
+        setVoiceReply(val);
+        voiceReplyRef.current = val;
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    voiceReplyRef.current = voiceReply;
+  }, [voiceReply]);
 
   const loc = CHAT_I18N[lang] || CHAT_I18N.en;
 
@@ -302,6 +333,10 @@ export default function KisanChatbot() {
 
   const toggleOpenState = (open: boolean) => {
     if (!open) {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+      }
       setIsClosing(true);
       try {
         sessionStorage.setItem("kisansetu_chat_open", "false");
@@ -351,7 +386,7 @@ export default function KisanChatbot() {
 
   // Web Speech Synthesis (Text to Speech)
   const speakText = (text: string) => {
-    if (!voiceReply || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    if (!voiceReplyRef.current || typeof window === "undefined" || !("speechSynthesis" in window)) return;
     try {
       window.speechSynthesis.cancel();
       const cleanText = text
@@ -456,6 +491,8 @@ export default function KisanChatbot() {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       options: [
         { label: l.btn_book_slot, action: () => startBookingFlow({}) },
+        { label: "🌤️ Live Weather", action: () => showLiveWeather() },
+        { label: l.btn_my_profile || "👨‍🌾 Farmer Profile", action: () => handleNavigate("/profile", "Opening Farmer Profile Dashboard...") },
         { label: l.btn_login_otp, action: () => promptLogin() },
         { label: l.btn_centers, action: () => handleNavigate("/centers", "Navigating to Procurement Centers...") },
         { label: l.btn_queue, action: () => handleNavigate("/queue", "Opening Live Queue Tracker...") },
@@ -520,6 +557,145 @@ export default function KisanChatbot() {
     };
     setMessages((prev) => [...prev, botMsg]);
     speakText(text.replace(/[*_#•]/g, ""));
+  };
+
+  const showLiveWeather = async () => {
+    const l = CHAT_I18N[lang] || CHAT_I18N.en;
+
+    const loadId = "weather-load-" + Date.now();
+    const loadingMsg: Message = {
+      id: loadId,
+      sender: "bot",
+      text:
+        lang === "hi"
+          ? "🌤️ आपके लाइव स्थान का मौसम और कृषि सलाह खोजी जा रही है..."
+          : lang === "bn"
+          ? "🌤️ আপনার লাইভ অবস্থানের আবহাওয়া দেখা হচ্ছে..."
+          : lang === "pa"
+          ? "🌤️ ਤੁਹਾਡੇ ਲਾਈਵ ਸਥਾਨ ਦਾ ਮੌਸਮ ਵੇਖਿਆ ਜਾ ਰਿਹਾ ਹੈ..."
+          : lang === "or"
+          ? "🌤️ ପାଣିପାଗ ସୂଚନା ଯାଞ୍ଚ ହେଉଛି..."
+          : "🌤️ Fetching live weather report for your current location...",
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    };
+    setMessages((prev) => [...prev, loadingMsg]);
+
+    const fetchWeather = async (lat: number, lon: number) => {
+      try {
+        const weatherRes = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+        );
+        const weatherJson = await weatherRes.json();
+
+        let resolvedArea = "Chandaka";
+        let resolvedCity = "Bhubaneswar";
+        let resolvedState = "Odisha";
+
+        try {
+          const geoRes = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+          );
+          const geoJson = await geoRes.json();
+          if (geoJson) {
+            const adminList = geoJson.localityInfo?.administrative || [];
+            resolvedState = geoJson.principalSubdivision || "Odisha";
+
+            const subdistrict =
+              adminList.find((a: any) => a.order >= 4 || a.adminLevel >= 6)?.name ||
+              geoJson.localityInfo?.informative?.[0]?.name;
+            const mainCity = geoJson.city || geoJson.locality || "Bhubaneswar";
+            const district = geoJson.principalSubdivisionDistrict || adminList.find((a: any) => a.order === 3)?.name || mainCity;
+
+            if (subdistrict && subdistrict.toLowerCase() !== mainCity.toLowerCase()) {
+              resolvedArea = subdistrict;
+              resolvedCity = mainCity;
+            } else if (district && district.toLowerCase() !== mainCity.toLowerCase()) {
+              resolvedArea = district;
+              resolvedCity = mainCity;
+            } else {
+              resolvedArea = geoJson.localityInfo?.informative?.[0]?.name || geoJson.locality || "Local Area";
+              resolvedCity = mainCity;
+            }
+
+            const POPULAR_METROS = ["Bhubaneswar", "Cuttack", "Kolkata", "Delhi", "New Delhi", "Mumbai", "Pune", "Lucknow", "Kanpur", "Patna", "Ludhiana", "Amritsar", "Jaipur", "Ahmedabad", "Chandigarh", "Bengaluru", "Hyderabad", "Chennai"];
+            if (POPULAR_METROS.includes(resolvedArea) && !POPULAR_METROS.includes(resolvedCity)) {
+              const temp = resolvedArea;
+              resolvedArea = resolvedCity;
+              resolvedCity = temp;
+            }
+          }
+        } catch {}
+
+        const current = weatherJson?.current_weather || { temperature: 28, windspeed: 11, weathercode: 0 };
+        const temp = Math.round(current.temperature);
+        const wind = Math.round(current.windspeed);
+
+        let icon = "☀️";
+        let conditionText = "Clear Sky";
+        let advisory = "Optimal conditions for crop harvesting, transit, and mandi delivery.";
+
+        if (current.weathercode >= 51 && current.weathercode <= 99) {
+          icon = "🌧️";
+          conditionText = lang === "hi" ? "बारिश / बूंदाबांदी" : lang === "bn" ? "বৃষ্টিপাত" : lang === "pa" ? "ਮੀਂਹ" : lang === "or" ? "ବର୍ଷା" : "Rain / Drizzle";
+          advisory =
+            lang === "hi"
+              ? `${resolvedCity} मंडी में फसल ले जाते समय तिरपाल से ढकें और कतार टोकन पहले से बुक करें।`
+              : lang === "bn"
+              ? `${resolvedCity} মান্ডিতে শস্য পরিবহনে ত্রিপল ব্যবহার করুন।`
+              : lang === "pa"
+              ? `${resolvedCity} ਮੰਡੀ ਜਾਣ ਸਮੇਂ ਫ਼ਸਲ ਨੂੰ ਤਰਪਾਲ ਨਾਲ ਢੱਕੋ।`
+              : `Keep tarpaulins ready during ${resolvedCity} mandi transit and pre-book token.`;
+        } else if (current.weathercode >= 1 && current.weathercode <= 3) {
+          icon = "⛅";
+          conditionText = lang === "hi" ? "आंशिक रूप से बादल" : lang === "bn" ? "আংশিক মেঘলা" : lang === "pa" ? "ਬੱਦਲਵਾਈ" : lang === "or" ? "ମେଘୁଆ" : "Partly Cloudy";
+        }
+
+        const weatherCardText =
+          `🌤️ **Live Weather & Mandi Advisory**\n\n` +
+          `• **Location**: 📍 ${resolvedArea}, ${resolvedCity}, ${resolvedState}\n` +
+          `• **Temperature**: ${temp}°C ${icon} (${conditionText})\n` +
+          `• **Wind Speed**: ${wind} km/h 💨\n\n` +
+          `🌾 **Agro Advisory**: ${advisory}`;
+
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === loadId
+              ? {
+                  ...m,
+                  text: weatherCardText,
+                  options: [
+                    { label: l.btn_book_slot, primary: true, action: () => startBookingFlow({}) },
+                    { label: l.btn_msp, action: () => showMspRates() },
+                    { label: l.btn_queue, action: () => handleNavigate("/queue", "Opening Live Queue tracker...") },
+                  ],
+                }
+              : m
+          )
+        );
+
+        speakText(
+          lang === "hi"
+            ? `${resolvedArea}, ${resolvedCity} में तापमान ${temp} डिग्री है। ${advisory}`
+            : lang === "bn"
+            ? `${resolvedArea}, ${resolvedCity} এলাকায় তাপমাত্রা ${temp} ডিগ্রি সেলসিয়াস।`
+            : lang === "pa"
+            ? `${resolvedArea}, ${resolvedCity} ਵਿੱਚ ਤਾਪਮਾਨ ${temp} ਡਿਗਰੀ ਹੈ।`
+            : `Live weather in ${resolvedArea}, ${resolvedCity} is ${temp} degrees Celsius with ${conditionText}. ${advisory}`
+        );
+      } catch (err) {
+        console.error("Chatbot weather error:", err);
+      }
+    };
+
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+        () => fetchWeather(20.2961, 85.8245),
+        { timeout: 8000 }
+      );
+    } else {
+      fetchWeather(20.2961, 85.8245);
+    }
   };
 
   // Sync scheduler URL with currently selected parameters
@@ -869,6 +1045,26 @@ export default function KisanChatbot() {
     }
 
     if (
+      text.includes("weather") ||
+      text.includes("मौसम") ||
+      text.includes("आबोहवा") ||
+      text.includes("আবহাওয়া") ||
+      text.includes("ਮੌਸਮ") ||
+      text.includes("ਪਾଣିਪାਗ") ||
+      text.includes("temperature") ||
+      text.includes("तापमान") ||
+      text.includes("बारिश") ||
+      text.includes("rain") ||
+      text.includes("বৃষ্টি") ||
+      text.includes("ਮੀਂਹ") ||
+      text.includes("ବର୍ଷା") ||
+      text.includes("climate")
+    ) {
+      showLiveWeather();
+      return;
+    }
+
+    if (
       text.includes("msp") ||
       text.includes("rate") ||
       text.includes("price") ||
@@ -883,7 +1079,65 @@ export default function KisanChatbot() {
       return;
     }
 
-    // 2. Farmer Login Request Handling
+    // 2. Farmer Profile Intent Handling
+    const isProfileIntent =
+      text.includes("profile") ||
+      text.includes("प्रोफाइल") ||
+      text.includes("প্রোফাইল") ||
+      text.includes("ਪ੍ਰੋਫਾਈਲ") ||
+      text.includes("ପ୍ରୋଫାଇଲ୍") ||
+      text.includes("account") ||
+      text.includes("details") ||
+      text.includes("my account") ||
+      text.includes("mera account") ||
+      text.includes("update detail");
+
+    if (isProfileIntent) {
+      let storedProfile: any = null;
+      try {
+        const stored = localStorage.getItem("kisanSetu_farmer_profile");
+        if (stored) storedProfile = JSON.parse(stored);
+      } catch {}
+
+      if (storedProfile?.name) {
+        const summary = (l.profile_summary || "")
+          .replace("{name}", storedProfile.name)
+          .replace("{id}", storedProfile.farmerId || "KS-FARM-8291")
+          .replace("{location}", storedProfile.location || "Kalyanpur")
+          .replace("{district}", storedProfile.district || "Kanpur Nagar")
+          .replace("{area}", (storedProfile.area || 5).toString())
+          .replace("{crop}", storedProfile.primaryCrop || "Paddy")
+          .replace("{bank}", storedProfile.bankAccount || "SBI ****4920");
+
+        const profileMsg: Message = {
+          id: "prof-" + Date.now(),
+          sender: "bot",
+          text: summary,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          redirectUrl: "/profile",
+          redirectLabel: l.btn_open_profile || "🚀 Open Full Profile Dashboard",
+          options: [
+            {
+              label: l.btn_open_profile || "🚀 Open Full Profile Dashboard",
+              primary: true,
+              action: () => handleNavigate("/profile", "Opening your full-screen farmer profile dashboard..."),
+            },
+            {
+              label: l.btn_book_slot,
+              action: () => startBookingFlow({}),
+            },
+          ],
+        };
+        setMessages((prev) => [...prev, profileMsg]);
+        speakText(`Farmer profile found for ${storedProfile.name}. You can manage all details on your profile page.`);
+        return;
+      } else {
+        promptLogin();
+        return;
+      }
+    }
+
+    // 3. Farmer Login Request Handling
     const isLoginIntent =
       text.includes("login") ||
       text.includes("लॉगिन") ||
@@ -893,8 +1147,6 @@ export default function KisanChatbot() {
       text.includes("sign in") ||
       text.includes("signin") ||
       text.includes("portal") ||
-      text.includes("profile") ||
-      text.includes("account") ||
       text.includes("खाता") ||
       text.includes("otp") ||
       text.includes("ओटीपी") ||
@@ -1148,29 +1400,56 @@ export default function KisanChatbot() {
               </div>
             </div>
 
-            <div className="flex items-center space-x-1.5">
+            <div className="flex items-center space-x-1">
               {/* Reset / New Chat */}
               <button
                 onClick={() => {
                   bookingDraftRef.current = { center: "", centreId: "", crop: "", weight: 0, date: "", timeSlot: "", slotId: "" };
                   setBookingDraft(bookingDraftRef.current);
                   setMessages([getWelcomeMessage(lang)]);
+                  if (typeof window !== "undefined" && "speechSynthesis" in window) {
+                    window.speechSynthesis.cancel();
+                    setIsSpeaking(false);
+                  }
                 }}
-                className="p-1.5 sm:p-2 rounded-xl text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer"
+                className="p-2 rounded-full bg-transparent hover:bg-white/10 text-slate-400 hover:text-white transition-all cursor-pointer active:scale-90"
                 title="Restart / Clear Chat"
+                aria-label="Restart chat"
               >
-                🔄
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
               </button>
 
               {/* Voice Readout Toggle */}
               <button
-                onClick={() => setVoiceReply(!voiceReply)}
-                className={`p-1.5 sm:p-2 rounded-xl text-xs transition-colors cursor-pointer ${
-                  voiceReply ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" : "bg-slate-800 text-slate-400"
+                onClick={() => {
+                  const next = !voiceReply;
+                  setVoiceReply(next);
+                  voiceReplyRef.current = next;
+                  try {
+                    localStorage.setItem("kisansetu_voice_reply", String(next));
+                  } catch {}
+                  if (!next && typeof window !== "undefined" && "speechSynthesis" in window) {
+                    window.speechSynthesis.cancel();
+                    setIsSpeaking(false);
+                  }
+                }}
+                className={`p-2 rounded-full bg-transparent hover:bg-white/10 transition-all cursor-pointer active:scale-90 ${
+                  voiceReply ? "text-emerald-400 hover:text-emerald-300" : "text-slate-500 hover:text-slate-300"
                 }`}
-                title={voiceReply ? "Voice Speech Enabled" : "Voice Speech Muted"}
+                title={voiceReply ? "Voice Speech Enabled (Click to Mute)" : "Voice Speech Muted (Click to Unmute)"}
+                aria-label="Toggle voice speech"
               >
-                {voiceReply ? "🔊" : "🔇"}
+                {voiceReply ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.757 3.63 8.25 4.51 8.25H6.75Z" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.757 3.63 8.25 4.51 8.25H6.75Z" />
+                  </svg>
+                )}
               </button>
             </div>
           </div>
