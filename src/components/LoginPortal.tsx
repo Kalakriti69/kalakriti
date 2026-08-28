@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 
 interface LoginPortalProps {
@@ -9,41 +9,117 @@ interface LoginPortalProps {
 }
 
 export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
-  const [step, setStep] = useState<"phone" | "otp" | "dashboard">("phone");
+  const [step, setStep] = useState<"phone" | "otp" | "profile" | "dashboard">("phone");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
+  const [farmerProfile, setFarmerProfile] = useState<{ name: string; location: string; area: number } | null>(null);
+  const [profileForm, setProfileForm] = useState({ name: "", location: "", area: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const cachedProfile = localStorage.getItem("kisanSetu_farmer_profile");
+    if (cachedProfile) {
+      try {
+        setFarmerProfile(JSON.parse(cachedProfile));
+        setStep("dashboard");
+      } catch {
+        localStorage.removeItem("kisanSetu_farmer_profile");
+      }
+    }
+  }, []);
 
   if (!isOpen) return null;
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneNumber || phoneNumber.length < 10) {
-      alert("Please enter a valid 10-digit mobile number.");
+    if (phoneNumber.length !== 10) {
+      setErrorMessage("Please enter a valid 10-digit mobile number.");
       return;
     }
     setIsSubmitting(true);
-    setTimeout(() => {
+    setErrorMessage("");
+    try {
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: `+91${phoneNumber}` }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not send OTP.");
       setIsSubmitting(false);
       setStep("otp");
-    }, 800);
+    } catch (error) {
+      setIsSubmitting(false);
+      setErrorMessage(error instanceof Error ? error.message : "Could not send OTP.");
+    }
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp !== "1234" && otp.length < 4) {
-      alert("Please enter a valid 4-digit code (use '1234' for demo login).");
+    if (otp.length !== 6) {
+      setErrorMessage("Please enter the 6-digit code sent by SMS.");
       return;
     }
     setIsSubmitting(true);
-    setTimeout(() => {
+    setErrorMessage("");
+    try {
+      const response = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: `+91${phoneNumber}`, otp }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not verify OTP.");
+      const profileResponse = await fetch("/api/farmers/profile");
+      const profileResult = await profileResponse.json();
+      if (!profileResponse.ok) throw new Error(profileResult.error || "Could not load farmer profile.");
       setIsSubmitting(false);
-      setStep("dashboard");
-    }, 800);
+      if (profileResult.profile) {
+        setFarmerProfile(profileResult.profile);
+        localStorage.setItem("kisanSetu_farmer_profile", JSON.stringify(profileResult.profile));
+        setStep("dashboard");
+      } else {
+        setStep("profile");
+      }
+    } catch (error) {
+      setIsSubmitting(false);
+      setErrorMessage(error instanceof Error ? error.message : "Could not verify OTP.");
+    }
   };
 
-  const handleLogout = () => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const area = Number(profileForm.area);
+    if (!profileForm.name.trim() || !profileForm.location.trim() || !Number.isFinite(area) || area <= 0) {
+      setErrorMessage("Enter your name, location, and a valid area.");
+      return;
+    }
+    setIsSubmitting(true);
+    setErrorMessage("");
+    try {
+      const response = await fetch("/api/farmers/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: profileForm.name.trim(), location: profileForm.location.trim(), area }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Could not save profile.");
+      setFarmerProfile(result.profile);
+      localStorage.setItem("kisanSetu_farmer_profile", JSON.stringify(result.profile));
+      setIsSubmitting(false);
+      setStep("dashboard");
+    } catch (error) {
+      setIsSubmitting(false);
+      setErrorMessage(error instanceof Error ? error.message : "Could not save profile.");
+    }
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    localStorage.removeItem("kisanSetu_farmer_profile");
+    setFarmerProfile(null);
     setStep("phone");
     setPhoneNumber("");
     setOtp("");
@@ -51,7 +127,9 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
   };
 
   const MOCK_FARMER = {
-    name: "Ramesh Kumar",
+    name: farmerProfile?.name || "Farmer",
+    location: farmerProfile?.location || "",
+    area: farmerProfile?.area || 0,
     state: "Uttar Pradesh",
     district: "Kalyanpur",
     bankAccount: "SBI ****4920",
@@ -98,6 +176,11 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
 
         {/* Modal Scrollable Content */}
         <div className="p-6 sm:p-8 overflow-y-auto flex-1 bg-slate-50/50">
+          {errorMessage && (
+            <p role="alert" className="max-w-md mx-auto mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+              {errorMessage}
+            </p>
+          )}
           {step === "phone" && (
             <div className="max-w-md mx-auto py-8 space-y-6">
               <div className="text-center space-y-2">
@@ -156,10 +239,12 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                     {t("login_otp_label")}
                   </label>
                   <input
-                    type="password"
+                    type="text"
                     required
-                    maxLength={4}
-                    placeholder="• • • •"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    placeholder="• • • • • •"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                     className="w-full tracking-[1.5em] text-center py-4 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800 font-black text-lg shadow-inner"
@@ -186,6 +271,53 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
             </div>
           )}
 
+          {step === "profile" && (
+            <div className="max-w-md mx-auto py-8 space-y-6">
+              <div className="text-center space-y-2">
+                <span className="text-4xl">👨‍🌾</span>
+                <h3 className="text-2xl font-black text-slate-900">Complete your farmer profile</h3>
+                <p className="text-sm text-slate-500">Tell us a little about your farm to finish setting up your account.</p>
+              </div>
+
+              <form onSubmit={handleSaveProfile} className="space-y-4">
+                <input
+                  required
+                  placeholder="Full name"
+                  value={profileForm.name}
+                  onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                  className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800 text-sm font-semibold shadow-inner"
+                />
+                <input
+                  required
+                  placeholder="Village, district, state"
+                  value={profileForm.location}
+                  onChange={(e) => setProfileForm({ ...profileForm, location: e.target.value })}
+                  className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800 text-sm font-semibold shadow-inner"
+                />
+                <div className="flex gap-3">
+                  <input
+                    required
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="Farm area"
+                    value={profileForm.area}
+                    onChange={(e) => setProfileForm({ ...profileForm, area: e.target.value })}
+                    className="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-800 text-sm font-semibold shadow-inner"
+                  />
+                  <span className="flex items-center px-4 rounded-xl border border-slate-200 bg-slate-100 text-sm font-bold text-slate-500">acres</span>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm py-4 rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center"
+                >
+                  {isSubmitting ? "Saving profile..." : "Save farmer profile"}
+                </button>
+              </form>
+            </div>
+          )}
+
           {step === "dashboard" && (
             <div className="space-y-8 py-2">
               {/* Profile Card */}
@@ -193,7 +325,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                 <div>
                   <h4 className="text-xl font-bold text-slate-800">{MOCK_FARMER.name}</h4>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    📍 {MOCK_FARMER.district}, {MOCK_FARMER.state} | Bank Link: {MOCK_FARMER.bankAccount}
+                    📍 {MOCK_FARMER.location} | Farm area: {MOCK_FARMER.area} acres
                   </p>
                 </div>
                 <button
