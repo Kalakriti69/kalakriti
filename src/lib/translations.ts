@@ -2,6 +2,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
   en: {
     nav_centers: "Procurement Centers",
     nav_schedule: "Book Schedule",
+    nav_pass: "My Gate Pass",
     nav_queue: "Live Queue Status",
     nav_login: "Farmer's Login",
     nav_login_portal: "Farmer's Login Portal",
@@ -117,6 +118,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
   hi: {
     nav_centers: "खरीद केंद्र",
     nav_schedule: "शेड्यूल बुक करें",
+    nav_pass: "गेट पास व क्यूआर",
     nav_queue: "लाइव कतार स्थिति",
     nav_login: "किसान लॉगिन",
     nav_login_portal: "किसान लॉगिन पोर्टल",
@@ -232,6 +234,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
   pa: {
     nav_centers: "ਖਰੀਦ ਕੇਂਦਰ",
     nav_schedule: "ਸ਼ਡਿਊਲ ਬੁੱਕ ਕਰੋ",
+    nav_pass: "ਗੇਟ ਪਾਸ ਤੇ QR",
     nav_queue: "ਲਾਈਵ ਕਤਾਰ ਸਥਿਤੀ",
     nav_login: "ਕਿਸਾਨ ਲੌਗਇਨ",
     nav_login_portal: "ਕਿਸਾਨ ਲੌਗਇਨ ਪੋਰਟਲ",
@@ -347,6 +350,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
   bn: {
     nav_centers: "ক্রয় কেন্দ্রসমূহ",
     nav_schedule: "সময় নির্ধারণ করুন",
+    nav_pass: "গেট পাস ও কিউআর",
     nav_queue: "লাইভ লাইনের অবস্থা",
     nav_login: "কৃষক লগইন",
     nav_login_portal: "কৃষক লগইন পোর্টাল",
@@ -462,6 +466,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
   or: {
     nav_centers: "କ୍ରୟ କେନ୍ଦ୍ର ସମୂହ",
     nav_schedule: "ସମୟ ନିର୍ଦ୍ଧାରଣ କରନ୍ତୁ",
+    nav_pass: "ଗେଟ୍ ପାସ୍ ଓ QR",
     nav_queue: "ଲାଇଭ ଲାଇନ ସ୍ଥିତି",
     nav_login: "କୃଷକ ଲଗଇନ୍",
     nav_login_portal: "କୃଷକ ଲଗଇନ୍ ପୋର୍ଟାଲ",

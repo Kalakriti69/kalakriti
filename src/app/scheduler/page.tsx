@@ -1,11 +1,12 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import PageWrapper from "@/components/PageWrapper";
 import ScheduleBooking from "@/components/ScheduleBooking";
 
 function SchedulerContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedCenter = searchParams.get("center") || "";
   const preselectedCrop = searchParams.get("crop") || "";
@@ -18,10 +19,6 @@ function SchedulerContent() {
     if (bookingDetails?.tokenId) {
       console.info("Booking confirmed", bookingDetails);
     }
-    const numericToken = bookingDetails.tokenId.replace(/\D/g, "");
-    router.push(
-      `/queue?token=${numericToken}&center=${encodeURIComponent(bookingDetails.center)}`
-    );
   };
 
   return (

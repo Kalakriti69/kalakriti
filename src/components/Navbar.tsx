@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/hooks/useTranslation";
+import StaffLoginModal from "@/components/StaffLoginModal";
 
 interface NavbarProps {
   onLoginClick: () => void;
@@ -11,9 +12,11 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: NavbarProps) {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [staffModalRole, setStaffModalRole] = useState<"admin" | "operator" | null>(null);
   const [farmerProfile, setFarmerProfile] = useState<{ name: string } | null>(null);
   const { t, lang, changeLanguage } = useTranslation();
 
@@ -59,7 +62,7 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
         ></div>
       )}
 
-      <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8 max-w-7xl mx-auto">
+      <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8 max-w-7xl mx-auto print:hidden">
         <nav
           className={`w-full rounded-2xl md:rounded-full bg-slate-950/75 backdrop-blur-xl border border-white/15 shadow-2xl shadow-black/60 py-2.5 md:py-3 px-5 md:px-8 font-sans ${mobileMenuOpen ? "rounded-3xl bg-slate-950/95" : ""
             }`}
@@ -108,6 +111,15 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
                 {t("nav_schedule")}
               </a>
               <a
+                href="/pass"
+                className={`text-sm font-bold px-4 py-2 rounded-full border transition-colors duration-150 cursor-pointer ${pathname === "/pass"
+                    ? "bg-emerald-500/25 text-emerald-300 border-emerald-400/50 shadow-sm font-black"
+                    : "text-slate-100 hover:text-emerald-300 border-transparent hover:border-white/15 hover:bg-white/10"
+                  }`}
+              >
+                {t("nav_pass")}
+              </a>
+              <a
                 href="/queue"
                 className={`text-sm font-bold px-4 py-2 rounded-full border transition-colors duration-150 cursor-pointer ${pathname === "/queue"
                     ? "bg-emerald-500/25 text-emerald-300 border-emerald-400/50 shadow-sm font-black"
@@ -120,7 +132,7 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
 
             {/* Action Buttons - Right Column */}
             <div className="flex-1 flex items-center justify-end">
-              <div className="hidden md:flex items-center">
+              <div className="hidden md:flex items-center gap-2.5 sm:gap-3">
                 {farmerProfile ? (
                   <a
                     href="/profile"
@@ -156,6 +168,97 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
                     {t("nav_login")}
                   </button>
                 )}
+
+                {/* Quick Settings Gear Trigger & Popover (Responsive for all PC aspect ratios) */}
+                <div className="relative">
+                  <button
+                    onClick={() => setSettingsOpen(!settingsOpen)}
+                    className="bg-slate-900/90 hover:bg-emerald-500 text-white hover:text-slate-950 p-2.5 rounded-full shadow-md border border-white/15 backdrop-blur-md transition-all duration-300 cursor-pointer flex items-center justify-center hover:rotate-45"
+                    title="Quick Settings"
+                    aria-label="Settings options"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-4.5 h-4.5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Settings Dropdown Popover */}
+                  {settingsOpen && (
+                    <div className="absolute right-0 top-full mt-3 bg-slate-950/95 border border-slate-700/80 text-white rounded-2xl p-4 w-72 shadow-2xl z-100 animate-fade-in-up space-y-4 backdrop-blur-xl">
+                      {/* Language Selection */}
+                      <div className="space-y-1.5">
+                        <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          Quick Language
+                        </span>
+                        <select
+                          value={lang}
+                          onChange={(e) => {
+                            changeLanguage(e.target.value);
+                            setSettingsOpen(false);
+                          }}
+                          className="w-full bg-slate-900 border border-slate-800 text-white rounded-xl py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold cursor-pointer"
+                        >
+                          <option value="en">English</option>
+                          <option value="hi">हिन्दी (Hindi)</option>
+                          <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                          <option value="bn">বাংলা (Bengali)</option>
+                          <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                        </select>
+                      </div>
+
+                      {/* Administrative Login Portals */}
+                      <div className="space-y-2 pt-2 border-t border-slate-800">
+                        <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          Staff Access
+                        </span>
+
+                        <button
+                          onClick={() => {
+                            setSettingsOpen(false);
+                            setStaffModalRole("operator");
+                          }}
+                          className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-xl border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
+                        >
+                          <span className="flex items-center gap-1.5">
+                            <span>🛠️</span>
+                            <span>Operator Login</span>
+                          </span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-extrabold uppercase">Google Auth</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setSettingsOpen(false);
+                            setStaffModalRole("admin");
+                          }}
+                          className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-xl border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
+                        >
+                          <span className="flex items-center gap-1.5">
+                            <span>👮</span>
+                            <span>Admin Portal Login</span>
+                          </span>
+                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 font-extrabold uppercase">Google Auth</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -199,17 +302,6 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
             : "max-h-0 opacity-0 pointer-events-none mt-0 pt-0 border-t-0 pb-0"
             }`}>
             <a
-              href="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`font-bold text-base py-2 px-3 rounded-xl transition-all flex items-center justify-between ${pathname === "/"
-                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                  : "text-slate-300 hover:text-white"
-                }`}
-            >
-              <span>{t("nav_home") || "Home"}</span>
-              {pathname === "/" && <span className="w-2 h-2 rounded-full bg-emerald-400"></span>}
-            </a>
-            <a
               href="/centers"
               onClick={() => setMobileMenuOpen(false)}
               className={`font-bold text-base py-2 px-3 rounded-xl transition-all flex items-center justify-between ${pathname === "/centers"
@@ -230,6 +322,17 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
             >
               <span>{t("nav_schedule")}</span>
               {pathname === "/scheduler" && <span className="w-2 h-2 rounded-full bg-emerald-400"></span>}
+            </a>
+            <a
+              href="/pass"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`font-bold text-base py-2 px-3 rounded-xl transition-all flex items-center justify-between ${pathname === "/pass"
+                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                  : "text-slate-300 hover:text-white"
+                }`}
+            >
+              <span>{t("nav_pass")}</span>
+              {pathname === "/pass" && <span className="w-2 h-2 rounded-full bg-emerald-400"></span>}
             </a>
             <a
               href="/queue"
@@ -320,90 +423,14 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
             </div>
           </div>
         </nav>
-
-        {/* Floating Settings Button for PC View with Blue Glass styling */}
-        <div className="hidden md:block fixed top-6 right-6 z-100">
-          <div className="relative">
-            <button
-              onClick={() => setSettingsOpen(!settingsOpen)}
-              className="bg-slate-950/90 hover:bg-emerald-500 text-white p-3 rounded-full shadow-lg border border-blue-500/20 backdrop-blur-md transition-all duration-300 cursor-pointer flex items-center justify-center hover:rotate-45"
-              title="Settings"
-              aria-label="Settings options"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5.5 h-5.5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-            </button>
-
-            {/* Settings Dropdown Popover */}
-            {settingsOpen && (
-              <div className="absolute right-0 mt-3 bg-slate-950/95 border border-blue-500/30 text-white rounded-2xl p-4 w-72 shadow-2xl z-100 animate-fade-in-up space-y-4 backdrop-blur-xl">
-                {/* Language Selection */}
-                <div className="space-y-1.5">
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Quick Language
-                  </span>
-                  <select
-                    value={lang}
-                    onChange={(e) => {
-                      changeLanguage(e.target.value);
-                      setSettingsOpen(false);
-                    }}
-                    className="w-full bg-slate-900 border border-slate-800 text-white rounded-xl py-2 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold cursor-pointer"
-                  >
-                    <option value="en">English</option>
-                    <option value="hi">हिन्दी (Hindi)</option>
-                    <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
-                    <option value="bn">বাংলা (Bengali)</option>
-                    <option value="or">ଓଡ଼ିଆ (Odia)</option>
-                  </select>
-                </div>
-
-                {/* Administrative Login Portals */}
-                <div className="space-y-2 pt-2 border-t border-slate-800">
-                  <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Staff Access
-                  </span>
-
-                  <a
-                    href="/operator"
-                    onClick={() => setSettingsOpen(false)}
-                    className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
-                  >
-                    <span>Operator Login</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-extrabold uppercase">Operator</span>
-                  </a>
-
-                  <a
-                    href="/admin"
-                    onClick={() => setSettingsOpen(false)}
-                    className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
-                  >
-                    <span>Admin Portal Login</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-extrabold uppercase">Admin</span>
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
       </header>
+
+      {/* Staff Google Login Modal */}
+      <StaffLoginModal
+        isOpen={staffModalRole !== null}
+        onClose={() => setStaffModalRole(null)}
+        initialRole={staffModalRole || "admin"}
+      />
     </>
   );
 }

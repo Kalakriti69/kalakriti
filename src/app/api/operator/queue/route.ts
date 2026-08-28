@@ -34,7 +34,7 @@ export async function GET() {
       );
     }
 
-    const queue = (data ?? []).map((entry) => ({
+    const queue = (data ?? []).map((entry: any) => ({
       id: entry.id,
       tokenId: `KS-${String(entry.token_number ?? "").padStart(6, "0")}`,
       farmerName: entry.farmer_name ?? "Unknown farmer",
