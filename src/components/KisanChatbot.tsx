@@ -1483,14 +1483,7 @@ export default function KisanChatbot() {
   return (
     <>
       {/* Floating Trigger Button (Bottom Right) */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 print:hidden">
-        {!isOpen && (
-          <div className="hidden sm:flex items-center bg-slate-950/90 text-white border border-emerald-500/40 px-3.5 py-1.5 rounded-full text-xs font-black shadow-2xl backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping mr-2"></span>
-            <span>{loc.title}: Ask / Book Slot 🌾</span>
-          </div>
-        )}
-
+      <div className="fixed bottom-6 right-6 z-50 flex items-center print:hidden">
         <button
           onClick={() => toggleOpenState(!isOpen)}
           className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-300 transform active:scale-95 cursor-pointer relative ${
