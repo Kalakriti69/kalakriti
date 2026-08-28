@@ -62,7 +62,7 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
         ></div>
       )}
 
-      <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8 max-w-7xl mx-auto">
+      <header className="fixed top-4 left-0 right-0 z-50 px-4 sm:px-8 max-w-7xl mx-auto print:hidden">
         <nav
           className={`w-full rounded-2xl md:rounded-full bg-slate-950/75 backdrop-blur-xl border border-white/15 shadow-2xl shadow-black/60 py-2.5 md:py-3 px-5 md:px-8 font-sans ${mobileMenuOpen ? "rounded-3xl bg-slate-950/95" : ""
             }`}
@@ -109,6 +109,15 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
                   }`}
               >
                 {t("nav_schedule")}
+              </a>
+              <a
+                href="/pass"
+                className={`text-sm font-bold px-4 py-2 rounded-full border transition-colors duration-150 cursor-pointer ${pathname === "/pass"
+                    ? "bg-emerald-500/25 text-emerald-300 border-emerald-400/50 shadow-sm font-black"
+                    : "text-slate-100 hover:text-emerald-300 border-transparent hover:border-white/15 hover:bg-white/10"
+                  }`}
+              >
+                {t("nav_pass")}
               </a>
               <a
                 href="/queue"
@@ -313,6 +322,17 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
             >
               <span>{t("nav_schedule")}</span>
               {pathname === "/scheduler" && <span className="w-2 h-2 rounded-full bg-emerald-400"></span>}
+            </a>
+            <a
+              href="/pass"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`font-bold text-base py-2 px-3 rounded-xl transition-all flex items-center justify-between ${pathname === "/pass"
+                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                  : "text-slate-300 hover:text-white"
+                }`}
+            >
+              <span>{t("nav_pass")}</span>
+              {pathname === "/pass" && <span className="w-2 h-2 rounded-full bg-emerald-400"></span>}
             </a>
             <a
               href="/queue"

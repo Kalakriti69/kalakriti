@@ -1354,7 +1354,7 @@ export default function KisanChatbot() {
   return (
     <>
       {/* Floating Launcher Button with Attractive Bounce Animation */}
-      <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-90 flex flex-col items-end">
+      <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-90 flex flex-col items-end print:hidden">
         <button
           onClick={() => toggleOpenState(!isOpen)}
           className={`relative group p-3.5 sm:p-4 rounded-full shadow-2xl transition-all duration-300 cursor-pointer flex items-center justify-center ${
@@ -1381,7 +1381,7 @@ export default function KisanChatbot() {
       {/* Floating Chat Drawer Window with macOS Opening/Closing animation */}
       {isOpen && (
         <div
-          className={`fixed bottom-20 sm:bottom-24 right-3 sm:right-6 z-100 w-[calc(100vw-1.5rem)] sm:w-[375px] max-h-[520px] h-[72vh] bg-slate-950/95 border border-emerald-500/30 rounded-3xl shadow-2xl shadow-emerald-500/10 flex flex-col overflow-hidden backdrop-blur-xl origin-bottom-right transition-all ${
+          className={`fixed bottom-20 sm:bottom-24 right-3 sm:right-6 z-100 w-[calc(100vw-1.5rem)] sm:w-[375px] max-h-[520px] h-[72vh] bg-slate-950/95 border border-emerald-500/30 rounded-3xl shadow-2xl shadow-emerald-500/10 flex flex-col overflow-hidden backdrop-blur-xl origin-bottom-right transition-all print:hidden ${
             isClosing ? "animate-macos-close" : "animate-macos-open"
           }`}
         >

@@ -19,10 +19,6 @@ function SchedulerContent() {
     if (bookingDetails?.tokenId) {
       console.info("Booking confirmed", bookingDetails);
     }
-    const numericToken = bookingDetails.tokenId.replace(/\D/g, "");
-    router.push(
-      `/queue?token=${numericToken}&center=${encodeURIComponent(bookingDetails.center)}`
-    );
   };
 
   return (

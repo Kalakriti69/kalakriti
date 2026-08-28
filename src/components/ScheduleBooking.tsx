@@ -185,9 +185,16 @@ export default function ScheduleBooking({
         qrToken: result.booking.qrToken,
       };
 
+      if (typeof window !== "undefined") {
+        localStorage.setItem("kisanSetu_latest_booking", JSON.stringify(bookingData));
+        window.dispatchEvent(new Event("kisanSetu_booking_created"));
+      }
+
       setReceipt(bookingData);
       setStep(4);
-      onBookingSuccess(bookingData);
+      if (onBookingSuccess) {
+        onBookingSuccess(bookingData);
+      }
     } catch (error) {
       alert(error instanceof Error ? error.message : "Unable to process booking.");
     } finally {
@@ -440,7 +447,7 @@ export default function ScheduleBooking({
             {step === 4 && receipt && (
               <div className="text-center py-4 space-y-6 animate-fade-in-up">
                 {/* Visual success alert */}
-                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2 text-emerald-600 shadow-lg shadow-emerald-500/20">
+                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2 text-emerald-600 shadow-lg shadow-emerald-500/20 print:hidden">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -453,7 +460,7 @@ export default function ScheduleBooking({
                   </svg>
                 </div>
                 
-                <div>
+                <div className="print:hidden">
                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                     {t("sched_success") || "Appointment Confirmed!"}
                   </h3>
@@ -463,7 +470,7 @@ export default function ScheduleBooking({
                 </div>
 
                 {/* Official Confirmation Slip */}
-                <div className="max-w-2xl mx-auto bg-gradient-to-b from-white to-slate-50 border-2 border-emerald-500/30 rounded-3xl p-6 sm:p-8 text-left relative overflow-hidden shadow-2xl">
+                <div className="max-w-2xl mx-auto bg-gradient-to-b from-white to-slate-50 border-2 border-emerald-500/30 rounded-3xl p-6 sm:p-8 text-left relative overflow-hidden shadow-2xl printable-slip-area print:border-2 print:border-black print:p-4 print:shadow-none print:bg-white print:text-black">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full flex items-start justify-end p-3 font-black text-emerald-800 text-[10px] uppercase tracking-wider">
                     VALID PASS
                   </div>
@@ -533,7 +540,7 @@ export default function ScheduleBooking({
                       <p className="text-[11px] text-slate-600 max-w-xs leading-relaxed">
                         Present this QR code to the APMC Yard Operator camera at the weighbridge gate for instant contactless check-in.
                       </p>
-                      <span className="text-[10px] text-amber-700 font-bold bg-amber-100/80 px-2 py-0.5 rounded-md inline-block mt-1">
+                      <span className="text-[10px] text-amber-700 font-bold bg-amber-100/80 px-2 py-0.5 rounded-md inline-block mt-1 print:hidden">
                         ⚠️ Pass will automatically expire once scanned at the yard.
                       </span>
                     </div>
@@ -556,7 +563,7 @@ export default function ScheduleBooking({
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap items-center justify-center gap-3 pt-4 max-w-xl mx-auto">
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-4 max-w-xl mx-auto print:hidden">
                   <a
                     href={receipt.qrCode}
                     download={`KisanSetu_GatePass_${receipt.tokenId}.png`}

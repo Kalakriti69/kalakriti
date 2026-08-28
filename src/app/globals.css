@@ -156,4 +156,39 @@ html {
   text-shadow: 0 4px 16px rgba(0, 0, 0, 0.9);
 }
 
+/* Print optimization - hide navbar, chatbot, footer and show only official slip & QR */
+@media print {
+  header,
+  nav,
+  footer,
+  aside,
+  #kisan-chatbot,
+  .chatbot-container,
+  .no-print,
+  button:not(.print-keep),
+  a:not(.print-keep) {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #printable-gate-pass,
+  .printable-slip-area {
+    margin: 0 auto !important;
+    padding: 1.5rem !important;
+    border: 2px solid #059669 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    page-break-inside: avoid !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
 
