@@ -48,6 +48,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("4241");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const [profileForm, setProfileForm] = useState({
@@ -110,6 +111,50 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
     return () => window.removeEventListener("kisansetu_open_login", handleLoginEvent);
   }, []);
 
+  // Geolocation auto-detection
+  const detectLocation = () => {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      setErrorMessage("Geolocation is not supported by your browser.");
+      return;
+    }
+    setIsDetectingLocation(true);
+    setErrorMessage("");
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const res = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          const data = await res.json();
+          if (data) {
+            const villageOrLocality = data.locality || data.city || data.principalSubdivisionDistrict || "Local Village";
+            const district = data.principalSubdivisionDistrict || data.city || "District Area";
+            const state = data.principalSubdivision || "Uttar Pradesh";
+
+            setProfileForm((prev) => ({
+              ...prev,
+              location: villageOrLocality,
+              district: district,
+              state: INDIAN_STATES.includes(state) ? state : prev.state,
+            }));
+          }
+        } catch (err) {
+          console.error("Geocoding failed:", err);
+          setErrorMessage("Could not resolve location name automatically. Please type it in.");
+        } finally {
+          setIsDetectingLocation(false);
+        }
+      },
+      (err) => {
+        console.warn("Location permission denied:", err);
+        setIsDetectingLocation(false);
+      },
+      { timeout: 10000 }
+    );
+  };
+
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (phoneNumber.length !== 10) {
@@ -143,8 +188,9 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
           }
         } catch {}
       }
-      // If no details filled yet, proceed to basic profile setup
+      // Trigger automatic GPS location check on profile step
       setStep("profile");
+      detectLocation();
     }, 250);
   };
 
@@ -171,7 +217,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
       area: Number(profileForm.area) || 5,
       primaryCrop: profileForm.primaryCrop || "Paddy (धान)",
       bankAccount: profileForm.bankAccount || "SBI ****4920",
-      dbtStatus: "Active & Verified ✅",
+      dbtStatus: "Active & Verified",
       farmerId: `KS-FARM-${Math.floor(1000 + Math.random() * 9000)}`,
       joinedDate: new Date().toLocaleDateString("en-IN", { month: "short", year: "numeric" }),
     };
@@ -188,7 +234,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-950/80 backdrop-blur-md px-4 py-6 animate-fade-in-up">
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-950/80 backdrop-blur-md px-4 py-6 animate-fade-in-up font-sans">
       {/* Modal Card */}
       <div className="relative w-full max-w-lg bg-slate-900 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-emerald-500/10 text-white overflow-hidden max-h-[90vh] overflow-y-auto scrollbar-thin">
         {/* Close Button */}
@@ -211,7 +257,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-black text-white tracking-tight">🌾 Farmer Login Portal</h2>
+              <h2 className="text-2xl font-black text-white tracking-tight">Farmer Login Portal</h2>
               <p className="text-sm text-slate-400">Enter your 10-digit mobile number to access your account.</p>
             </div>
 
@@ -219,7 +265,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Mobile Number</label>
                 <div className="flex rounded-2xl bg-slate-950 border border-slate-700 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 overflow-hidden transition-all">
-                  <span className="px-4 py-3 bg-slate-800 text-slate-300 font-bold text-sm flex items-center border-r border-slate-700">🇮🇳 +91</span>
+                  <span className="px-4 py-3 bg-slate-800 text-slate-300 font-bold text-sm flex items-center border-r border-slate-700">+91</span>
                   <input
                     type="tel"
                     maxLength={10}
@@ -239,7 +285,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                 disabled={phoneNumber.length !== 10 || isSubmitting}
                 className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-black py-3.5 px-4 rounded-2xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
-                {isSubmitting ? "Sending OTP..." : "Get OTP Code ⚡"}
+                {isSubmitting ? "Sending OTP..." : "Get OTP Code"}
               </button>
             </form>
           </div>
@@ -254,7 +300,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-black text-white tracking-tight">🔐 Verify Mobile Number</h2>
+              <h2 className="text-2xl font-black text-white tracking-tight">Verify Mobile Number</h2>
               <p className="text-sm text-slate-400">
                 Code sent to <span className="font-bold text-white font-mono">+91 {phoneNumber}</span>
               </p>
@@ -262,7 +308,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
 
             {/* Dummy OTP Hint Banner */}
             <div className="bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-2xl flex items-center justify-between text-xs">
-              <span className="text-emerald-300 font-semibold">⚡ Demo Fixed OTP Code:</span>
+              <span className="text-emerald-300 font-semibold">Fixed Demo OTP Code:</span>
               <span className="font-mono font-black text-emerald-400 text-base tracking-widest bg-emerald-950/80 px-2.5 py-0.5 rounded-lg border border-emerald-500/30">
                 4241
               </span>
@@ -288,7 +334,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                 disabled={otp.length !== 4 || isSubmitting}
                 className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-black py-3.5 px-4 rounded-2xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
               >
-                {isSubmitting ? "Verifying..." : "Verify & Proceed 🚀"}
+                {isSubmitting ? "Verifying..." : "Verify & Proceed"}
               </button>
 
               <div className="flex justify-between items-center text-xs text-slate-400 pt-2">
@@ -303,7 +349,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
           </div>
         )}
 
-        {/* Step 3: Farmer Basic Details Setup */}
+        {/* Step 3: Farmer Basic Details Setup with Geolocation */}
         {step === "profile" && (
           <div className="space-y-5">
             <div className="text-center space-y-1">
@@ -312,14 +358,40 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                 </svg>
               </div>
-              <h2 className="text-2xl font-black text-white tracking-tight">👨‍🌾 Farmer Basic Profile</h2>
-              <p className="text-xs text-slate-400">Complete your profile once to unlock auto-slot booking & digital tokens.</p>
+              <h2 className="text-2xl font-black text-white tracking-tight">Farmer Basic Profile</h2>
+              <p className="text-xs text-slate-400">Complete your profile to unlock auto-slot booking and token access.</p>
+            </div>
+
+            {/* Auto GPS Detect Button */}
+            <div className="flex items-center justify-between bg-slate-950 p-3 rounded-2xl border border-slate-800">
+              <div className="flex items-center space-x-2 text-xs text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 text-emerald-400">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                </svg>
+                <span>Device GPS Location</span>
+              </div>
+              <button
+                type="button"
+                onClick={detectLocation}
+                disabled={isDetectingLocation}
+                className="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                {isDetectingLocation ? (
+                  <>
+                    <span className="w-3 h-3 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></span>
+                    Detecting...
+                  </>
+                ) : (
+                  "Auto-Detect Location"
+                )}
+              </button>
             </div>
 
             <form onSubmit={handleSaveProfile} className="space-y-3.5">
               {/* Full Name */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Full Name (पूरा नाम) *</label>
+                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Full Name *</label>
                 <input
                   type="text"
                   placeholder="e.g. Rameshwar Singh"
@@ -333,7 +405,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
               {/* State & District */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">State (राज्य)</label>
+                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">State</label>
                   <select
                     value={profileForm.state}
                     onChange={(e) => setProfileForm({ ...profileForm, state: e.target.value })}
@@ -348,7 +420,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">District (जिला)</label>
+                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">District</label>
                   <input
                     type="text"
                     placeholder="e.g. Kanpur Nagar"
@@ -362,7 +434,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
               {/* Village & Land Area */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Village / Tehsil (गाँव / तहसील) *</label>
+                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Village / Tehsil Location *</label>
                   <input
                     type="text"
                     placeholder="e.g. Kalyanpur"
@@ -374,7 +446,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Land Area (Acres) (जमीन)</label>
+                  <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Land Area (Acres)</label>
                   <input
                     type="number"
                     step="0.5"
@@ -390,7 +462,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
 
               {/* Primary Crop */}
               <div>
-                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Primary Crop (मुख्य फसल)</label>
+                <label className="block text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-1">Primary Crop</label>
                 <select
                   value={profileForm.primaryCrop}
                   onChange={(e) => setProfileForm({ ...profileForm, primaryCrop: e.target.value })}
@@ -411,7 +483,7 @@ export default function LoginPortal({ isOpen, onClose }: LoginPortalProps) {
                 disabled={isSubmitting}
                 className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3.5 px-4 rounded-2xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98] mt-2"
               >
-                {isSubmitting ? "Saving Profile..." : "Save Details & Open Profile Page 🚀"}
+                {isSubmitting ? "Saving Profile..." : "Save Details & Open Profile Page"}
               </button>
             </form>
           </div>
