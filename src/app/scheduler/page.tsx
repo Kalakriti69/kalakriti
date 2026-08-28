@@ -8,16 +8,30 @@ import ScheduleBooking from "@/components/ScheduleBooking";
 function SchedulerContent() {
   const searchParams = useSearchParams();
   const preselectedCenter = searchParams.get("center") || "";
+  const preselectedCrop = searchParams.get("crop") || "";
+  const preselectedWeight = searchParams.get("weight") ? Number(searchParams.get("weight")) : undefined;
+  const preselectedDate = searchParams.get("date") || "";
+  const preselectedSlot = searchParams.get("slot") || "";
+  const preselectedStep = searchParams.get("step") ? Number(searchParams.get("step")) : undefined;
 
   const handleBookingSuccess = (bookingDetails: any) => {
     if (bookingDetails?.tokenId) {
       console.info("Booking confirmed", bookingDetails);
     }
+    const numericToken = bookingDetails.tokenId.replace(/\D/g, "");
+    router.push(
+      `/queue?token=${numericToken}&center=${encodeURIComponent(bookingDetails.center)}`
+    );
   };
 
   return (
     <ScheduleBooking
       preselectedCenter={preselectedCenter}
+      preselectedCrop={preselectedCrop}
+      preselectedWeight={preselectedWeight}
+      preselectedDate={preselectedDate}
+      preselectedSlot={preselectedSlot}
+      preselectedStep={preselectedStep}
       onBookingSuccess={handleBookingSuccess}
     />
   );
