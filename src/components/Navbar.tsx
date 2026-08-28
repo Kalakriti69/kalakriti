@@ -293,17 +293,6 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
             : "max-h-0 opacity-0 pointer-events-none mt-0 pt-0 border-t-0 pb-0"
             }`}>
             <a
-              href="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`font-bold text-base py-2 px-3 rounded-xl transition-all flex items-center justify-between ${pathname === "/"
-                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                  : "text-slate-300 hover:text-white"
-                }`}
-            >
-              <span>{t("nav_home") || "Home"}</span>
-              {pathname === "/" && <span className="w-2 h-2 rounded-full bg-emerald-400"></span>}
-            </a>
-            <a
               href="/centers"
               onClick={() => setMobileMenuOpen(false)}
               className={`font-bold text-base py-2 px-3 rounded-xl transition-all flex items-center justify-between ${pathname === "/centers"
