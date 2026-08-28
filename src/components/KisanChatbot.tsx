@@ -1485,7 +1485,7 @@ export default function KisanChatbot() {
       {/* Floating Trigger Button (Bottom Right) */}
       <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 print:hidden">
         {!isOpen && (
-          <div className="hidden sm:flex items-center bg-slate-950/90 text-white border border-emerald-500/40 px-3.5 py-1.5 rounded-full text-xs font-black shadow-2xl backdrop-blur-md animate-bounce">
+          <div className="hidden sm:flex items-center bg-slate-950/90 text-white border border-emerald-500/40 px-3.5 py-1.5 rounded-full text-xs font-black shadow-2xl backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping mr-2"></span>
             <span>{loc.title}: Ask / Book Slot 🌾</span>
           </div>
@@ -1496,7 +1496,7 @@ export default function KisanChatbot() {
           className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-all duration-300 transform active:scale-95 cursor-pointer relative ${
             isOpen
               ? "bg-rose-600 hover:bg-rose-500 text-white rotate-90"
-              : "bg-gradient-to-tr from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white hover:scale-105"
+              : "bg-gradient-to-tr from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white hover:scale-110 animate-bounce shadow-emerald-500/30 ring-4 ring-emerald-500/20"
           }`}
           title={isOpen ? "Close Assistant" : "Open KisanMitra Voice AI"}
         >
@@ -1505,9 +1505,8 @@ export default function KisanChatbot() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <div className="relative">
-              <span className="text-2xl">🌾</span>
-              <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-slate-900 animate-pulse"></span>
+            <div className="flex items-center justify-center">
+              <img src="/icon.svg" alt="KisanSetu Logo" className="w-9 h-9 object-contain rounded-xl drop-shadow-md" />
             </div>
           )}
         </button>
@@ -1521,19 +1520,19 @@ export default function KisanChatbot() {
           }`}
         >
           {/* Drawer Header */}
-          <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 px-5 py-3.5 border-b border-emerald-500/20 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-xl shadow-inner">
-                🌾
+          <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 px-4 sm:px-5 py-3 sm:py-3.5 border-b border-emerald-500/20 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center p-1.5 shadow-inner shrink-0">
+                <img src="/icon.svg" alt="KisanSetu Logo" className="w-full h-full object-contain rounded-xl" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-black text-white text-sm sm:text-base tracking-tight">{loc.title}</h3>
-                  <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-black px-2 py-0.2 rounded-full border border-emerald-500/30 uppercase">
+                  <h3 className="font-black text-white text-sm sm:text-base tracking-tight truncate">{loc.title}</h3>
+                  <span className="hidden sm:inline-flex bg-emerald-500/20 text-emerald-300 text-[10px] font-black px-2 py-0.5 rounded-full border border-emerald-500/30 uppercase whitespace-nowrap shrink-0">
                     AI Voice & Booking
                   </span>
                 </div>
-                <p className="text-[11px] text-emerald-400/80 font-bold">KisanSetu Virtual Assistant</p>
+                <p className="text-[10px] sm:text-[11px] text-emerald-400/80 font-bold truncate">KisanSetu Virtual Assistant</p>
               </div>
             </div>
 
