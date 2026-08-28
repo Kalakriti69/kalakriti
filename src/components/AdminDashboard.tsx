@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { StaffSession, signOutStaff } from "@/lib/firebase/config";
+import { StaffSession, signOutStaff, isAuthorizedAdmin, AUTHORIZED_ADMIN_EMAILS } from "@/lib/firebase/config";
+import StaffLoginModal from "@/components/StaffLoginModal";
 
 interface FarmerRecord {
   id: string;
@@ -129,6 +130,8 @@ export default function AdminDashboard() {
   const [stateFilter, setStateFilter] = useState("All");
   const [selectedFarmer, setSelectedFarmer] = useState<FarmerRecord | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     // Check if session exists in localStorage
@@ -136,20 +139,19 @@ export default function AdminDashboard() {
       const stored = localStorage.getItem("kisanSetu_admin_session");
       if (stored) {
         try {
-          setSession(JSON.parse(stored));
-        } catch {}
+          const parsed = JSON.parse(stored);
+          if (parsed && isAuthorizedAdmin(parsed.email)) {
+            setSession(parsed);
+          } else {
+            setSession(null);
+          }
+        } catch {
+          setSession(null);
+        }
       } else {
-        // Fallback default admin session for quick access
-        const defaultAdmin: StaffSession = {
-          uid: "admin-default",
-          name: "Dr. Rajesh Sharma, IAS",
-          email: "rajesh.sharma@agri.gov.in",
-          role: "admin",
-          loginTime: new Date().toISOString(),
-        };
-        setSession(defaultAdmin);
-        localStorage.setItem("kisanSetu_admin_session", JSON.stringify(defaultAdmin));
+        setSession(null);
       }
+      setIsLoaded(true);
 
       // Check if user registered their own profile in KisanSetu
       const registeredFarmer = localStorage.getItem("farmer_profile");
@@ -182,6 +184,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     await signOutStaff("admin");
+    setSession(null);
     router.push("/");
   };
 
@@ -201,6 +204,59 @@ export default function AdminDashboard() {
       setSelectedFarmer((prev) => (prev ? { ...prev, kycStatus: prev.kycStatus === "Verified" ? "Pending KYC" : "Verified" } : null));
     }
   };
+
+  const isAuthorized = Boolean(session && isAuthorizedAdmin(session.email));
+
+  if (isLoaded && !isAuthorized) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center shadow-2xl space-y-6">
+          <div className="w-16 h-16 bg-rose-500/15 border border-rose-500/30 text-rose-400 rounded-2xl flex items-center justify-center mx-auto text-3xl">
+            🔒
+          </div>
+          <div>
+            <h2 className="text-2xl font-black tracking-tight text-white">Government Admin Portal</h2>
+            <p className="text-xs text-rose-300 bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl mt-3 font-semibold">
+              Access Restricted: APMC Operators and unauthorized accounts cannot access the National Beneficiary Registry.
+            </p>
+          </div>
+
+          <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-left text-xs space-y-2">
+            <span className="text-slate-400 font-bold block uppercase text-[10px] tracking-wider">
+              Authorized Government Administrator Gmails:
+            </span>
+            {AUTHORIZED_ADMIN_EMAILS.map((email) => (
+              <div key={email} className="font-mono text-emerald-400 font-bold flex items-center gap-1.5">
+                <span>✓</span>
+                <span>{email}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <button
+              onClick={() => setIsLoginModalOpen(true)}
+              className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm py-3.5 rounded-2xl shadow-lg transition-all cursor-pointer"
+            >
+              Sign in with Authorized Google Account
+            </button>
+            <button
+              onClick={() => router.push("/operator")}
+              className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-3 rounded-2xl border border-slate-700 transition-all cursor-pointer"
+            >
+              Switch to APMC Operator Desk
+            </button>
+          </div>
+        </div>
+
+        <StaffLoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          initialRole="admin"
+        />
+      </div>
+    );
+  }
 
   // Metrics Calculations
   const totalFarmersCount = farmers.length;

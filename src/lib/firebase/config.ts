@@ -16,6 +16,17 @@ export const auth = app ? getAuth(app) : null;
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
+export const AUTHORIZED_ADMIN_EMAILS = [
+  "rajatava2006@gmail.com",
+  "manishdey356@gmail.com",
+  "priyankashrutikumari12345@gmail.com",
+];
+
+export function isAuthorizedAdmin(email?: string | null): boolean {
+  if (!email) return false;
+  return AUTHORIZED_ADMIN_EMAILS.map((e) => e.toLowerCase().trim()).includes(email.toLowerCase().trim());
+}
+
 export interface StaffSession {
   uid: string;
   name: string;
@@ -27,18 +38,26 @@ export interface StaffSession {
 
 /**
  * Perform Sign In with Google via Firebase Popup.
- * If Firebase environment variables are not yet set or in offline simulation,
- * it returns a simulated authenticated staff profile so the workflow can be tested immediately.
+ * Restricts Admin Portal to authorized government Gmail IDs.
  */
 export async function signInWithGoogle(role: "admin" | "operator"): Promise<StaffSession> {
   if (auth && firebaseConfig.apiKey) {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user: User = result.user;
+      const userEmail = (user.email || "").toLowerCase().trim();
+
+      // STRICT ADMIN SECURITY GATE: Only authorized admin Gmails can access Admin Portal
+      if (role === "admin" && !isAuthorizedAdmin(userEmail)) {
+        throw new Error(
+          `Access Denied: ${userEmail} is not authorized for the Government Admin Portal. Access is strictly restricted to designated administrator accounts.`
+        );
+      }
+
       const session: StaffSession = {
         uid: user.uid,
         name: user.displayName || (role === "admin" ? "Govt Admin" : "Yard Operator"),
-        email: user.email || (role === "admin" ? "admin@kisansetu.gov.in" : "operator@kisansetu.gov.in"),
+        email: userEmail,
         photoURL: user.photoURL || undefined,
         role,
         loginTime: new Date().toISOString(),
@@ -53,16 +72,17 @@ export async function signInWithGoogle(role: "admin" | "operator"): Promise<Staf
       if (err.code === "auth/popup-closed-by-user") {
         throw new Error("Sign-in cancelled. Please complete Google authentication.");
       }
-      // If API key is invalid/restricted, fallback gracefully with notification
+      // Re-throw specific security access errors or general errors
       throw new Error(err.message || "Failed to sign in with Google.");
     }
   }
 
-  // Fallback demo authentication when Firebase env variables are pending
+  // Fallback demo authentication with first authorized admin ID
+  const fallbackEmail = role === "admin" ? AUTHORIZED_ADMIN_EMAILS[0] : "manoj.operator@odishamandi.gov.in";
   const fallbackSession: StaffSession = {
     uid: `demo-${role}-${Date.now()}`,
-    name: role === "admin" ? "Rajesh Sharma (Admin)" : "Manoj Das (APMC Operator)",
-    email: role === "admin" ? "rajesh.admin@kisansetu.gov.in" : "manoj.operator@odishamandi.gov.in",
+    name: role === "admin" ? "Rajatava (Admin)" : "Manoj Das (APMC Operator)",
+    email: fallbackEmail,
     photoURL: "https://api.dicebear.com/7.x/bottts/svg?seed=kisan",
     role,
     loginTime: new Date().toISOString(),

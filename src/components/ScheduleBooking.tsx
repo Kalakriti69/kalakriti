@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import QRCode from "qrcode";
 import { useTranslation } from "@/hooks/useTranslation";
 import { MOCK_CENTERS } from "./ProcurementCenters";
 
@@ -107,13 +108,27 @@ export default function ScheduleBooking({
     try {
       setIsSubmitting(true);
 
+      // Check for logged in farmer profile
+      let currentFarmerName = "Ramesh Kumar";
+      let currentFarmerPhone = "+91 98765 43210";
+      if (typeof window !== "undefined") {
+        const storedProfile = localStorage.getItem("farmer_profile") || localStorage.getItem("kisanSetu_farmer_profile");
+        if (storedProfile) {
+          try {
+            const parsed = JSON.parse(storedProfile);
+            if (parsed.name) currentFarmerName = parsed.name;
+            if (parsed.phone) currentFarmerPhone = parsed.phone;
+          } catch {}
+        }
+      }
+
       const response = await fetch("/api/bookings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          farmerName: "Ramesh Kumar",
+          farmerName: currentFarmerName,
           centreName: center,
           crop,
           weight,
@@ -128,16 +143,45 @@ export default function ScheduleBooking({
         throw new Error(result.error || "Unable to save booking.");
       }
 
+      const generatedTokenId = result.booking.tokenId || `KS-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      // Guarantee high-resolution dynamic one-time QR code
+      let qrCodeUrl = result.booking.qrCode;
+      if (!qrCodeUrl) {
+        const qrPayload = JSON.stringify({
+          tokenId: generatedTokenId,
+          farmerName: result.booking.farmerName || currentFarmerName,
+          phone: currentFarmerPhone,
+          center: result.booking.centreName || center,
+          crop: result.booking.crop || crop,
+          weight: result.booking.weight || weight,
+          date: result.booking.appointmentDate || selectedDate,
+          timeSlot: result.booking.appointmentTime || selectedSlot,
+          oneTimePass: true,
+          securityHash: `OTP_${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+        });
+        qrCodeUrl = await QRCode.toDataURL(qrPayload, {
+          margin: 1,
+          width: 280,
+          errorCorrectionLevel: "H",
+          color: {
+            dark: "#022c22",
+            light: "#ffffff",
+          },
+        });
+      }
+
       const bookingData = {
         center: result.booking.centreName || center,
         crop: result.booking.crop || crop,
         weight: result.booking.weight || weight,
         date: result.booking.appointmentDate || selectedDate,
         timeSlot: result.booking.appointmentTime || selectedSlot,
-        tokenId: result.booking.tokenId,
-        qrCode: result.booking.qrCode,
+        tokenId: generatedTokenId,
+        qrCode: qrCodeUrl,
         confirmationStatus: result.booking.confirmationStatus || "Confirmed",
-        farmerName: result.booking.farmerName || "Ramesh Kumar",
+        farmerName: result.booking.farmerName || currentFarmerName,
+        farmerPhone: currentFarmerPhone,
         qrToken: result.booking.qrToken,
       };
 
@@ -396,110 +440,153 @@ export default function ScheduleBooking({
             {step === 4 && receipt && (
               <div className="text-center py-4 space-y-6 animate-fade-in-up">
                 {/* Visual success alert */}
-                <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2 text-emerald-600">
+                <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2 text-emerald-600 shadow-lg shadow-emerald-500/20">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth={3}
                     stroke="currentColor"
-                    className="w-7 h-7"
+                    className="w-8 h-8"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                   </svg>
                 </div>
                 
-                <h3 className="text-2xl font-black text-slate-900">{t("sched_success")}</h3>
-                <p className="text-slate-500 max-w-md mx-auto text-sm">
-                  {t("sched_success_desc")}
-                </p>
-
-                {/* Confirmation slip */}
-                <div className="max-w-2xl mx-auto bg-slate-50 border border-slate-200/80 rounded-2xl p-6 text-left relative overflow-hidden shadow-inner">
-                 <div className="absolute top-0 right-0 w-20 h-20 bg-emerald-500/10 rounded-bl-full flex items-center justify-center font-bold text-emerald-800 text-[10px] uppercase">
-                   Active
-                 </div>
-
-                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between pb-4 border-b border-dashed border-slate-300 mb-4">
-                   <div>
-                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{t("sched_ticket_token")}</span>
-                     <p className="text-2xl font-black text-emerald-600 tracking-wider mt-0.5">{receipt.tokenId}</p>
-                   </div>
-                   <div className="text-left md:text-right">
-                     <span className="text-[10px] text-slate-400 block font-bold uppercase">Confirmation status</span>
-                     <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-bold text-[10px] mt-1 inline-block">
-                       {receipt.confirmationStatus || "Confirmed"}
-                     </span>
-                   </div>
-                 </div>
-
-                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 text-xs font-semibold">
-                   <div>
-                     <span className="text-slate-400 block mb-0.5">Farmer</span>
-                     <span className="text-slate-800 block text-sm font-bold leading-tight">{receipt.farmerName}</span>
-                   </div>
-                   <div>
-                     <span className="text-slate-400 block mb-0.5">{t("sched_ticket_center")}</span>
-                     <span className="text-slate-800 block text-sm font-bold leading-tight">
-                       {t(`center_${MOCK_CENTERS.findIndex(c => c.name === receipt.center) + 1}_name`)}
-                     </span>
-                   </div>
-                   <div>
-                     <span className="text-slate-400 block mb-0.5">{t("sched_ticket_crop")}</span>
-                     <span className="text-slate-800 block text-sm font-bold">
-                       🌾 {t("crop_" + receipt.crop)} ({receipt.weight} Qtl)
-                     </span>
-                   </div>
-                   <div>
-                     <span className="text-slate-400 block mb-0.5">Weight</span>
-                     <span className="text-slate-800 block text-sm font-bold">{receipt.weight} quintals</span>
-                   </div>
-                   <div>
-                     <span className="text-slate-400 block mb-0.5">{t("sched_ticket_date")}</span>
-                     <span className="text-slate-800 block text-sm font-bold">📅 {receipt.date}</span>
-                   </div>
-                   <div>
-                     <span className="text-slate-400 block mb-0.5">{t("sched_ticket_slot")}</span>
-                     <span className="text-slate-800 block text-sm font-bold">⏰ {receipt.timeSlot}</span>
-                   </div>
-                 </div>
-
-                 <div className="mt-6 pt-5 border-t border-slate-200/60 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                   <div className="flex-1">
-                     <span className="text-[10px] text-slate-400 block font-bold uppercase">One-time pass</span>
-                     <span className="text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-0.5 font-bold text-[10px] mt-1 inline-block">
-                       {t("sched_ticket_status")}
-                     </span>
-                   </div>
-                   <div className="flex justify-center md:justify-end">
-                     {receipt.qrCode ? (
-                       <img
-                         src={receipt.qrCode}
-                         alt="Booking QR code"
-                         className="w-32 h-32 rounded-xl border border-slate-200 bg-white p-2 shadow-sm"
-                       />
-                     ) : (
-                       <div className="w-32 h-32 border border-slate-200 bg-slate-100 rounded-xl flex items-center justify-center text-[10px] font-bold uppercase text-slate-500">
-                         QR
-                       </div>
-                     )}
-                   </div>
-                 </div>
+                <div>
+                  <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                    {t("sched_success") || "Appointment Confirmed!"}
+                  </h3>
+                  <p className="text-slate-500 max-w-md mx-auto text-xs sm:text-sm mt-1">
+                    Your dynamic one-time gate pass QR code has been generated. Please show this code at the APMC yard entry gate.
+                  </p>
                 </div>
 
-                {/* Receipt Actions */}
-                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2 max-w-sm mx-auto">
+                {/* Official Confirmation Slip */}
+                <div className="max-w-2xl mx-auto bg-gradient-to-b from-white to-slate-50 border-2 border-emerald-500/30 rounded-3xl p-6 sm:p-8 text-left relative overflow-hidden shadow-2xl">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full flex items-start justify-end p-3 font-black text-emerald-800 text-[10px] uppercase tracking-wider">
+                    VALID PASS
+                  </div>
+
+                  {/* Top Slip Header */}
+                  <div className="flex items-center gap-3 pb-4 border-b-2 border-dashed border-slate-200">
+                    <img src="/icon.svg" alt="Logo" className="w-10 h-10 rounded-xl" />
+                    <div>
+                      <h4 className="font-black text-slate-900 text-sm sm:text-base leading-tight">
+                        APMC GOVT PROCUREMENT YARD • GATE ENTRY PASS
+                      </h4>
+                      <p className="text-[11px] text-slate-500 font-semibold">
+                        Ministry of Agriculture & Farmers Welfare • Direct Benefit Transfer (DBT)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Token & Confirmation Status */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between py-4 border-b border-slate-100 gap-2">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">ASSIGNED TOKEN ID</span>
+                      <p className="text-3xl font-black text-emerald-600 font-mono tracking-tight mt-0.5">{receipt.tokenId}</p>
+                    </div>
+                    <div className="sm:text-right">
+                      <span className="text-[10px] text-slate-400 block font-bold uppercase">Pass Status</span>
+                      <span className="text-emerald-800 bg-emerald-100 border border-emerald-300 rounded-full px-3 py-1 font-extrabold text-xs inline-flex items-center gap-1.5 mt-0.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>ONE-TIME PASS • ACTIVE</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Details Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 text-xs">
+                    <div className="bg-slate-100/60 p-3 rounded-2xl">
+                      <span className="text-slate-400 block font-semibold text-[10px] uppercase">Farmer Beneficiary</span>
+                      <span className="text-slate-900 font-black text-sm block mt-0.5">{receipt.farmerName}</span>
+                      <span className="text-slate-500 font-mono text-xs">{receipt.farmerPhone || "+91 98765 43210"}</span>
+                    </div>
+
+                    <div className="bg-slate-100/60 p-3 rounded-2xl">
+                      <span className="text-slate-400 block font-semibold text-[10px] uppercase">Procurement Hub</span>
+                      <span className="text-slate-900 font-bold text-xs block mt-0.5 leading-snug">{receipt.center}</span>
+                    </div>
+
+                    <div className="bg-slate-100/60 p-3 rounded-2xl">
+                      <span className="text-slate-400 block font-semibold text-[10px] uppercase">Commodity & Quantity</span>
+                      <span className="text-emerald-800 font-black text-sm block mt-0.5">
+                        🌾 {receipt.crop} — {receipt.weight} Quintals
+                      </span>
+                    </div>
+
+                    <div className="bg-slate-100/60 p-3 rounded-2xl">
+                      <span className="text-slate-400 block font-semibold text-[10px] uppercase">Scheduled Appointment</span>
+                      <span className="text-slate-900 font-bold text-xs block mt-0.5">
+                        📅 {receipt.date} • ⏰ {receipt.timeSlot}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Dynamic One-Time Pass QR Code Container */}
+                  <div className="mt-4 pt-5 border-t-2 border-dashed border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-6 bg-emerald-950/5 p-4 rounded-3xl">
+                    <div className="space-y-1 text-center sm:text-left">
+                      <span className="text-xs font-black text-emerald-900 block flex items-center gap-1.5 justify-center sm:justify-start">
+                        <span>📲 Dynamic One-Time Scannable Pass</span>
+                      </span>
+                      <p className="text-[11px] text-slate-600 max-w-xs leading-relaxed">
+                        Present this QR code to the APMC Yard Operator camera at the weighbridge gate for instant contactless check-in.
+                      </p>
+                      <span className="text-[10px] text-amber-700 font-bold bg-amber-100/80 px-2 py-0.5 rounded-md inline-block mt-1">
+                        ⚠️ Pass will automatically expire once scanned at the yard.
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col items-center">
+                      {receipt.qrCode ? (
+                        <img
+                          src={receipt.qrCode}
+                          alt="One-Time Pass QR Code"
+                          className="w-36 h-36 rounded-2xl border-2 border-emerald-500/40 bg-white p-2 shadow-md"
+                        />
+                      ) : (
+                        <div className="w-36 h-36 border-2 border-dashed border-emerald-400 bg-white rounded-2xl flex items-center justify-center font-bold text-emerald-800 text-xs">
+                          QR Pass
+                        </div>
+                      )}
+                      <span className="text-[10px] font-mono text-slate-400 mt-1 font-bold">SCAN WITH OPERATOR DESK</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-4 max-w-xl mx-auto">
+                  <a
+                    href={receipt.qrCode}
+                    download={`KisanSetu_GatePass_${receipt.tokenId}.png`}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm px-6 py-3 rounded-full shadow-lg transition-all cursor-pointer flex items-center gap-2 hover:scale-105"
+                  >
+                    <span>📥</span>
+                    <span>Download QR Pass</span>
+                  </a>
+
                   <button
                     onClick={() => window.print()}
-                    className="flex-1 bg-slate-900 hover:bg-emerald-600 text-white font-bold text-sm px-6 py-3 rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-full transition-all cursor-pointer flex items-center gap-2"
                   >
-                    🖨️ {t("sched_btn_print")}
+                    <span>🖨️</span>
+                    <span>Print Confirmation Slip</span>
                   </button>
+
+                  <a
+                    href={`/queue?token=${receipt.tokenId.replace(/\D/g, "")}&center=${encodeURIComponent(receipt.center)}`}
+                    className="bg-slate-100 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-xs sm:text-sm px-6 py-3 rounded-full transition-all cursor-pointer flex items-center gap-2"
+                  >
+                    <span>📍</span>
+                    <span>Track Live Yard Queue</span>
+                  </a>
+
                   <button
                     onClick={resetForm}
-                    className="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm px-6 py-3 rounded-full shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                    className="text-slate-500 hover:text-slate-900 font-bold text-xs px-4 py-2 cursor-pointer"
                   >
-                    🔄 {t("sched_btn_another")}
+                    🔄 Book Another Delivery
                   </button>
                 </div>
               </div>
