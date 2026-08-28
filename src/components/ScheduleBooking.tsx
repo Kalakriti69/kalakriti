@@ -48,7 +48,7 @@ export default function ScheduleBooking({
   
   // Receipt details
   const [receipt, setReceipt] = useState<any>(null);
-  const [isBooking, setIsBooking] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sync preselected parameters from URL/Chatbot
   useEffect(() => {
@@ -148,66 +148,6 @@ export default function ScheduleBooking({
       alert(error instanceof Error ? error.message : "Unable to process booking.");
     } finally {
       setIsSubmitting(false);
-    } else {
-      if (isBooking) return;
-      setIsBooking(true);
-      try {
-        const matchCenter = MOCK_CENTERS.find(c => c.name === center);
-        const centreId = matchCenter ? matchCenter.id : MOCK_CENTERS[0].id;
-
-        // Map selectedSlot string to UUID format matching database.types.ts schemas
-        const slotMap: Record<string, string> = {
-          "08:00 AM - 10:00 AM": "11111111-aaa1-1111-1111-111111111111",
-          "10:00 AM - 12:00 PM": "11111111-aaa2-1111-1111-111111111111",
-          "12:00 PM - 02:00 PM": "11111111-aaa3-1111-1111-111111111111",
-          "02:00 PM - 04:00 PM": "11111111-aaa4-1111-1111-111111111111",
-          "04:00 PM - 06:00 PM": "11111111-aaa5-1111-1111-111111111111",
-        };
-        const slotId = slotMap[selectedSlot] || "11111111-aaa1-1111-1111-111111111111";
-        const farmerId = "99999999-9999-9999-9999-999999999999";
-
-        const res = await fetch("/api/bookings", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ farmerId, centreId, slotId }),
-        });
-        const data = await res.json();
-        
-        if (data.success && data.booking) {
-          const bookingData = {
-            center,
-            crop,
-            weight,
-            date: selectedDate,
-            timeSlot: selectedSlot,
-            tokenId: `KS-${data.booking.token_number}`,
-          };
-          setReceipt(bookingData);
-          setStep(4);
-          onBookingSuccess(bookingData);
-        } else {
-          alert("Booking failed: " + (data.error || "Please try again."));
-        }
-      } catch (err) {
-        console.error("Booking error:", err);
-        alert("An error occurred during booking. Generating offline receipt...");
-        
-        // Fallback to random offline token if API is down
-        const randomToken = "KS-" + Math.floor(100000 + Math.random() * 900000);
-        const bookingData = {
-          center,
-          crop,
-          weight,
-          date: selectedDate,
-          timeSlot: selectedSlot,
-          tokenId: randomToken,
-        };
-        setReceipt(bookingData);
-        setStep(4);
-        onBookingSuccess(bookingData);
-      } finally {
-        setIsBooking(false);
-      }
     }
   };
 
@@ -588,11 +528,6 @@ export default function ScheduleBooking({
               >
                 {isSubmitting ? "Saving..." : step === 3 ? t("sched_btn_gen") : t("sched_btn_next")}
                 {!isSubmitting && (
-                disabled={isBooking}
-                className="bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm px-7 py-3 rounded-full shadow-md transition-all duration-300 cursor-pointer flex items-center gap-1 disabled:opacity-50"
-              >
-                {isBooking ? "Booking..." : (step === 3 ? t("sched_btn_gen") : t("sched_btn_next"))}
-                {!isBooking && (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

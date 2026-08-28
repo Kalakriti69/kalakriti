@@ -52,11 +52,6 @@ const fallbackBooking = {
   appointmentDate: new Date().toISOString().slice(0, 10),
   appointmentTime: "08:00 AM - 10:00 AM",
 };
-const bookingSchema = z.object({
-  farmerId: z.string().min(1),
-  centreId: z.string().min(1),
-  slotId: z.string().min(1),
-});
 
 export async function POST(request: NextRequest) {
   try {

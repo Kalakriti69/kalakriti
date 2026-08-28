@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/hooks/useTranslation";
+import StaffLoginModal from "@/components/StaffLoginModal";
 
 interface NavbarProps {
   onLoginClick: () => void;
@@ -11,9 +12,11 @@ interface NavbarProps {
 }
 
 export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: NavbarProps) {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [staffModalRole, setStaffModalRole] = useState<"admin" | "operator" | null>(null);
   const [farmerProfile, setFarmerProfile] = useState<{ name: string } | null>(null);
   const { t, lang, changeLanguage } = useTranslation();
 
@@ -381,29 +384,46 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
                     Staff Access
                   </span>
 
-                  <a
-                    href="/operator"
-                    onClick={() => setSettingsOpen(false)}
-                    className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
+                  <button
+                    onClick={() => {
+                      setSettingsOpen(false);
+                      setStaffModalRole("operator");
+                    }}
+                    className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-xl border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
                   >
-                    <span>Operator Login</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-extrabold uppercase">Operator</span>
-                  </a>
+                    <span className="flex items-center gap-1.5">
+                      <span>🛠️</span>
+                      <span>Operator Login</span>
+                    </span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-extrabold uppercase">Google Auth</span>
+                  </button>
 
-                  <a
-                    href="/admin"
-                    onClick={() => setSettingsOpen(false)}
-                    className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-lg border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
+                  <button
+                    onClick={() => {
+                      setSettingsOpen(false);
+                      setStaffModalRole("admin");
+                    }}
+                    className="w-full bg-slate-900 hover:bg-slate-850 text-white font-bold text-xs py-2.5 px-3 rounded-xl border border-slate-800 transition-colors flex items-center justify-between cursor-pointer"
                   >
-                    <span>Admin Portal Login</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-extrabold uppercase">Admin</span>
-                  </a>
+                    <span className="flex items-center gap-1.5">
+                      <span>👮</span>
+                      <span>Admin Portal Login</span>
+                    </span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 font-extrabold uppercase">Google Auth</span>
+                  </button>
                 </div>
               </div>
             )}
           </div>
         </div>
       </header>
+
+      {/* Staff Google Login Modal */}
+      <StaffLoginModal
+        isOpen={staffModalRole !== null}
+        onClose={() => setStaffModalRole(null)}
+        initialRole={staffModalRole || "admin"}
+      />
     </>
   );
 }
