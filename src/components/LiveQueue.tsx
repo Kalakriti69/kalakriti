@@ -159,7 +159,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
         status: "serving_now",
         slotsAhead: 0,
         estWait: 0,
-        message: "🎉 YOUR TURN! Proceed directly to Weighbridge 1.",
+        message: t("queue_status_your_turn") || "🎉 YOUR TURN! Proceed directly to Weighbridge 1.",
         alertColor: "bg-emerald-50 border-emerald-300 text-emerald-800 animate-pulse",
       });
     } else {
@@ -239,7 +239,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
         <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8">
           <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] sm:text-xs font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider mb-2.5 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>Live APMC Mandi Telemetry</span>
+            <span>{t("queue_telemetry") || "Live APMC Mandi Telemetry"}</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black text-slate-950 tracking-tight leading-tight">
             {t("queue_title") || "Live Queue Monitor"}
@@ -258,17 +258,17 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
               </div>
               <div>
                 <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-wide">
-                  Live Yard Progression Convoy
+                  {t("queue_convoy_title") || "Live Yard Progression Convoy"}
                 </h3>
                 <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
-                  Real-time vehicle movement towards the weighbridge
+                  {t("queue_convoy_desc") || "Real-time vehicle movement towards the weighbridge"}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 self-stretch sm:self-auto justify-between sm:justify-end">
               <span className="text-xs font-black bg-emerald-100/80 text-emerald-800 border border-emerald-200/80 px-3 py-1 rounded-full shadow-xs">
-                {slotsAheadCount} {t("queue_status_vehicles") || "Tractors"} Ahead
+                {slotsAheadCount} {t("queue_status_vehicles") || "Tractors"} {t("queue_more") === "More" || t("queue_more") === "ଅଧିକ" ? "Ahead" : t("queue_more")}
               </span>
 
               <button
@@ -289,7 +289,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                 >
                   <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                 </svg>
-                <span>{isRefreshing ? "Syncing..." : "Refresh"}</span>
+                <span>{isRefreshing ? (t("queue_syncing") || "Syncing...") : (t("queue_refresh") || "Refresh")}</span>
               </button>
             </div>
           </div>
@@ -310,10 +310,10 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                     ⚖️
                   </div>
                   <span className="text-[9px] font-black text-emerald-900 mt-1.5 uppercase font-mono tracking-wider">
-                    WEIGHBRIDGE
+                    {t("queue_weighbridge") || "WEIGHBRIDGE"}
                   </span>
                   <span className="text-[9px] font-mono font-black text-white bg-emerald-600 px-2 py-0.5 rounded-full mt-0.5 shadow-xs">
-                    #{servingToken} SERVING
+                    #{servingToken} {t("queue_serving_badge") || "SERVING"}
                   </span>
                 </div>
 
@@ -324,7 +324,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                       🚜
                     </div>
                     <span className="text-[9px] font-bold text-slate-400 mt-1.5 uppercase font-mono">
-                      YARD QUEUE
+                      {t("queue_yard_queue") || "YARD QUEUE"}
                     </span>
                     <span className="text-[9px] font-mono font-bold text-slate-700 bg-white border border-slate-200 px-2 py-0.5 rounded-md mt-0.5 shadow-xs">
                       #{servingToken + idx + 1}
@@ -339,7 +339,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                       +{slotsAheadCount - maxVisibleTractors}
                     </div>
                     <span className="text-[9px] font-bold text-slate-400 mt-1.5 uppercase">
-                      MORE
+                      {t("queue_more") || "MORE"}
                     </span>
                   </div>
                 )}
@@ -350,10 +350,10 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                     🚜
                   </div>
                   <span className="text-[9px] font-black text-slate-900 mt-1.5 uppercase font-mono tracking-wider">
-                    YOUR TRUCK
+                    {t("queue_your_truck") || "YOUR TRUCK"}
                   </span>
                   <span className="text-[9px] font-mono font-black text-emerald-950 bg-emerald-300 px-2 py-0.5 rounded-full mt-0.5 shadow-xs">
-                    #{parsedUserToken} YOU
+                    #{parsedUserToken} {t("queue_you") || "YOU"}
                   </span>
                 </div>
               </div>
@@ -361,9 +361,9 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
 
             {/* Mobile Scroll Indicator Helper */}
             <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/60 text-[10px] text-slate-400 font-medium sm:hidden">
-              <span>⚖️ Scale Entry</span>
-              <span className="text-emerald-700 font-bold">Swipe convoy line ➔</span>
-              <span>🚜 Your Spot</span>
+              <span>⚖️ {t("queue_scale_entry") || "Scale Entry"}</span>
+              <span className="text-emerald-700 font-bold">{t("queue_swipe_convoy") || "Swipe convoy line ➔"}</span>
+              <span>🚜 {t("queue_your_spot") || "Your Spot"}</span>
             </div>
           </div>
         </div>
@@ -376,11 +376,11 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
             <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300/80 shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-                <span>OPERATOR FEED • LIVE</span>
+                <span>{t("queue_operator_feed") || "OPERATOR FEED • LIVE"}</span>
               </span>
 
               <span className="text-xs text-slate-500 font-mono">
-                Syncing in <strong className="text-slate-900 font-black">{secondsUntilSync}s</strong>
+                {t("queue_syncing_in").replace("{seconds}", String(secondsUntilSync)) || `Syncing in ${secondsUntilSync}s`}
               </span>
             </div>
 
@@ -388,7 +388,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
             <div className="space-y-3.5 my-4">
               <div>
                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-wider block mb-1.5">
-                  Procurement Center Hub
+                  {t("queue_center_hub") || "Procurement Center Hub"}
                 </label>
                 <div className="relative">
                   <select
@@ -412,7 +412,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
 
               <div>
                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block mb-1">
-                  Active Terminal
+                  {t("queue_active_terminal") || "Active Terminal"}
                 </span>
                 <div className="bg-slate-50 border border-slate-200 p-2.5 rounded-xl flex items-center justify-between text-xs">
                   <span className="font-bold text-slate-800 flex items-center gap-1.5">
@@ -420,7 +420,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                     <span>{activeCounter}</span>
                   </span>
                   <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-bold">
-                    Connected
+                    {t("queue_connected") || "Connected"}
                   </span>
                 </div>
               </div>
@@ -436,18 +436,18 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
               </p>
               <p className="text-[11px] sm:text-xs text-emerald-800 font-bold flex items-center justify-center gap-1.5 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                <span>Weighbridge Counter 1 Active</span>
+                <span>{t("queue_weighbridge_active") || "Weighbridge Counter 1 Active"}</span>
               </p>
             </div>
 
             {/* Stats Footer */}
             <div className="grid grid-cols-2 gap-2.5 border-t border-slate-100 pt-3.5 text-xs">
               <div className="bg-slate-50 p-2.5 sm:p-3 rounded-xl border border-slate-200/80 text-center">
-                <span className="text-[9px] sm:text-[10px] text-slate-400 block font-bold uppercase tracking-wider">Avg Pace per Load</span>
-                <span className="text-xs sm:text-sm font-black text-slate-800 font-mono mt-0.5 block">~{avgWaitPerToken} Mins</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-400 block font-bold uppercase tracking-wider">{t("queue_avg_pace") || "Avg Pace per Load"}</span>
+                <span className="text-xs sm:text-sm font-black text-slate-800 font-mono mt-0.5 block">~{avgWaitPerToken} {t("queue_serving_mins") || "Mins"}</span>
               </div>
               <div className="bg-slate-50 p-2.5 sm:p-3 rounded-xl border border-slate-200/80 text-center">
-                <span className="text-[9px] sm:text-[10px] text-slate-400 block font-bold uppercase tracking-wider">Last Sync</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-400 block font-bold uppercase tracking-wider">{t("queue_last_sync") || "Last Sync"}</span>
                 <span className="text-xs font-mono font-bold text-emerald-700 mt-1 block">{lastSyncedTime}</span>
               </div>
             </div>
@@ -460,7 +460,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
               <div className="mb-3.5">
                 <h3 className="text-base sm:text-lg font-black text-slate-950">{t("queue_check_title") || "Track Your Position"}</h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Enter your token number to view live queue position and estimated arrival time.
+                  {t("queue_check_desc_custom") || "Enter your token number to view live queue position and estimated arrival time."}
                 </p>
               </div>
 
@@ -468,7 +468,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Enter Token (e.g. 110)"
+                    placeholder={t("queue_enter_token_placeholder") || "Enter Token (e.g. 110)"}
                     value={userToken}
                     onChange={(e) => setUserToken(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 text-slate-900 font-mono font-bold rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:outline-none focus:border-emerald-500 shadow-xs"
@@ -479,7 +479,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                   disabled={isChecking}
                   className="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-black text-xs sm:text-sm px-4 sm:px-6 py-2.5 rounded-xl transition-all cursor-pointer shadow-xs disabled:opacity-50 shrink-0"
                 >
-                  {isChecking ? "Checking..." : "Track"}
+                  {isChecking ? (t("login_otp_verifying") || "Checking...") : (t("queue_track_btn") || "Track")}
                 </button>
               </form>
 
@@ -494,7 +494,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                   <div className="grid grid-cols-2 gap-2.5">
                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-xs">
                       <span className="text-[9px] sm:text-[10px] text-slate-400 block font-black uppercase tracking-wider">
-                        TRACTORS AHEAD
+                        {t("queue_tractors_ahead_label") || "TRACTORS AHEAD"}
                       </span>
                       <span className="text-xl sm:text-2xl font-black text-slate-900 font-mono block mt-0.5">
                         {slotsAheadCount} {t("queue_status_vehicles") || "Tractors"}
@@ -503,10 +503,10 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
 
                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-xs">
                       <span className="text-[9px] sm:text-[10px] text-slate-400 block font-black uppercase tracking-wider">
-                        ESTIMATED WAIT
+                        {t("queue_est_wait_label") || "ESTIMATED WAIT"}
                       </span>
                       <span className="text-xl sm:text-2xl font-black text-emerald-600 font-mono block mt-0.5">
-                        ~{positionResult.estWait} Mins
+                        ~{positionResult.estWait} {t("queue_serving_mins") || "Mins"}
                       </span>
                     </div>
                   </div>
@@ -525,7 +525,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto font-black text-xs mb-1">
                     1
                   </div>
-                  <span className="text-[9px] text-slate-400 font-bold uppercase block">Serving Now</span>
+                  <span className="text-[9px] text-slate-400 font-bold uppercase block">{t("queue_milestone_serving") || "Serving Now"}</span>
                   <span className="text-xs font-black text-emerald-700 font-mono mt-0.5 block">#{servingToken}</span>
                 </div>
 
@@ -533,7 +533,7 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center mx-auto font-black text-xs mb-1">
                     2
                   </div>
-                  <span className="text-[9px] text-slate-400 font-bold uppercase block">Next Gate</span>
+                  <span className="text-[9px] text-slate-400 font-bold uppercase block">{t("queue_milestone_next") || "Next Gate"}</span>
                   <span className="text-xs font-black text-slate-800 font-mono mt-0.5 block">#{servingToken + 1}</span>
                 </div>
 
@@ -541,15 +541,15 @@ export default function LiveQueue({ activeBooking }: LiveQueueProps) {
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center mx-auto font-black text-xs mb-1">
                     3
                   </div>
-                  <span className="text-[9px] text-slate-400 font-bold uppercase block">In Yard</span>
-                  <span className="text-xs font-black text-slate-800 font-mono mt-0.5 block">{slotsAheadCount} Tractors</span>
+                  <span className="text-[9px] text-slate-400 font-bold uppercase block">{t("queue_milestone_yard") || "In Yard"}</span>
+                  <span className="text-xs font-black text-slate-800 font-mono mt-0.5 block">{slotsAheadCount} {t("queue_status_vehicles") || "Tractors"}</span>
                 </div>
 
                 <div className="bg-emerald-50/80 p-2.5 sm:p-3 rounded-xl border-2 border-emerald-500">
                   <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto font-black text-xs mb-1">
                     📍
                   </div>
-                  <span className="text-[9px] text-emerald-800 font-bold uppercase block">Your Spot</span>
+                  <span className="text-[9px] text-emerald-800 font-bold uppercase block">{t("queue_your_spot") || "Your Spot"}</span>
                   <span className="text-xs font-black text-emerald-900 font-mono mt-0.5 block">#{parsedUserToken}</span>
                 </div>
               </div>
