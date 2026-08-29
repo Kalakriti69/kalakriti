@@ -407,18 +407,24 @@ export default function Navbar({ onLoginClick, onOperatorClick, onAdminClick }: 
 
               {/* Mobile operator/admin */}
               <div className="grid grid-cols-2 gap-2 pt-1">
-                <a
-                  href="/operator"
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setStaffModalRole("operator");
+                  }}
                   className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer text-center flex items-center justify-center"
                 >
                   Operator
-                </a>
-                <a
-                  href="/admin"
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setStaffModalRole("admin");
+                  }}
                   className="bg-slate-950/80 hover:bg-slate-900 border border-blue-500/20 text-white text-xs font-bold py-2.5 rounded-xl cursor-pointer text-center flex items-center justify-center"
                 >
                   Admin
-                </a>
+                </button>
               </div>
             </div>
           </div>
