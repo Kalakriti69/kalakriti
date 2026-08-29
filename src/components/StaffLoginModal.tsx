@@ -144,6 +144,12 @@ export default function StaffLoginModal({ isOpen, onClose, initialRole = "admin"
           )}
           <span>{isLoading ? "Signing in..." : `Sign in with Google as ${activeRole === "admin" ? "Admin" : "Operator"}`}</span>
         </button>
+        
+        {/* Security Warning Notice */}
+        <p className="text-[11px] text-slate-400 mt-2.5 text-center font-bold tracking-wide flex items-center justify-center gap-1.5 bg-slate-950/40 py-1.5 px-3 rounded-xl border border-slate-800">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+          Only Authenticated Users Will Be Able To Login
+        </p>
 
         {/* Security Info */}
         <div className="mt-6 pt-4 border-t border-slate-800/80 text-center">
