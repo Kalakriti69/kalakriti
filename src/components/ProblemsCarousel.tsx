@@ -18,6 +18,7 @@ interface Slide {
 export default function ProblemsCarousel() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   const slides: Slide[] = [
     {
@@ -78,6 +79,26 @@ export default function ProblemsCarousel() {
       )
     }
   ];
+
+  // Mobile Auto-play slide animation every 6 seconds
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      if (scrollContainerRef.current) {
+        const container = scrollContainerRef.current;
+        if (container.clientWidth < container.scrollWidth) {
+          const nextIndex = (activeTab + 1) % slides.length;
+          const targetLeft = nextIndex * (container.scrollWidth / slides.length);
+          container.scrollTo({
+            left: targetLeft,
+            behavior: "smooth"
+          });
+          setActiveTab(nextIndex);
+        }
+      }
+    }, 6000);
+
+    return () => clearInterval(timer);
+  }, [activeTab, slides.length]);
 
   return (
     <section className="py-20 bg-slate-950 text-white overflow-hidden relative z-20 border-t border-slate-900">
@@ -198,12 +219,13 @@ export default function ProblemsCarousel() {
         <div className="md:hidden space-y-4">
           {/* Scrollable Container */}
           <div 
+            ref={scrollContainerRef}
             onScroll={(e) => {
               const scrollLeft = e.currentTarget.scrollLeft;
               const width = e.currentTarget.clientWidth;
               if (width > 0) {
                 const newIndex = Math.round(scrollLeft / width);
-                if (newIndex >= 0 && newIndex < slides.length) {
+                if (newIndex >= 0 && newIndex < slides.length && newIndex !== activeTab) {
                   setActiveTab(newIndex);
                 }
               }
