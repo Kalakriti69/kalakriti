@@ -191,10 +191,10 @@ export default function FarmerPassView() {
         {/* Page Top Header */}
         <div className="text-center mb-6 print:hidden">
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            Official Gate Pass & Scannable QR Code
+            {t("pass_page_title") || "Official Gate Pass & Scannable QR Code"}
           </h1>
           <p className="text-xs text-slate-500 max-w-lg mx-auto mt-1">
-            Show this scannable QR code at the APMC gate for instant contactless check-in.
+            {t("pass_page_desc") || "Show this scannable QR code at the APMC gate for instant contactless check-in."}
           </p>
         </div>
 
@@ -213,7 +213,7 @@ export default function FarmerPassView() {
               isPassUsed ? "bg-rose-500/15 text-rose-400" : "bg-emerald-500/10 text-emerald-400"
             }`}
           >
-            {isPassUsed ? "PASS USED" : "VALID PASS"}
+            {isPassUsed ? (t("pass_watermark_used") || "PASS USED") : (t("pass_watermark_valid") || "VALID PASS")}
           </div>
 
           {/* Slip Header */}
@@ -221,13 +221,13 @@ export default function FarmerPassView() {
             <img src="/icon.svg" alt="Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-md border border-slate-700 print:border-none" />
             <div>
               <span className="text-[8.5px] sm:text-[9.5px] font-extrabold text-emerald-400 print:text-emerald-800 uppercase tracking-widest block">
-                Government of India • Ministry of Agriculture & Farmers Welfare
+                {t("pass_gov_ministry") || "Government of India • Ministry of Agriculture & Farmers Welfare"}
               </span>
               <h2 className="text-base sm:text-lg font-black text-white print:text-slate-900 tracking-tight leading-none mt-0.5">
-                APMC YARD ENTRY GATE PASS
+                {t("pass_yard_entry_title") || "APMC YARD ENTRY GATE PASS"}
               </h2>
               <p className="text-[10px] text-slate-400 print:text-slate-600 font-semibold mt-0.5">
-                Direct Benefit Transfer (DBT) Crop Procurement Hub
+                {t("pass_dbt_sub") || "Direct Benefit Transfer (DBT) Crop Procurement Hub"}
               </p>
             </div>
           </div>
@@ -238,14 +238,14 @@ export default function FarmerPassView() {
               <div className="flex items-center gap-2">
                 <span className="text-base">🚫</span>
                 <div>
-                  <strong className="block font-black text-white">ONE-TIME PASS USED & EXPIRED</strong>
+                  <strong className="block font-black text-white">{t("pass_expired_title") || "ONE-TIME PASS USED & EXPIRED"}</strong>
                   <p className="text-[11px] text-rose-200">
-                    This pass was verified and checked in at the APMC yard gate ({usedTimestamp || "Today"}).
+                    {t("pass_expired_desc") ? t("pass_expired_desc").replace("{time}", usedTimestamp || "Today") : `This pass was verified and checked in at the APMC yard gate (${usedTimestamp || "Today"}).`}
                   </p>
                 </div>
               </div>
               <span className="text-[9px] font-mono bg-rose-950/80 border border-rose-500/40 text-rose-200 px-2 py-0.5 rounded font-bold uppercase shrink-0">
-                VOID
+                {t("pass_void_badge") || "VOID"}
               </span>
             </div>
           )}
@@ -257,7 +257,7 @@ export default function FarmerPassView() {
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-[9px] font-bold text-slate-400 print:text-slate-500 uppercase tracking-wider block">
-                    ASSIGNED TOKEN NUMBER
+                    {t("pass_assigned_token") || "ASSIGNED TOKEN NUMBER"}
                   </span>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span
@@ -273,7 +273,7 @@ export default function FarmerPassView() {
                       title="Copy Token ID"
                     >
                       <span>📋</span>
-                      <span>{copiedNotification ? "Copied!" : "Copy"}</span>
+                      <span>{copiedNotification ? (t("pass_copied") || "Copied!") : (t("pass_copy") || "Copy")}</span>
                     </button>
                   </div>
                 </div>
@@ -282,25 +282,25 @@ export default function FarmerPassView() {
                   {isPassUsed ? (
                     <span className="text-rose-300 bg-rose-500/20 border border-rose-500/40 rounded-full px-2.5 py-0.5 font-black text-[10px] inline-flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                      <span>PASS USED (VOID)</span>
+                      <span>{t("pass_used_void_status") || "PASS USED (VOID)"}</span>
                     </span>
                   ) : (
                     <span className="text-emerald-300 bg-emerald-500/20 border border-emerald-500/40 print:text-emerald-900 print:bg-emerald-100 print:border-emerald-300 rounded-full px-2.5 py-0.5 font-black text-[10px] inline-flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 print:bg-emerald-600 animate-pulse"></span>
-                      <span>VALID ONE-TIME PASS</span>
+                      <span>{t("pass_valid_status") || "VALID ONE-TIME PASS"}</span>
                     </span>
                   )}
                 </div>
               </div>
 
               {/* Scheduled Arrival Time Window */}
-              <div className="bg-slate-900/90 border border-slate-800 print:bg-emerald-50 print:border-emerald-200 rounded-xl p-2.5 flex items-center gap-2.5">
+              <div className="bg-slate-900/95 border border-slate-800 print:bg-emerald-50 print:border-emerald-200 rounded-xl p-2.5 flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-lg bg-emerald-500 text-slate-950 font-bold flex items-center justify-center text-sm shadow-sm shrink-0">
                   ⏰
                 </div>
                 <div>
                   <span className="text-[8.5px] font-black text-emerald-400 print:text-emerald-900 uppercase tracking-wider block">
-                    SCHEDULED ARRIVAL TIME WINDOW
+                    {t("pass_arrival_window") || "SCHEDULED ARRIVAL TIME WINDOW"}
                   </span>
                   <span className="text-xs sm:text-sm font-black text-white print:text-slate-900 font-mono">
                     {pass.timeSlot} • <span className="font-bold text-slate-300 print:text-slate-700">{pass.date}</span>
@@ -324,7 +324,7 @@ export default function FarmerPassView() {
                   />
                 ) : (
                   <div className="w-36 h-36 sm:w-44 sm:h-44 md:w-48 md:h-48 border-2 border-dashed border-emerald-400 bg-white rounded-2xl flex items-center justify-center font-bold text-emerald-800 text-xs">
-                    Generating QR...
+                    {t("pass_generating_qr") || "Generating QR..."}
                   </div>
                 )}
 
@@ -333,10 +333,10 @@ export default function FarmerPassView() {
                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/80 rounded-2xl border-2 border-rose-500 p-2 text-center">
                     <span className="text-2xl sm:text-3xl mb-1">❌</span>
                     <span className="text-xs sm:text-sm font-black text-rose-400 uppercase tracking-tight">
-                      PASS SCANNED
+                      {t("pass_qr_overlay_scanned") || "PASS SCANNED"}
                     </span>
                     <span className="text-[9px] font-mono text-slate-300 font-bold mt-0.5">
-                      Already Verified
+                      {t("pass_qr_overlay_verified") || "Already Verified"}
                     </span>
                   </div>
                 )}
@@ -347,7 +347,7 @@ export default function FarmerPassView() {
                   isPassUsed ? "text-rose-400" : "text-emerald-400 print:text-slate-600"
                 }`}
               >
-                {isPassUsed ? "🚫 EXPIRED ONE-TIME PASS" : "📷 SCAN AT APMC GATE"}
+                {isPassUsed ? (t("pass_expired_footer") || "🚫 EXPIRED ONE-TIME PASS") : (t("pass_scan_footer") || "📷 SCAN AT APMC GATE")}
               </span>
             </div>
           </div>
@@ -355,33 +355,33 @@ export default function FarmerPassView() {
           {/* LOWER SECTION: BENEFICIARY DETAILS GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 py-3 text-xs print:gap-2">
             <div className="bg-slate-900/90 print:bg-slate-50 p-2.5 rounded-xl border border-slate-800 print:border-slate-200">
-              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">Farmer Beneficiary</span>
+              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">{t("pass_grid_farmer") || "Farmer Beneficiary"}</span>
               <span className="text-white print:text-slate-900 font-black text-xs sm:text-sm block mt-0.5">{pass.farmerName}</span>
               <span className="text-slate-400 print:text-slate-500 font-mono text-[10px] block mt-0.5">{pass.farmerPhone || "+91 98765 43210"}</span>
             </div>
 
             <div className="bg-slate-900/90 print:bg-slate-50 p-2.5 rounded-xl border border-slate-800 print:border-slate-200">
-              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">Designated Procurement Center</span>
+              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">{t("pass_grid_center") || "Designated Procurement Center"}</span>
               <span className="text-white print:text-slate-900 font-bold text-[11px] block mt-0.5 leading-snug">{pass.center}</span>
             </div>
 
             <div className="bg-slate-900/90 print:bg-slate-50 p-2.5 rounded-xl border border-slate-800 print:border-slate-200">
-              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">Commodity Crop Variety</span>
-              <span className="text-emerald-400 print:text-emerald-800 font-black text-xs block mt-0.5">🌾 {pass.crop}</span>
+              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">{t("pass_grid_crop") || "Commodity Crop Variety"}</span>
+              <span className="text-emerald-400 print:text-emerald-800 font-black text-xs block mt-0.5">🌾 {t("crop_" + pass.crop.split(" ")[0]) || pass.crop}</span>
             </div>
 
             <div className="bg-slate-900/90 print:bg-slate-50 p-2.5 rounded-xl border border-slate-800 print:border-slate-200">
-              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">Declared Intake Weight</span>
+              <span className="text-slate-400 print:text-slate-500 block font-bold text-[8.5px] uppercase">{t("pass_grid_weight") || "Declared Intake Weight"}</span>
               <span className="text-white print:text-slate-900 font-mono font-black text-xs sm:text-sm block mt-0.5">
-                {pass.weight} Quintals <span className="text-[10px] font-normal text-slate-400 print:text-slate-500">({pass.weight * 100} kg)</span>
+                {pass.weight} {t("pass_quintals") || "Quintals"} <span className="text-[10px] font-normal text-slate-400 print:text-slate-500">({pass.weight * 100} kg)</span>
               </span>
             </div>
           </div>
 
           {/* Slip Footer Security Stamp */}
           <div className="mt-2 pt-2 border-t border-slate-800 print:border-slate-200 text-center text-[8.5px] text-slate-400 print:text-slate-500 flex items-center justify-between">
-            <span>🔒 Verified Digitally via KisanSetu National Mandi Portal</span>
-            <span>Gate Entry Token: {pass.tokenId}</span>
+            <span>{t("pass_footer_security") || "🔒 Verified Digitally via KisanSetu National Mandi Portal"}</span>
+            <span>{t("pass_footer_token") || "Gate Entry Token"}: {pass.tokenId}</span>
           </div>
         </div>
 
@@ -392,7 +392,7 @@ export default function FarmerPassView() {
             className="bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-md transition-all cursor-pointer flex items-center gap-2 hover:scale-105 active:scale-95"
           >
             <span>🖨️</span>
-            <span>Print Official Gate Pass</span>
+            <span>{t("pass_btn_print") || "Print Official Gate Pass"}</span>
           </button>
 
           {generatedQr && (
@@ -402,7 +402,7 @@ export default function FarmerPassView() {
               className="bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full shadow-md border border-slate-700 transition-all cursor-pointer flex items-center gap-2 hover:scale-105"
             >
               <span>📥</span>
-              <span>Download QR Code</span>
+              <span>{t("pass_btn_download") || "Download QR Code"}</span>
             </a>
           )}
 
@@ -411,14 +411,14 @@ export default function FarmerPassView() {
             className="bg-white hover:bg-emerald-50 text-slate-800 hover:text-emerald-800 font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full border border-slate-300 shadow-sm transition-all cursor-pointer flex items-center gap-2"
           >
             <span>📍</span>
-            <span>Track Live Yard Queue</span>
+            <span>{t("pass_btn_track") || "Track Live Yard Queue"}</span>
           </a>
 
           <a
             href="/scheduler"
             className="text-slate-500 hover:text-slate-900 font-bold text-xs px-3 py-1.5 cursor-pointer"
           >
-            🔄 Book New Appointment
+            🔄 {t("pass_btn_new") || "Book New Appointment"}
           </a>
         </div>
       </div>
