@@ -8,6 +8,7 @@ KisanSetu provides farmers with an online appointment scheduler, scannable digit
 ## Tech Stack
 The application is built using modern web technologies:
 - **Core Framework:** Next.js 15 (App Router with SSR & Client components)
+- **Backend & Database:** Supabase (Database & Authentication services)
 - **Programming Language:** TypeScript
 - **Styling:** Tailwind CSS (premium custom dark/light modes)
 - **State Management:** Custom React hooks (with LocalStorage synchronisation across operator/admin views)
