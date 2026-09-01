@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 
 interface LiveWeatherData {
@@ -236,135 +236,137 @@ export default function Hero() {
   const [activeCropRates, setActiveCropRates] = useState<CropRateItem[]>(REGIONAL_MANDI_DATA.DEFAULT.crops);
   const [weatherLoading, setWeatherLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchLiveLocationAndData = async (lat: number, lon: number) => {
+  const fetchLiveLocationAndData = useCallback(async (lat: number, lon: number) => {
+    try {
+      setWeatherLoading(true);
+      // 1. Fetch live Open-Meteo Forecast
+      const weatherRes = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+      );
+      const weatherJson = await weatherRes.json();
+
+      // 2. Fetch Detailed Locality (Area, City, State)
+      let resolvedArea = "Kalyanpur";
+      let resolvedCity = "Kanpur";
+      let resolvedState = "Uttar Pradesh";
+
       try {
-        // 1. Fetch live Open-Meteo Forecast
-        const weatherRes = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`
+        const geoRes = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
         );
-        const weatherJson = await weatherRes.json();
+        const geoJson = await geoRes.json();
+        if (geoJson) {
+          const adminList = geoJson.localityInfo?.administrative || [];
+          resolvedState = geoJson.principalSubdivision || "Uttar Pradesh";
 
-        // 2. Fetch Detailed Locality (Area, City, State)
-        let resolvedArea = "Kalyanpur";
-        let resolvedCity = "Kanpur";
-        let resolvedState = "Uttar Pradesh";
+          // Identify specific local area (tehsil, subdistrict, or neighbourhood)
+          const subdistrict =
+            adminList.find((a: any) => a.order >= 4 || a.adminLevel >= 6)?.name ||
+            geoJson.localityInfo?.informative?.[0]?.name;
 
-        try {
-          const geoRes = await fetch(
-            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
-          );
-          const geoJson = await geoRes.json();
-          if (geoJson) {
-            const adminList = geoJson.localityInfo?.administrative || [];
-            resolvedState = geoJson.principalSubdivision || "Uttar Pradesh";
+          const mainCity = geoJson.city || geoJson.locality || "Bhubaneswar";
+          const district = geoJson.principalSubdivisionDistrict || adminList.find((a: any) => a.order === 3)?.name || mainCity;
 
-            // Identify specific local area (tehsil, subdistrict, or neighbourhood)
-            const subdistrict =
-              adminList.find((a: any) => a.order >= 4 || a.adminLevel >= 6)?.name ||
-              geoJson.localityInfo?.informative?.[0]?.name;
-
-            const mainCity = geoJson.city || geoJson.locality || "Bhubaneswar";
-            const district = geoJson.principalSubdivisionDistrict || adminList.find((a: any) => a.order === 3)?.name || mainCity;
-
-            if (subdistrict && subdistrict.toLowerCase() !== mainCity.toLowerCase()) {
-              resolvedArea = subdistrict;
-              resolvedCity = mainCity;
-            } else if (district && district.toLowerCase() !== mainCity.toLowerCase()) {
-              // If district is Chandaka and locality is Bhubaneswar, Chandaka is Area and Bhubaneswar is City
-              resolvedArea = district;
-              resolvedCity = mainCity;
-            } else {
-              resolvedArea = geoJson.localityInfo?.informative?.[0]?.name || geoJson.locality || "Local Area";
-              resolvedCity = mainCity;
-            }
-
-            // Safety check: if Area and City got flipped (e.g. Area="Bhubaneswar", City="Chandaka")
-            const POPULAR_METROS = ["Bhubaneswar", "Cuttack", "Kolkata", "Delhi", "New Delhi", "Mumbai", "Pune", "Lucknow", "Kanpur", "Patna", "Ludhiana", "Amritsar", "Jaipur", "Ahmedabad", "Chandigarh", "Bengaluru", "Hyderabad", "Chennai"];
-            if (POPULAR_METROS.includes(resolvedArea) && !POPULAR_METROS.includes(resolvedCity)) {
-              const temp = resolvedArea;
-              resolvedArea = resolvedCity;
-              resolvedCity = temp;
-            }
-          }
-        } catch { }
-
-        // Strict deduplication: remove any duplicate state/city names
-        const cleanState = (resolvedState || "Odisha").trim();
-        const cleanCity = (resolvedCity || "Bhubaneswar").trim();
-        let cleanArea = (resolvedArea || "").trim();
-
-        if (cleanArea.toLowerCase() === cleanState.toLowerCase()) {
-          cleanArea = "";
-        }
-
-        const distinctParts: string[] = [];
-        if (
-          cleanArea &&
-          cleanArea.toLowerCase() !== cleanCity.toLowerCase() &&
-          cleanArea.toLowerCase() !== cleanState.toLowerCase()
-        ) {
-          distinctParts.push(cleanArea);
-        }
-        if (cleanCity && cleanCity.toLowerCase() !== cleanState.toLowerCase()) {
-          distinctParts.push(cleanCity);
-        }
-        if (cleanState) {
-          distinctParts.push(cleanState);
-        }
-
-        const fullLocationString =
-          distinctParts.join(", ") || `${cleanCity || "Bhubaneswar"}, ${cleanState || "Odisha"}`;
-
-        // 3. Resolve Location-Specific Live Mandi Rates
-        const regional = REGIONAL_MANDI_DATA[cleanState] || REGIONAL_MANDI_DATA.DEFAULT;
-        setMandiHeader(`${cleanCity} ${regional.mandiNameSuffix}`);
-        setActiveCropRates(regional.crops);
-
-        // 4. Resolve Weather & Custom Agro Advisory
-        if (weatherJson?.current_weather) {
-          const current = weatherJson.current_weather;
-          const codeInfo = WMO_WEATHER_MAP[current.weathercode] || { condition: "Clear Sky", icon: "☀️" };
-          const temperature = Math.round(current.temperature);
-          const wind = Math.round(current.windspeed);
-
-          let customAdvisory = "";
-          if (current.weathercode >= 51 && current.weathercode <= 99) {
-            customAdvisory =
-              lang === "hi"
-                ? `${temperature}°C बारिश की संभावना - ${resolvedCity} मंडी में ले जाते समय तिरपाल से ढकें और कतार टोकन पहले से बुक करें।`
-                : lang === "bn"
-                  ? `${temperature}°C বৃষ্টির সম্ভাবনা - ${resolvedCity} মান্ডিতে শস্য পরিবহনে ত্রিপল ব্যবহার করুন।`
-                  : lang === "pa"
-                    ? `${temperature}°C ਮੀਂਹ ਦੀ ਸੰਭਾਵਨਾ - ${resolvedCity} ਮੰਡੀ ਜਾਣ ਸਮੇਂ ਫ਼ਸਲ ਨੂੰ ਤਰਪਾਲ ਨਾਲ ਢੱਕੋ।`
-                    : `${temperature}°C Rain expected - Keep tarpaulins ready during ${resolvedCity} mandi transit and pre-book token.`;
+          if (subdistrict && subdistrict.toLowerCase() !== mainCity.toLowerCase()) {
+            resolvedArea = subdistrict;
+            resolvedCity = mainCity;
+          } else if (district && district.toLowerCase() !== mainCity.toLowerCase()) {
+            // If district is Chandaka and locality is Bhubaneswar, Chandaka is Area and Bhubaneswar is City
+            resolvedArea = district;
+            resolvedCity = mainCity;
           } else {
-            customAdvisory =
-              lang === "hi"
-                ? `${temperature}°C ${codeInfo.condition} - ${resolvedArea}, ${resolvedCity} क्षेत्र में मौसम अनुकूल है। फसल कटाई और मंडी खरीद के लिए उपयुक्त समय।`
-                : lang === "bn"
-                  ? `${temperature}°C ${codeInfo.condition} - ${resolvedArea}, ${resolvedCity} এলাকায় আবহাওয়া পরিষ্কার। ফসল কাটা ও মান্ডিতে পরিবহনের জন্য আদর্শ দিন।`
-                  : lang === "pa"
-                    ? `${temperature}°C ${codeInfo.condition} - ${resolvedArea}, ${resolvedCity} ਖੇਤਰ ਵਿੱਚ ਮੌਸਮ ਸਾਫ਼ ਹੈ। ਫ਼ਸਲ ਕਟਾਈ ਤੇ ਮੰਡੀ ਢੋਆ-ਢੁਆਈ ਲਈ ਵਧੀਆ ਸਮਾਂ।`
-                    : `${temperature}°C ${codeInfo.condition} - Clear skies in ${resolvedArea}, ${resolvedCity}. Optimal conditions for crop harvesting and mandi delivery.`;
+            resolvedArea = geoJson.localityInfo?.informative?.[0]?.name || geoJson.locality || "Local Area";
+            resolvedCity = mainCity;
           }
 
-          setWeather({
-            temp: temperature,
-            condition: codeInfo.condition,
-            icon: codeInfo.icon,
-            locationName: fullLocationString,
-            windSpeed: wind,
-            advisory: customAdvisory,
-          });
+          // Safety check: if Area and City got flipped (e.g. Area="Bhubaneswar", City="Chandaka")
+          const POPULAR_METROS = ["Bhubaneswar", "Cuttack", "Kolkata", "Delhi", "New Delhi", "Mumbai", "Pune", "Lucknow", "Kanpur", "Patna", "Ludhiana", "Amritsar", "Jaipur", "Ahmedabad", "Chandigarh", "Bengaluru", "Hyderabad", "Chennai"];
+          if (POPULAR_METROS.includes(resolvedArea) && !POPULAR_METROS.includes(resolvedCity)) {
+            const temp = resolvedArea;
+            resolvedArea = resolvedCity;
+            resolvedCity = temp;
+          }
         }
-      } catch (err) {
-        console.error("Live weather/location fetch error:", err);
-      } finally {
-        setWeatherLoading(false);
-      }
-    };
+      } catch { }
 
+      // Strict deduplication: remove any duplicate state/city names
+      const cleanState = (resolvedState || "Odisha").trim();
+      const cleanCity = (resolvedCity || "Bhubaneswar").trim();
+      let cleanArea = (resolvedArea || "").trim();
+
+      if (cleanArea.toLowerCase() === cleanState.toLowerCase()) {
+        cleanArea = "";
+      }
+
+      const distinctParts: string[] = [];
+      if (
+        cleanArea &&
+        cleanArea.toLowerCase() !== cleanCity.toLowerCase() &&
+        cleanArea.toLowerCase() !== cleanState.toLowerCase()
+      ) {
+        distinctParts.push(cleanArea);
+      }
+      if (cleanCity && cleanCity.toLowerCase() !== cleanState.toLowerCase()) {
+        distinctParts.push(cleanCity);
+      }
+      if (cleanState) {
+        distinctParts.push(cleanState);
+      }
+
+      const fullLocationString =
+        distinctParts.join(", ") || `${cleanCity || "Bhubaneswar"}, ${cleanState || "Odisha"}`;
+
+      // 3. Resolve Location-Specific Live Mandi Rates
+      const regional = REGIONAL_MANDI_DATA[cleanState] || REGIONAL_MANDI_DATA.DEFAULT;
+      setMandiHeader(`${cleanCity} ${regional.mandiNameSuffix}`);
+      setActiveCropRates(regional.crops);
+
+      // 4. Resolve Weather & Custom Agro Advisory
+      if (weatherJson?.current_weather) {
+        const current = weatherJson.current_weather;
+        const codeInfo = WMO_WEATHER_MAP[current.weathercode] || { condition: "Clear Sky", icon: "☀️" };
+        const temperature = Math.round(current.temperature);
+        const wind = Math.round(current.windspeed);
+
+        let customAdvisory = "";
+        if (current.weathercode >= 51 && current.weathercode <= 99) {
+          customAdvisory =
+            lang === "hi"
+              ? `${temperature}°C बारिश की संभावना - ${resolvedCity} मंडी में ले जाते समय तिरपाल से ढकें और कतार टोकन पहले से बुक करें।`
+              : lang === "bn"
+                ? `${temperature}°C বৃষ্টির সম্ভাবনা - ${resolvedCity} মান্ডিতে শস্য পরিবহনে ত্রিপল ব্যবহার করুন।`
+                : lang === "pa"
+                  ? `${temperature}°C ਮੀਂਹ ਦੀ ਸੰਭਾਵਨਾ - ${resolvedCity} ਮੰਡੀ ਜਾਣ ਸਮੇਂ ਫ਼ਸਲ ਨੂੰ ਤਰਪਾਲ ਨਾਲ ਢੱਕੋ।`
+                  : `${temperature}°C Rain expected - Keep tarpaulins ready during ${resolvedCity} mandi transit and pre-book token.`;
+        } else {
+          customAdvisory =
+            lang === "hi"
+              ? `${temperature}°C ${codeInfo.condition} - ${resolvedArea}, ${resolvedCity} क्षेत्र में मौसम अनुकूल है। फसल कटाई और मंडी खरीद के लिए उपयुक्त समय।`
+              : lang === "bn"
+                ? `${temperature}°C ${codeInfo.condition} - ${resolvedArea}, ${resolvedCity} এলাকায় আবহাওয়া পরিষ্কার। ফসল কাটা ও মান্ডিতে পরিবহনের জন্য আদর্শ দিন।`
+                : lang === "pa"
+                  ? `${temperature}°C ${codeInfo.condition} - ${resolvedArea}, ${resolvedCity} ਖੇਤਰ ਵਿੱਚ ਮੌਸਮ ਸਾਫ਼ ਹੈ। ਫ਼ਸਲ ਕਟਾਈ ਤੇ ਮੰਡੀ ਢੋਆ-ਢੁਆਈ ਲਈ ਵਧੀਆ ਸਮਾਂ।`
+                  : `${temperature}°C ${codeInfo.condition} - Clear skies in ${resolvedArea}, ${resolvedCity}. Optimal conditions for crop harvesting and mandi delivery.`;
+        }
+
+        setWeather({
+          temp: temperature,
+          condition: codeInfo.condition,
+          icon: codeInfo.icon,
+          locationName: fullLocationString,
+          windSpeed: wind,
+          advisory: customAdvisory,
+        });
+      }
+    } catch (err) {
+      console.error("Live weather/location fetch error:", err);
+    } finally {
+      setWeatherLoading(false);
+    }
+  }, [lang]);
+
+  const refreshWeather = useCallback(() => {
+    setWeatherLoading(true);
     if (typeof window !== "undefined" && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
@@ -379,7 +381,11 @@ export default function Hero() {
     } else {
       fetchLiveLocationAndData(26.8467, 80.9462);
     }
-  }, [lang]);
+  }, [fetchLiveLocationAndData]);
+
+  useEffect(() => {
+    refreshWeather();
+  }, [refreshWeather]);
 
   return (
     <section className="relative w-full min-h-screen pt-24 pb-20 md:pt-32 md:pb-28 overflow-hidden flex items-center bg-slate-950 font-sans">
