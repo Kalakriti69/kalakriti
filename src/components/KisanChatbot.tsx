@@ -38,7 +38,7 @@ const CROPS = ["Paddy", "Wheat", "Maize", "Mustard", "Barley"];
 
 const CROP_LABELS: Record<string, Record<string, string>> = {
   Paddy: { en: "Paddy", hi: "धान (Paddy)", bn: "ধান (Paddy)", pa: "ਝੋਨਾ (Paddy)", or: "ଧାନ (Paddy)" },
-  Wheat: { en: "Wheat", hi: "गेहूं (Wheat)", bn: "গম (Wheat)", pa: "ਕਣਕ (Wheat)", or: "ଗହମ (Wheat)" },
+  Wheat: { en: "Wheat", hi: "गेहूं (Wheat)", bn: "গম (Wheat)", pa: "ਕਣਕ (Wheat)", or: "ଗହਮ (Wheat)" },
   Maize: { en: "Maize", hi: "मक्का (Maize)", bn: "ভুট্টা (Maize)", pa: "ਮੱਕੀ (Maize)", or: "ମକା (Maize)" },
   Mustard: { en: "Mustard", hi: "सरसों (Mustard)", bn: "সর্ষে (Mustard)", pa: "ਸਰ੍ਹੋਂ (Mustard)", or: "ସୋରିଷ (Mustard)" },
   Barley: { en: "Barley", hi: "जौ (Barley)", bn: "বার্লি (Barley)", pa: "ਜੌਂ (Barley)", or: "ଯବ (Barley)" },
@@ -61,6 +61,7 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     btn_book_slot: "🌾 Book a Delivery Slot",
     btn_gate_pass: "🎫 Gate Pass & QR Code",
     btn_queue: "⚡ Live Queue & Proceedings",
+    btn_weather: "🌤️ Live Weather",
     btn_login_otp: "🔐 Farmer's Login & OTP",
     btn_my_profile: "👨‍🌾 Farmer Profile",
     btn_centers: "📍 View Nearby Centers",
@@ -101,6 +102,7 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     btn_book_slot: "🌾 फसल स्लॉट बुक करें",
     btn_gate_pass: "🎫 गेट पास व QR कोड",
     btn_queue: "⚡ लाइव कतार व कार्यवाही",
+    btn_weather: "🌤️ लाइव मौसम व सलाह",
     btn_login_otp: "🔐 किसान लॉगिन व OTP",
     btn_my_profile: "👨‍🌾 मेरी किसान प्रोफाइल",
     btn_centers: "📍 नजदीकी खरीद केंद्र",
@@ -141,6 +143,7 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     btn_book_slot: "🌾 ডেলিভারি স্লট বুক করুন",
     btn_gate_pass: "🎫 গেট পাস ও QR কোড",
     btn_queue: "⚡ লাইভ কাতার ও কার্যক্রম",
+    btn_weather: "🌤️ লাইভ আবহাওয়া",
     btn_login_otp: "🔐 কৃষক লগইন ও OTP",
     btn_my_profile: "👨‍🌾 আমার কৃষক প্রোফাইল",
     btn_centers: "📍 নিকটবর্তী ক্রয় কেন্দ্র",
@@ -151,14 +154,14 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     step_2_crop: "📍 কেন্দ্র: **{center}** ✅\n\nধাপ ২: আপনি কোন **শস্য** ডেলিভারি করছেন?",
     step_3_weight: "🌾 শস্য: **{crop}** ✅\n\nধাপ ৩: আপনার আনুমানিক **ওজন (কুইন্টালে)** কত? (১ কুইন্টাল = ১০০ কেজি):",
     step_4_date: "⚖️ ওজন: **{weight} কুইন্টাল** ✅\n\nধাপ ৪: আপনার **ডেলিভারির তারিখ** নির্বাচন করুন:",
-    step_5_slot: "📅 তারিখ: **{date}** ✅\n\nশেষ ধাপ: একটি উপলব্ধ **সময় স্লট** নির্বাচন করুন:",
+    step_5_slot: "📅 তারিখ: **{date}** ✅\n\nচূড়ান্ত ধাপ: উপলব্ধ **সময় স্লট** নির্বাচন করুন:",
     confirm_title: "📋 **বুকিং বিবরণ প্রস্তুত!**\n\n• **কেন্দ্র**: {center}\n• **শস্য**: {crop}\n• **ওজন**: {weight} কুইন্টাল ({kg} কেজি)\n• **তারিখ**: {date}\n• **সময় স্লট**: {slot}\n\nআপনি কি লাইভ ডিজিটাল টোকেন তৈরি করতে প্রস্তুত?",
     btn_confirm_token: "⚡ হ্যাঁ, ডিজিটাল টোকেন তৈরি করুন",
     btn_modify: "🔄 বিবরণ পরিবর্তন করুন",
     booking_success: "🎉 **বুকিং নিশ্চিত! টোকেন #{token} তৈরি হয়েছে!**\n\nআপনার ডিজিটাল টোকেন নিবন্ধিত হয়েছে। লাইভ কাতার ট্র্যাকার খোলা হচ্ছে...",
     btn_track_queue: "⚡ লাইভ কাতার ট্র্যাকার দেখুন",
     btn_book_another: "🔄 অন্য স্লট বুক করুন",
-    login_ask_phone: "📲 **কৃষক লগইন পোর্টাল**\n\nঅনুগ্রহ করে আপনার **১০-সংখ্যার মোবাইল নম্বর** বলুন বা লিখুন। ডেমো OTP (**4241**) দিয়ে পোর্টাল খুলে দেওয়া হবে! ⚡",
+    login_ask_phone: "📲 **কৃষক লগইন পোর্টাল**\n\nঅনুগ্রহ করে আপনার **১০-সংখ্যার মোবাইল নম্বর** বলুন বা লিখুন। ডেমো OTP (**4241**) দিয়ে পোর্টাল খোলা হবে! ⚡",
     login_otp_sent: "📱 **কৃষক পোর্টাল খোলা হয়েছে!**\n\nমোবাইল নম্বর **+91 {mobile}** তৈরি এবং ডেমো OTP **4241**। পপআপে **4241** লিখুন! 🔐",
     btn_view_login: "🔑 লগইন উইন্ডো দেখুন",
     fallback_out_of_scope: "আমি **কিষাণমিত্র**, কিষাণসেতু পোর্টালের ডিজিটাল সহকারী 🌾।\n\nআমি কেবল **কিষাণসেতু প্ল্যাটফর্মের পরিষেবাগুলিতে** সাহায্য করতে পারি:\n• **শস্য টোকেন ও স্লট বুকিং**\n• **ডিজিটাল গেট পাস ও QR কোড**\n• **লাইভ ইয়ার্ড কাতার ও মান্ডি কার্যক্রম**\n• **নিকটবর্তী ক্রয় কেন্দ্র ও মান্ডি**\n• **আজকের মান্ডি এমএসপি দর**",
@@ -181,6 +184,7 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     btn_book_slot: "🌾 ਫ਼ਸਲ ਸਲਾਟ ਬੁੱਕ ਕਰੋ",
     btn_gate_pass: "🎫 ਗੇਟ ਪਾਸ ਤੇ QR ਕੋਡ",
     btn_queue: "⚡ ਲਾਈਵ ਲਾਈਨ ਤੇ ਕਾਰਵਾਈ",
+    btn_weather: "🌤️ ਲਾਈਵ ਮੌਸਮ",
     btn_login_otp: "🔐 ਕਿਸਾਨ ਲੌਗਇਨ ਤੇ OTP",
     btn_my_profile: "👨‍🌾 ਮੇਰੀ ਕਿਸਾਨ ਪ੍ਰੋਫਾਈਲ",
     btn_centers: "📍 ਨੇੜਲੇ ਖਰੀਦ ਕੇਂਦਰ",
@@ -221,6 +225,7 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     btn_book_slot: "🌾 ଫସଲ ସ୍ଲଟ୍ ବୁକ୍ କରନ୍ତୁ",
     btn_gate_pass: "🎫 ଗେଟ୍ ପାସ୍ ଓ QR କୋଡ୍",
     btn_queue: "⚡ ଲାଇଭ୍ ଧାଡ଼ି ଓ ପ୍ରଣାଳୀ",
+    btn_weather: "🌤️ ଲାଇଭ୍ ପାଣିପାଗ",
     btn_login_otp: "🔐 କୃଷକ ଲଗଇନ୍ ଓ OTP",
     btn_my_profile: "👨‍🌾 ମୋର କୃଷକ ପ୍ରୋଫାଇଲ୍",
     btn_centers: "📍 ନିକଟସ୍ଥ କ୍ରୟ କେନ୍ଦ୍ର",
@@ -238,8 +243,8 @@ const CHAT_I18N: Record<string, Record<string, string>> = {
     booking_success: "🎉 **ବୁକିଂ ନିଶ୍ଚିତ! ଟୋକନ #{token} ସୃଷ୍ଟି ହୋଇଛି!**\n\nଲାଇଭ୍ ଧାଡ଼ି ଟ୍ରାକର୍ ଖୋଲାଯାଉଛି...",
     btn_track_queue: "⚡ ଲାଇଭ୍ ଧାଡ଼ି ଦେଖନ୍ତୁ",
     btn_book_another: "🔄 ଅନ୍ୟ ସ୍ଲଟ୍ ବୁକ୍ କରନ୍ତୁ",
-    login_ask_phone: "📲 **କୃଷକ ଲଗଇନ୍ ପୋର୍ଟାଲ୍**\n\nଦୟାକରି ଆପଣଙ୍କର **୧୦-ଅଙ୍କ ବିଶିଷ୍ଟ ମୋବାଇଲ୍ ନମ୍ବର** କୁହନ୍ତୁ କିମ୍ବା ଲେଖନ୍ତୁ। ଡେମୋ OTP (**4241**) ବ୍ୟବହାର ହେବ! ⚡",
-    login_otp_sent: "📱 **କୃଷକ ପୋର୍ଟାଲ୍ ଖୋଲିଗଲା!**\n\nମୋବାଇଲ୍ ନମ୍ବର **+91 {mobile}** ଓ ଡେମୋ OTP **4241**। ପପ୍-ଅପ୍ ରେ **4241** ଦିଅନ୍ତୁ! 🔐",
+    login_ask_phone: "📲 **କୃଷକ ଲଗଇନ୍ ପୋର୍ଟାଲ୍**\n\nଦୟାକରି ଆପଣଙ୍କର **୧୦-ଅଙ୍କ ବିଶିଷ୍ଟ ମୋବାଇଲ୍ ନମ୍ବਰ** କୁହନ୍ତୁ କିମ୍ବା ଲେଖନ୍ତୁ। ଡେମୋ OTP (**4241**) ବ୍ୟବହାର ହେବ! ⚡",
+    login_otp_sent: "📱 **କୃଷକ ପୋର୍ଟାଲ୍ ଖୋଲିଗଲା!**\n\nମୋବାଇଲ୍ ନମ୍ବਰ **+91 {mobile}** ଓ ଡେମୋ OTP **4241**। ପପ୍-ଅପ୍ ରେ **4241** ଦିଅନ୍ତୁ! 🔐",
     btn_view_login: "🔑 ଲଗଇନ୍ ୱିଣ୍ଡୋ ଦେଖନ୍ତୁ",
     fallback_out_of_scope: "ମୁଁ **କିଷାନ ମିତ୍ର**, କିଷାନସେତୁ ପୋର୍ଟାଲର ଡିଜିଟାଲ୍ ସହାୟକ 🌾।\n\nମୁଁ କେବଳ **କିଷାନସେତୁ ସେବା**ରେ ସାହାଯ୍ୟ କରିପାରିବି:\n• **ଫସଲ ଟୋକନ ଓ ସ୍ଲଟ୍ ବୁକିଂ**\n• **ଡିଜିଟାଲ୍ ଗେଟ୍ ପାସ୍ ଓ QR କୋଡ୍**\n• **ଲାଇଭ୍ ମଣ୍ଡି ଧାଡ଼ି ଓ ଟ୍ରାକ୍ଟର ପ୍ରଣାଳୀ**\n• **ନିକଟସ୍ଥ କ୍ରୟ କେନ୍ଦ୍ର ଓ ମଣ୍ଡି**\n• **ଆଜିର ମଣ୍ଡି MSP ଦର**",
     input_placeholder: "କୁହନ୍ତୁ କିମ୍ବା ଲେଖନ୍ତୁ: 'ମୋ ଗେଟ୍ ପାସ୍', 'ଲାଇଭ୍ ଧାଡ଼ି'...",
@@ -275,7 +280,7 @@ function renderFormattedText(text: string, isUser: boolean) {
                   </strong>
                 );
               }
-              return part;
+              return <span key={pIdx}>{part}</span>;
             })}
           </span>
         );
@@ -553,6 +558,7 @@ export default function KisanChatbot() {
     }
 
     const token = storedBooking?.tokenId || "KS-781920";
+    const numToken = storedBooking?.tokenNumber || 382;
     const name = storedBooking?.farmerName || farmerProfile?.name || "Ramesh Kumar";
     const center = storedBooking?.center || "Chandaka RMC Procurement Yard, Odisha";
     const crop = storedBooking?.crop || "Paddy (Common)";
@@ -565,46 +571,45 @@ export default function KisanChatbot() {
     const isPa = lang === "pa";
     const isOr = lang === "or";
 
-    const passText =
-      isHi
-        ? `🎫 **आपका डिजिटल गेट पास व QR कोड विवरण!**\n\n• **असाइन किया गया टोकन**: **${token}**\n• **किसान लाभार्थी**: **${name}**\n• **खरीद केंद्र**: 🏬 ${center}\n• **फसल व वजन**: 🌾 ${crop} (${weight} क्विंटल)\n• **आगमन समय**: ⏰ ${timeSlot} • 📅 ${date}\n• **पास स्थिति**: 🟢 वैध वन-टाइम गेट पास\n\nइस पास में हाई-रेज़ोल्यूशन QR कोड शामिल है जिसे मंडी गेट पर ऑपरेटर द्वारा स्कैन किया जाता है!`
-        : isBn
-        ? `🎫 **আপনার ডিজিটাল গেট পাস ও QR কোড বিবরণ!**\n\n• **টোকেন নম্বর**: **${token}**\n• **কৃষক নাম**: **${name}**\n• **ক্রয় কেন্দ্র**: 🏬 ${center}\n• **শস্য ও ওজন**: 🌾 ${crop} (${weight} কুইন্টাল)\n• **সময় উইন্ডো**: ⏰ ${timeSlot} • 📅 ${date}\n• **স্ট্যাটাস**: 🟢 বৈধ ওয়ান-টাইম গেট পাস`
-        : isPa
-        ? `🎫 **ਤੁਹਾਡਾ ਡਿਜੀਟਲ ਗੇਟ ਪਾਸ ਤੇ QR ਕੋਡ ਵੇਰਵਾ!**\n\n• **ਟੋਕਨ ਨੰਬਰ**: **${token}**\n• **ਕਿਸਾਨ ਦਾ ਨਾਮ**: **${name}**\n• **ਖਰੀਦ ਕੇਂਦਰ**: 🏬 ${center}\n• **ਫ਼ਸਲ ਤੇ ਵਜ਼ਨ**: 🌾 ${crop} (${weight} ਕੁਇੰਟਲ)\n• **ਸਮਾਂ ਸਲਾਟ**: ⏰ ${timeSlot} • 📅 ${date}`
-        : isOr
-        ? `🎫 **ଆପଣଙ୍କର ଡିଜିଟାଲ୍ ଗେଟ୍ ପାସ୍ ଓ QR କୋଡ୍ ବିବରଣୀ!**\n\n• **ଟୋକନ ନମ୍ବର**: **${token}**\n• **କୃଷକ ନାମ**: **${name}**\n• **କ୍ରୟ କେନ୍ଦ୍ର**: 🏬 ${center}\n• **ଫସଲ ଓ ଓଜନ**: 🌾 ${crop} (${weight} କ୍ୱିଣ୍ଟାଲ)\n• **ସମୟ**: ⏰ ${timeSlot} • 📅 ${date}`
-        : `🎫 **Your Digital APMC Gate Pass & Scannable QR Code**\n\n• **Assigned Token ID**: **${token}**\n• **Farmer Beneficiary**: **${name}**\n• **Procurement Yard**: 🏬 ${center}\n• **Crop & Weight**: 🌾 ${crop} (${weight} Quintals)\n• **Arrival Window**: ⏰ ${timeSlot} • 📅 ${date}\n• **Pass Status**: 🟢 Active One-Time QR Pass\n\nPresent your scannable QR pass at the APMC gate for instant contactless check-in.`;
+    const passText = isHi
+      ? `🎫 **डिजिटल गेट एंट्री पास व टोकन विवरण**\n\n• **टोकन नंबर**: **#${numToken}** (${token})\n• **किसान का नाम**: 👨‍🌾 ${name}\n• **खरीद केंद्र**: 📍 ${center}\n• **फसल व वजन**: 🌾 ${crop} (${weight} क्विंटल)\n• **तारीख व समय**: 📅 ${date} • ⏱️ ${timeSlot}\n\n✅ **प्रवेश स्थिति**: गेट चेक-इन के लिए क्यूआर कोड सक्रिय है!`
+      : isBn
+      ? `🎫 **ডিজিটাল গেট পাস ও টোকেন বিবরণ**\n\n• **টোকেন নম্বর**: **#${numToken}** (${token})\n• **কৃষকের নাম**: 👨‍🌾 ${name}\n• **ক্রয় কেন্দ্র**: 📍 ${center}\n• **শস্য ও ওজন**: 🌾 ${crop} (${weight} কুইন্টাল)\n• **তারিখ ও সময়**: 📅 ${date} • ⏱️ ${timeSlot}\n\n✅ **স্ট্যাটাস**: গেট এন্ট্রির জন্য QR কোড প্রস্তুত!`
+      : isPa
+      ? `🎫 **ਡਿਜੀਟਲ ਗੇਟ ਪਾਸ ਤੇ ਟੋਕਨ ਵੇਰਵੇ**\n\n• **ਟੋਕਨ ਨੰਬਰ**: **#${numToken}** (${token})\n• **ਕਿਸਾਨ ਦਾ ਨਾਮ**: 👨‍🌾 ${name}\n• **ਖਰੀਦ ਕੇਂਦਰ**: 📍 ${center}\n• **ਫ਼ਸਲ ਤੇ ਭਾਰ**: 🌾 ${crop} (${weight} ਕੁਇੰਟਲ)\n• **ਮਿਤੀ ਤੇ ਸਮਾਂ**: 📅 ${date} • ⏱️ ${timeSlot}\n\n✅ **ਸਥਿਤੀ**: ਗੇਟ ਐਂਟਰੀ ਲਈ QR ਕੋਡ ਐਕਟਿਵ ਹੈ!`
+      : isOr
+      ? `🎫 **ଡିଜିଟାଲ୍ ଗେଟ୍ ପାସ୍ ଓ ଟୋକନ ବିବରଣୀ**\n\n• **ଟୋକନ ନମ୍ବର**: **#${numToken}** (${token})\n• **କୃଷକଙ୍କ ନାମ**: 👨‍🌾 ${name}\n• **କ୍ରୟ କେନ୍ଦ୍ର**: 📍 ${center}\n• **ଫସଲ ଓ ଓଜନ**: 🌾 ${crop} (${weight} କ୍ୱିଣ୍ଟାଲ)\n• **ତାରିଖ ଓ ସମୟ**: 📅 ${date} • ⏱️ ${timeSlot}\n\n✅ **ସ୍ଥିତି**: ଗେଟ୍ ଚେକ୍-ଇନ୍ ପାଇଁ QR କୋଡ୍ ପ୍ରସ୍ତୁତ!`
+      : `🎫 **Digital Gate Entry Pass & Token Summary**\n\n• **Assigned Token**: **#${numToken}** (${token})\n• **Farmer Name**: 👨‍🌾 ${name}\n• **Procurement Center**: 📍 ${center}\n• **Crop & Weight**: 🌾 ${crop} (${weight} Quintals)\n• **Date & Slot**: 📅 ${date} • ⏱️ ${timeSlot}\n\n✅ **Status**: Active & Verified for Gate QR Scanner!`;
 
-    const msg: Message = {
+    const botMsg: Message = {
       id: "pass-" + Date.now(),
       sender: "bot",
       text: passText,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      redirectUrl: `/pass?token=${token.replace(/\D/g, "")}`,
-      redirectLabel: isHi ? "🎫 पूरा गेट पास व QR कोड खोलें" : "🎫 Open Full Gate Pass & QR Code",
+      redirectUrl: `/pass?token=${numToken}`,
+      redirectLabel: isHi ? "🎫 पूरा डिजिटल गेट पास खोलें" : "🎫 Open Full Gate Pass & QR",
       options: [
         {
-          label: isHi ? "🎫 डिजिटल गेट पास खोलें" : isBn ? "🎫 গেট পাস খুলুন" : isPa ? "🎫 ਗੇਟ ਪਾਸ ਖੋਲ੍ਹੋ" : isOr ? "🎫 ଗେଟ୍ ପାସ୍ ଖୋଲନ୍ତୁ" : "🎫 Open Gate Pass & QR",
+          label: isHi ? "🎫 आधिकारिक गेट पास देखें" : isBn ? "🎫 অফিসিয়াল গেট পাস দেখুন" : isPa ? "🎫 ਗੇਟ ਪਾਸ ਵੇਖੋ" : isOr ? "🎫 ସମ୍ପୂର୍ଣ୍ଣ ଗେଟ୍ ପାସ୍ ଦେଖନ୍ତୁ" : "🎫 View Official Gate Pass",
           primary: true,
-          action: () => handleNavigate(`/pass?token=${token.replace(/\D/g, "")}`, "Opening your Official Gate Pass with high-res QR code..."),
+          action: () => handleNavigate(`/pass?token=${numToken}`, "Opening your official digital gate pass with QR code..."),
         },
         {
-          label: isHi ? "🚜 लाइव कतार स्थिति देखें" : isBn ? "🚜 লাইভ কাতার দেখুন" : isPa ? "🚜 ਲਾਈਵ ਲਾਈਨ ਵੇਖੋ" : isOr ? "🚜 ଲାଇଭ୍ ଧାଡ଼ି ଦେଖନ୍ତୁ" : "🚜 Track Live Yard Queue",
-          action: () => handleNavigate(`/queue?token=${token.replace(/\D/g, "")}&center=${encodeURIComponent(center)}`, "Opening Live Yard Queue tracker..."),
+          label: isHi ? "⚡ लाइव कतार ट्रैकर खोलें" : isBn ? "⚡ লাইভ কাতার খুলুন" : isPa ? "⚡ ਲਾਈਵ ਲਾਈਨ ਵੇਖੋ" : isOr ? "⚡ ଲାଇଭ୍ ଧାଡ଼ି ଖୋଲନ୍ତୁ" : "⚡ Track Live Yard Queue",
+          action: () => handleNavigate(`/queue?token=${numToken}&center=${encodeURIComponent(center)}`, "Opening Live Yard Queue Tracker..."),
         },
         {
-          label: isHi ? "🌾 नया स्लॉट बुक करें" : "🌾 Book Another Slot",
+          label: isHi ? "🌾 दूसरा स्लॉट बुक करें" : "🌾 Book Another Delivery",
           action: () => startBookingFlow({}),
         },
       ],
     };
 
-    setMessages((prev) => [...prev, msg]);
+    setMessages((prev) => [...prev, botMsg]);
     speakText(passText.replace(/[*_#•]/g, ""));
   };
 
-  // Show Live Queue & Mandi Proceedings Timeline
+  // Show Live Queue Status & Yard Proceedings
   const showQueueProceedings = () => {
     let storedBooking: any = null;
     if (typeof window !== "undefined") {
@@ -614,8 +619,8 @@ export default function KisanChatbot() {
       } catch {}
     }
 
+    const numToken = storedBooking?.tokenNumber || 382;
     const token = storedBooking?.tokenId || "KS-781920";
-    const numToken = storedBooking?.tokenNumber || Number(token.replace(/\D/g, "")) || 112;
     const center = storedBooking?.center || "Chandaka RMC Procurement Yard, Odisha";
 
     const isHi = lang === "hi";
@@ -623,16 +628,15 @@ export default function KisanChatbot() {
     const isPa = lang === "pa";
     const isOr = lang === "or";
 
-    const queueText =
-      isHi
-        ? `🚜 **लाइव मंडी कतार व यार्ड प्रगति स्थिति!**\n\n• **आपका टोकन नंबर**: **#${numToken}**\n• **खरीद मंडी**: 🏬 ${center}\n• **आगे की गाड़ियाँ**: 🚜 **2 ट्रैक्टर आगे हैं** (कन्वेयर लाइन में)\n• **अनुमानित प्रतीक्षा समय**: ⏱️ **~15 मिनट**\n\n📋 **मंडी कार्यवाही चरण (Proceedings)**:\n  1️⃣ **गेट एंट्री**: QR कोड स्कैन कर तुरंत चेक-इन करें।\n  2️⃣ **वेईब्रिज वजन तुला ⚖️**: ट्रैक्टर का सकल वजन दर्ज होता है।\n  3️⃣ **अनलोडिंग बे**: फसल की नमी व गुणवत्ता परीक्षण।\n  4️⃣ **त्वरित DBT भुगतान**: MSP दर अनुसार सीधे बैंक खाते में भुगतान!\n\nलाइव पेज हर 10 सेकंड में स्वतः रिफ्रेश होता है!`
-        : isBn
-        ? `🚜 **লাইভ মান্ডি কাতার ও ইয়ার্ড ট্র্যাকার!**\n\n• **আপনার টোকেন**: **#${numToken}**\n• **ক্রয় মান্ডি**: 🏬 ${center}\n• **সামনে ট্র্যাক্টর**: 🚜 **২টি ট্র্যাক্টর সামনে আছে**\n• **আনুমানিক সময়**: ⏱️ **~১৫ মিনিট**\n\n📋 **মান্ডি কার্যক্রম (Proceedings)**:\n  ১. গেট QR স্ক্যান ➔ ২. ওয়েইব্রিজ স্কেল ⚖️ ➔ ৩. আনলোডিং ➔ ৪. সরাসরি DBT পেমেন্ট!`
-        : isPa
-        ? `🚜 **ਲਾਈਵ ਮੰਡੀ ਲਾਈਨ ਤੇ ਯਾਰਡ ਸਥਿਤੀ!**\n\n• **ਤੁਹਾਡਾ ਟੋਕਨ**: **#${numToken}**\n• **ਮੰਡੀ ਕੇਂਦਰ**: 🏬 ${center}\n• **ਅੱਗੇ ਟਰੈਕਟਰ**: 🚜 **2 ਟਰੈਕਟਰ ਅੱਗੇ ਹਨ**\n• **ਉਡੀਕ ਸਮਾਂ**: ⏱️ **~15 ਮਿੰਟ**\n\n📋 **ਮੰਡੀ ਕਾਰਵਾਈ (Proceedings)**:\n  1. ਗੇਟ QR ➔ 2. ਵੇਈਬ੍ਰਿਜ ⚖️ ➔ 3. ਅਨਲੋਡਿੰਗ ➔ 4. DBT ਪੇਮੈਂਟ!`
-        : isOr
-        ? `🚜 **ଲାଇଭ୍ ମଣ୍ଡି ଧାଡ଼ି ଓ ଟ୍ରାକର୍ ବିବରଣୀ!**\n\n• **ଆପଣଙ୍କ ଟୋକନ**: **#${numToken}**\n• **କ୍ରୟ ମଣ୍ଡି**: 🏬 ${center}\n• **ଆଗରେ ଟ୍ରାକ୍ଟର**: 🚜 **୨ଟି ଟ୍ରାକ୍ଟର ଆଗରେ ଅଛି**\n• **ସମୟ**: ⏱️ **~୧୫ ମିନିଟ୍**\n\n📋 **ମଣ୍ଡି ପ୍ରଣାଳୀ (Proceedings)**:\n  ୧. ଗେଟ୍ QR ➔ ୨. ୱେଇବ୍ରିଜ୍ ⚖️ ➔ ୩. ଅନଲୋଡିଂ ➔ ୪. DBT ଦେୟ!`
-        : `🚜 **Live Mandi Yard Progression & Queue Tracker**\n\n• **Your Assigned Token**: **#${numToken}**\n• **Procurement Hub**: 🏬 ${center}\n• **Tractors Ahead**: 🚜 **2 Tractors Ahead** in conveyor line\n• **Estimated Wait Time**: ⏱️ **~15 minutes**\n\n📋 **Mandi Proceedings Timeline**:\n  1️⃣ **Gate Entry**: Instant QR scan contactless check-in.\n  2️⃣ **Weighbridge Scale ⚖️**: Digital gross weight measurement.\n  3️⃣ **Unloading Bay**: Moisture & crop quality inspection.\n  4️⃣ **Direct DBT Payout**: Automatic payment transfer to your bank account!\n\nThe live yard automatically auto-refreshes every 10 seconds.`;
+    const queueText = isHi
+      ? `🚜 **लाइव यार्ड कतार स्थिति व कार्यवाही ट्रैकर**\n\n• **आपका टोकन**: **#${numToken}**\n• **खरीद केंद्र**: 🏬 ${center}\n• **कन्वेयर लाइन में स्थिति**: 🚜 **2 ट्रैक्टर आगे हैं**\n• **अनुमानित प्रतीक्षा समय**: ⏱️ **लगभग 15 मिनट**\n\n📋 **मंडी कार्यवाही के 4 चरण**:\n  1️⃣ **गेट एंट्री**: बिना रुके तुरंत QR कोड स्कैन।\n  2️⃣ **तुला / वेईब्रिज स्केल ⚖️**: डिजिटल वजन मापन।\n  3️⃣ **अनलोडिंग बे**: नमी व गुणवत्ता जांच।\n  4️⃣ **सीधा DBT भुगतान**: 48 घंटों में बैंक खाते में राशि!\n\nलाइव यार्ड स्थिति हर 10 सेकंड में स्वतः रिफ्रेश होती है।`
+      : isBn
+      ? `🚜 **লাইভ ইয়ার্ড কাতার ও কার্যক্রম ট্র্যাকার**\n\n• **আপনার টোকেন**: **#${numToken}**\n• **ক্রয় কেন্দ্র**: 🏬 ${center}\n• **লাইন পজিশন**: 🚜 **সামনে ২ টি ট্রাক্টর আছে**\n• **আনুমানিক সময়**: ⏱️ **~১৫ মিনিট**\n\n📋 **মান্ডি কার্যক্রমের ধাপসমূহ**:\n  1️⃣ **গেট এন্ট্রি**: QR কোড স্ক্যান করে দ্রুত প্রবেশ।\n  2️⃣ **ওয়েব্রীজ স্কেল ⚖️**: ডিজিটাল ওজন মাপ।\n  3️⃣ **আনলোডিং বে**: শস্যের আর্দ্রতা ও মান যাচাই।\n  4️⃣ **সরাসরি DBT পেমেন্ট**: ব্যাংক একাউন্টে টাকা স্থানান্তর!\n\nইয়ার্ড ট্র্যাকারে রিয়েল-টাইম লাইভ কাতার দেখা যাবে।`
+      : isPa
+      ? `🚜 **ਲਾਈਵ ਮੰਡੀ ਯਾਰਡ ਲਾਈਨ ਤੇ ਕਾਰਵਾਈ ਟਰੈਕਰ**\n\n• **ਤੁਹਾਡਾ ਟੋਕਨ**: **#${numToken}**\n• **ਖਰੀਦ ਕੇਂਦਰ**: 🏬 ${center}\n• **ਲਾਈਨ ਵਿੱਚ ਸਥਿਤੀ**: 🚜 **2 ਟਰੈਕਟਰ ਅੱਗੇ ਹਨ**\n• **ਉਡੀਕ ਸਮਾਂ**: ⏱️ **~15 ਮਿੰਟ**\n\n📋 **ਮੰਡੀ ਕਾਰਵਾਈ ਦੇ ਪੜਾਅ**:\n  1️⃣ **ਗੇਟ ਐਂਟਰੀ**: QR ਕੋਡ ਨਾਲ ਕੰਟੈਕਟਲੈੱਸ ਚੈੱਕ-ਇਨ।\n  2️⃣ **ਵੇਅਬ੍ਰਿਜ ⚖️**: ਡਿਜੀਟਲ ਭਾਰ ਤੋਲ।\n  3️⃣ **ਅਨਲੋਡਿੰਗ**: ਕੁਆਲਿਟੀ ਤੇ ਨਮੀ ਦੀ ਜਾਂਚ।\n  4️⃣ **ਸਿੱਧਾ DBT ਭੁਗਤਾਨ**: ਬੈਂਕ ਵਿੱਚ ਸਿੱਧੀ ਅਦਾਇਗੀ!\n\nਲਾਈਵ ਯਾਰਡ ਸਥਿਤੀ ਹਰ 10 ਸਕਿੰਟ ਬਾਅਦ ਅੱਪਡੇਟ ਹੁੰਦੀ ਹੈ।`
+      : isOr
+      ? `🚜 **ଲାଇଭ୍ ମଣ୍ଡି ଧାଡ଼ି ଓ କାର୍ଯ୍ୟପ୍ରଣାଳୀ ଟ୍ରାକର୍**\n\n• **ଆପଣଙ୍କ ଟୋକନ**: **#${numToken}**\n• **କ୍ରୟ କେନ୍ଦ୍ର**: 🏬 ${center}\n• **ଧାଡ଼ି ସ୍ଥିତି**: 🚜 **ଆଗରେ ୨ ଟି ଟ୍ରାକ୍ଟର ଅଛି**\n• **ଅପେକ୍ଷା ସମୟ**: ⏱️ **ପ୍ରାୟ ୧୫ ମିନିଟ୍**\n\n📋 **ମଣ୍ଡି ପ୍ରଣାଳୀ ପର୍ଯ୍ୟାୟ**:\n  1️⃣ **ଗେଟ୍ ପ୍ରବେଶ**: QR ସ୍କାନ୍ ଦ୍ୱାରା ଦ୍ରୁତ ଚେକ୍-ଇନ୍।\n  2️⃣ **ୱେବ୍ରିଜ୍ ⚖️**: ଡିଜିଟାଲ୍ ଓଜନ ମାପ।\n  3️⃣ **ଅନଲୋଡିଂ ବେ**: ଗୁଣବତ୍ତା ଓ ଆର୍ଦ୍ରତା ଯାଞ୍ଚ।\n  4️⃣ **ସିଧାସଳଖ DBT ଦେୟ**: ବ୍ୟାଙ୍କ ଖାତାରେ ଜମା!`
+      : `🚜 **Live Mandi Yard Progression & Queue Tracker**\n\n• **Your Assigned Token**: **#${numToken}**\n• **Procurement Hub**: 🏬 ${center}\n• **Tractors Ahead**: 🚜 **2 Tractors Ahead** in conveyor line\n• **Estimated Wait Time**: ⏱️ **~15 minutes**\n\n📋 **Mandi Proceedings Timeline**:\n  1️⃣ **Gate Entry**: Instant QR scan contactless check-in.\n  2️⃣ **Weighbridge Scale ⚖️**: Digital gross weight measurement.\n  3️⃣ **Unloading Bay**: Moisture & crop quality inspection.\n  4️⃣ **Direct DBT Payout**: Automatic payment transfer to your bank account!\n\nThe live yard automatically auto-refreshes every 10 seconds.`;
 
     const msg: Message = {
       id: "queue-" + Date.now(),
@@ -649,7 +653,7 @@ export default function KisanChatbot() {
         },
         {
           label: isHi ? "🎫 डिजिटल गेट पास देखें" : isBn ? "🎫 গেট পাস দেখুন" : isPa ? "🎫 ਗੇਟ ਪਾਸ ਵੇਖੋ" : isOr ? "🎫 ଗେଟ୍ ପାସ୍ ଦେଖନ୍ତୁ" : "🎫 View Gate Pass & QR",
-          action: () => handleNavigate(`/pass?token=${token.replace(/\D/g, "")}`, "Opening your Official Gate Pass..."),
+          action: () => handleNavigate(`/pass?token=${numToken}`, "Opening your Official Gate Pass..."),
         },
         {
           label: isHi ? "📍 खरीद केंद्र सूची" : "📍 View Nearby Centers",
@@ -717,37 +721,21 @@ export default function KisanChatbot() {
         );
         const weatherJson = await weatherRes.json();
 
-        let resolvedArea = "Chandaka";
-        let resolvedCity = "Bhubaneswar";
+        let resolvedArea = "Bhubaneswar";
+        let resolvedCity = "Khordha";
         let resolvedState = "Odisha";
 
         try {
           const geoRes = await fetch(
             `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
           );
-          const geoJson = await geoRes.json();
-          if (geoJson) {
-            const adminList = geoJson.localityInfo?.administrative || [];
-            resolvedState = geoJson.principalSubdivision || "Odisha";
+          const geoData = await geoRes.json();
+          if (geoData) {
+            resolvedArea = geoData.locality || geoData.principalSubdivisionDistrict || "Local Mandi Hub";
+            resolvedCity = geoData.city || geoData.locality || "Procurement Zone";
+            resolvedState = geoData.principalSubdivision || "India";
 
-            const subdistrict =
-              adminList.find((a: any) => a.order >= 4 || a.adminLevel >= 6)?.name ||
-              geoJson.localityInfo?.informative?.[0]?.name;
-            const mainCity = geoJson.city || geoJson.locality || "Bhubaneswar";
-            const district = geoJson.principalSubdivisionDistrict || adminList.find((a: any) => a.order === 3)?.name || mainCity;
-
-            if (subdistrict && subdistrict.toLowerCase() !== mainCity.toLowerCase()) {
-              resolvedArea = subdistrict;
-              resolvedCity = mainCity;
-            } else if (district && district.toLowerCase() !== mainCity.toLowerCase()) {
-              resolvedArea = district;
-              resolvedCity = mainCity;
-            } else {
-              resolvedArea = geoJson.localityInfo?.informative?.[0]?.name || geoJson.locality || "Local Area";
-              resolvedCity = mainCity;
-            }
-
-            const POPULAR_METROS = ["Bhubaneswar", "Cuttack", "Kolkata", "Delhi", "New Delhi", "Mumbai", "Pune", "Lucknow", "Kanpur", "Patna", "Ludhiana", "Amritsar", "Jaipur", "Ahmedabad", "Chandigarh", "Bengaluru", "Hyderabad", "Chennai"];
+            const POPULAR_METROS = ["Kolkata", "Delhi", "Mumbai", "Chennai", "Bengaluru", "Hyderabad", "Bhubaneswar", "Kanpur", "Ludhiana"];
             if (POPULAR_METROS.includes(resolvedArea) && !POPULAR_METROS.includes(resolvedCity)) {
               const temp = resolvedArea;
               resolvedArea = resolvedCity;
@@ -915,48 +903,44 @@ export default function KisanChatbot() {
       const tomorrowDate = new Date();
       tomorrowDate.setDate(tomorrowDate.getDate() + 1);
       const tomorrow = tomorrowDate.toISOString().split("T")[0];
+      const in2DaysDate = new Date();
+      in2DaysDate.setDate(in2DaysDate.getDate() + 2);
+      const in2Days = in2DaysDate.toISOString().split("T")[0];
 
-      const dayAfterDate = new Date();
-      dayAfterDate.setDate(dayAfterDate.getDate() + 2);
-      const dayAfter = dayAfterDate.toISOString().split("T")[0];
-
-      const textDate = l.step_4_date.replace("{weight}", current.weight.toString());
       const msg: Message = {
         id: "step-date-" + Date.now(),
         sender: "bot",
-        text: textDate,
+        text: l.step_4_date,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         options: [
           { label: `📅 ${l.date_today} (${today})`, action: () => selectDate(today) },
           { label: `📅 ${l.date_tomorrow} (${tomorrow})`, action: () => selectDate(tomorrow) },
-          { label: `📅 ${l.date_2days} (${dayAfter})`, action: () => selectDate(dayAfter) },
+          { label: `📅 ${l.date_2days} (${in2Days})`, action: () => selectDate(in2Days) },
         ],
       };
       setMessages((prev) => [...prev, msg]);
-      speakText(textDate.replace(/[*_#•]/g, ""));
+      speakText(l.step_4_date.replace(/[*_#•]/g, ""));
       return;
     }
 
     // Step 5: Time Slot
     if (!current.timeSlot) {
       syncSchedulerUrl(current, 3);
-      const textSlot = l.step_5_slot.replace("{date}", current.date);
       const msg: Message = {
         id: "step-slot-" + Date.now(),
         sender: "bot",
-        text: textSlot,
+        text: l.step_5_slot.replace("{date}", current.date),
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         options: TIME_SLOTS.map((s) => ({
-          label: `⏰ ${s.time}`,
+          label: `⏱️ ${s.time}`,
           action: () => selectSlot(s.time, s.id),
         })),
       };
       setMessages((prev) => [...prev, msg]);
-      speakText(textSlot.replace(/[*_#•]/g, ""));
+      speakText(l.step_5_slot.replace("{date}", current.date).replace(/[*_#•]/g, ""));
       return;
     }
 
-    // All details complete -> Show Confirmation Card
     showBookingConfirmation(current);
   };
 
@@ -1074,6 +1058,7 @@ export default function KisanChatbot() {
     try {
       if (typeof window !== "undefined") {
         localStorage.setItem("kisanSetu_latest_booking", JSON.stringify(payload));
+        window.dispatchEvent(new Event("kisanSetu_booking_created"));
       }
 
       await fetch("/api/bookings", {
@@ -1225,7 +1210,7 @@ export default function KisanChatbot() {
       text.includes("आबोहवा") ||
       text.includes("আবহাওয়া") ||
       text.includes("ਮੌਸਮ") ||
-      text.includes("ਪਾଣିପାਗ") ||
+      text.includes("ਪਾਣਿਪਾਗ") ||
       text.includes("temperature") ||
       text.includes("तापमान") ||
       text.includes("बारिश") ||
